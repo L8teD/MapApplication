@@ -57,7 +57,7 @@ namespace MapApplicationWPF
             initData = new InitData
             {
                 ppmList = new ObservableCollection<MapApplicationWPF.ExternalResourses.PPM>(),
-                initErrors = new ModellingErrorsLib.Types.InitErrors()
+                initErrors = new ModellingErrorsLib3.Types.InitErrors()
             };
             outputData = new OutputData()
             {

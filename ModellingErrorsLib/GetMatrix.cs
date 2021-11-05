@@ -39,7 +39,7 @@ namespace ModellingErrorsLib.Matrix
             Matrix1 = MatrixOperations.Create(4, 4);
             Matrix1[0] = new double[] { 0, 1, 0, 0 };
 
-            Matrix1[1][0] = Math.Pow(omegaGyro.Y, 2) + Math.Pow(omegaGyro.Z, 2) + Math.Pow(earthModel.shulerFrequency, 2);
+            Matrix1[1][0] = Math.Pow(omegaGyro.Y, 2) + Math.Pow(omegaGyro.Z, 2) - Math.Pow(earthModel.shulerFrequency, 2);
             Matrix1[1][1] = 0;
             Matrix1[1][2] = omegaGyro.Z_dot - omegaGyro.X * omegaGyro.Y;
             Matrix1[1][3] = 2 * omegaGyro.Z;

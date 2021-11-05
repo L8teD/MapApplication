@@ -25,18 +25,22 @@ namespace MapApplicationWPF.Graphic
         {
             plotDataList.Add(new PlotData("Latitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Latitude));
             plotDataList.Add(new PlotData("Longitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Longitude));
+            plotDataList.Add(new PlotData("Altitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Altitude));
             plotDataList.Add(new PlotData("Velocity", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Velocity));
             plotDataList.Add(new PlotData("Velocity East", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityEast));
             plotDataList.Add(new PlotData("Velocity North", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityNorth));
+            plotDataList.Add(new PlotData("Velocity H", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityH));
             plotDataList.Add(new PlotData("Heading", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Heading));
             plotDataList.Add(new PlotData("Roll", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Roll));
             plotDataList.Add(new PlotData("Pitch", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Pitch));
 
             plotDataList.Add(new PlotData("Latitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Latitude));
             plotDataList.Add(new PlotData("Longitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Longitude));
+            plotDataList.Add(new PlotData("Altitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Altitude));
             plotDataList.Add(new PlotData("Velocity", "Error Data", fullDisplayedData.DisplayedDatasError[index].Velocity));
             plotDataList.Add(new PlotData("Velocity East", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityEast));
             plotDataList.Add(new PlotData("Velocity North", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityNorth));
+            plotDataList.Add(new PlotData("Velocity H", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityH));
             plotDataList.Add(new PlotData("Heading", "Error Data", fullDisplayedData.DisplayedDatasError[index].Heading));
             plotDataList.Add(new PlotData("Roll", "Error Data", fullDisplayedData.DisplayedDatasError[index].Roll));
             plotDataList.Add(new PlotData("Pitch", "Error Data", fullDisplayedData.DisplayedDatasError[index].Pitch));

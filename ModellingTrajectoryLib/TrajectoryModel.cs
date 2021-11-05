@@ -1,6 +1,6 @@
 ﻿using CommonLib;
 using CommonLib.Params;
-using ModellingErrorsLib;
+using ModellingErrorsLib3;
 using ModellingTrajectoryLib.Helper;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CommonLib.Types;
-using static ModellingErrorsLib.Types;
+using static ModellingErrorsLib3.Types;
 using static ModellingTrajectoryLib.Types;
 
 namespace ModellingTrajectoryLib
@@ -111,10 +111,11 @@ namespace ModellingTrajectoryLib
 
 
 
-            outputDisplayedDataIdeal.Add(new DisplayedData(outputPointsList[outputPointsList.Count - 1].InDegrees,
+            outputDisplayedDataIdeal.Add(
+                new DisplayedData(outputPointsList[outputPointsList.Count - 1].InDegrees,
                 outputVelocityList[outputVelocityList.Count - 1].Value, parameters.angles));
-            outputDisplayedDataError.Add(new DisplayedData(outputPointsList[outputPointsList.Count - 1].ErrorInDegrees,
-                outputVelocityList[outputVelocityList.Count - 1].Error,
+            outputDisplayedDataError.Add(
+                new DisplayedData(outputPointsList[outputPointsList.Count - 1].ErrorInDegrees, outputVelocityList[outputVelocityList.Count - 1].Error,
                 new Angles() { heading = errorsModel.anglesErrors[0][0], pitch = errorsModel.anglesErrors[1][0], roll = errorsModel.anglesErrors[2][0] }));
 
             localParams.Add(parameters);

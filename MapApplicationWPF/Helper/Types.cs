@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MapApplicationWPF.ExternalResourses;
 using static CommonLib.Types;
-using static ModellingErrorsLib.Types;
+using static ModellingErrorsLib3.Types;
 
 namespace MapApplicationWPF.Helper
 {

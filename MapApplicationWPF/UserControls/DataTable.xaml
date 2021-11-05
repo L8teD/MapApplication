@@ -16,15 +16,19 @@
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <local:DataRow x:Name="dr_Latitude" ParameterName="Latitude"  Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
             <local:DataRow x:Name="dr_Longitude" ParameterName="Longitude" Grid.Row="1" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Velocity" ParameterName="Velocity" Grid.Row="2" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Velocity_East" ParameterName="Velocity East" Grid.Row="3" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Velocity_North" ParameterName="Velocity North" Grid.Row="4" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Heading" ParameterName="Heading" Grid.Row="5" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Roll" ParameterName="Roll" Grid.Row="6" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
-            <local:DataRow x:Name="dr_Pitch" ParameterName="Pitch" Grid.Row="7" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Altitude" ParameterName="Altitude" Grid.Row="2" Dimension="[m]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Velocity" ParameterName="Velocity" Grid.Row="3" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Velocity_East" ParameterName="Velocity East" Grid.Row="4" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Velocity_North" ParameterName="Velocity North" Grid.Row="5" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Velocity_H" ParameterName="Velocity H" Grid.Row="6" Dimension="[m/sec]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Heading" ParameterName="Heading" Grid.Row="7" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Roll" ParameterName="Roll" Grid.Row="8" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
+            <local:DataRow x:Name="dr_Pitch" ParameterName="Pitch" Grid.Row="9" Dimension="[deg]" SetPlotFactor="SetPlotFactor"></local:DataRow>
         </Grid>
     </GroupBox>
 

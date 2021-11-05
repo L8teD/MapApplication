@@ -14,10 +14,10 @@
             <ColumnDefinition Width="1.5*"></ColumnDefinition>
             <ColumnDefinition Width="1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label  Margin="5" FontSize="14" VerticalAlignment="Center" Content="{Binding ParameterName}"></Label>
+        <Label  Margin="1" FontSize="12" VerticalAlignment="Center" Content="{Binding ParameterName}"></Label>
         <Ellipse x:Name="ellipse" Grid.Column="1" Fill="{Binding FillOperationName}" Stroke="Black" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Margin="5" Width="20"></Ellipse>
-        <Label x:Name="label" Grid.Column="2" Content="{Binding ContentOperationName}"  Margin="5" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
-        <TextBlock x:Name="tblock_Dimension" Grid.Column="3" Text="{Binding Dimension}" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5"></TextBlock>
+        <Label x:Name="label" Grid.Column="2" Content="{Binding ContentOperationName}"  Margin="1" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+        <TextBlock x:Name="tblock_Dimension" Grid.Column="3" Text="{Binding Dimension}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="1"></TextBlock>
         <Button x:Name="btn_Plot" Grid.Column="4" HorizontalAlignment="Right" Margin="2,2" Command="{Binding Cmd_OpenPlot}" Style="{DynamicResource btn_Style}">
             <Image Source="pack://application:,,,/AnotherFiles/Images/graph.png" Stretch="Uniform"></Image>
         </Button>

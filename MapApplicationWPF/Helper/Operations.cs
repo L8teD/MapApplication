@@ -47,7 +47,7 @@ namespace MapApplicationWPF.Helper
         public static InitData CopyInitData(InitData original)
         {
             InitData copy = new InitData();
-            copy.initErrors = new ModellingErrorsLib.Types.InitErrors();
+            copy.initErrors = new ModellingErrorsLib3.Types.InitErrors();
             copy.ppmList = new System.Collections.ObjectModel.ObservableCollection<MapApplicationWPF.ExternalResourses.PPM>();
 
             foreach (PPM ppm in original.ppmList)

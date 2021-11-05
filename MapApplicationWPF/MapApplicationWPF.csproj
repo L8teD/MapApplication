@@ -210,5 +210,11 @@
     <Resource Include="AnotherFiles\Images\Start.png" />
     <Resource Include="AnotherFiles\Images\Stop.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModellingErrorsLib3\ModellingErrorsLib3.csproj">
+      <Project>{9E346DEB-C935-42C6-9FA8-9C722353C55C}</Project>
+      <Name>ModellingErrorsLib3</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

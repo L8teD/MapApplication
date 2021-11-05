@@ -1,5 +1,6 @@
 ﻿
-namespace ModellingErrorsLib
+
+namespace ModellingErrorsLib3
 {
     public class Types
     {

@@ -31,9 +31,11 @@ namespace CommonLib
         {
             public double Latitude { get; private set; }
             public double Longitude { get; private set; }
+            public double Altitude { get; private set; }
             public double Velocity { get; private set; }
             public double VelocityEast { get; private set; }
             public double VelocityNorth { get; private set; }
+            public double VelocityH { get; private set; }
             public double Heading { get; private set; }
             public double Pitch { get; private set; }
             public double Roll { get; private set; }
@@ -41,9 +43,11 @@ namespace CommonLib
             {
                 Latitude = Math.Round(point.lat, 3);
                 Longitude = Math.Round(point.lon, 3);
+                Altitude = Math.Round(point.alt, 3);
                 Velocity = Math.Round(velocity.value, 3);
                 VelocityEast = Math.Round(velocity.E, 3);
                 VelocityNorth = Math.Round(velocity.N, 3);
+                VelocityH = Math.Round(velocity.H, 3);
                 Heading = Math.Round(Converter.RadToDeg(angles.heading), 3);
                 Pitch = Math.Round(Converter.RadToDeg(angles.pitch), 3);
                 Roll = Math.Round(Converter.RadToDeg(angles.roll), 3);
@@ -61,7 +65,7 @@ namespace CommonLib
             {
                 InDegrees = Converter.RadToDeg(parameters.point);
                 InMeters = Converter.DegreesToMeters(InDegrees, parameters.point.lat, parameters.earthModel);
-                ErrorInMeters = new Point(_error[2][0], _error[0][0], 0);
+                ErrorInMeters = new Point(_error[2][0], _error[0][0], _error[4][0]);
                 ErrorInDegrees = Converter.MetersToDegrees(ErrorInMeters, parameters.point.lat, parameters.earthModel);
                 InDegreesWithError = MathTransformation.SumCoordsAndErrors(InDegrees, ErrorInDegrees);
                 InMetersWithError = MathTransformation.SumCoordsAndErrors(InMeters, ErrorInMeters);
@@ -75,7 +79,7 @@ namespace CommonLib
             public VelocitySet(Velocity _velocity, double[][] _error)
             {
                 Value = new VelocityValue(_velocity.E, _velocity.N, _velocity.H, _velocity.value);
-                Error = new VelocityValue(_error[1][0], _error[3][0], 0, Math.Sqrt(Math.Pow(_error[1][0], 2) + Math.Pow(_error[3][0], 2)));
+                Error = new VelocityValue(_error[1][0], _error[3][0], _error[5][0], Math.Sqrt(Math.Pow(_error[1][0], 2) + Math.Pow(_error[3][0], 2) + Math.Pow(_error[3][0],2)));
                 ValueWithError = new VelocityValue(Value.E + Error.E, Value.N + Error.N, Value.H + Error.H, Value.value + Error.value);
             }
         }

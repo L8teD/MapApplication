@@ -1,13 +1,11 @@
 ﻿using CommonLib;
-using ModellingTrajectoryLib.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CommonLib.Types;
-using static ModellingErrorsLib.Types;
-using static ModellingTrajectoryLib.Types;
+using static ModellingErrorsLib3.Types;
 
 namespace ModellingTrajectoryLib
 {
