@@ -22,8 +22,10 @@ namespace ModellingTrajectoryLib
 
         public List<PointSet> outputPointsList = new List<PointSet>();
         public List<VelocitySet> outputVelocityList = new List<VelocitySet>();
+        public List<AnglesSet> outputAnglesList = new List<AnglesSet>();
         public List<DisplayedData> outputDisplayedDataIdeal = new List<DisplayedData>();
         public List<DisplayedData> outputDisplayedDataError = new List<DisplayedData>();
+        public List<DisplayedData> outputDisplayedDataWithError = new List<DisplayedData>();
         public void Model(double[] latArray, double[] lonArray, double[] altArray, double[] velocity, InitErrors initErrors)
         {
             int inputPointsCount = latArray.Length;
@@ -108,16 +110,20 @@ namespace ModellingTrajectoryLib
 
             outputPointsList.Add(new PointSet(parameters, errorsModel.X));
             outputVelocityList.Add(new VelocitySet(parameters.velocity, errorsModel.X));
+            outputAnglesList.Add(new AnglesSet(parameters.angles, errorsModel.anglesErrors));
 
-
+            int index = outputPointsList.Count - 1;
 
             outputDisplayedDataIdeal.Add(
-                new DisplayedData(outputPointsList[outputPointsList.Count - 1].InDegrees,
-                outputVelocityList[outputVelocityList.Count - 1].Value, parameters.angles));
-            outputDisplayedDataError.Add(
-                new DisplayedData(outputPointsList[outputPointsList.Count - 1].ErrorInDegrees, outputVelocityList[outputVelocityList.Count - 1].Error,
-                new Angles() { heading = errorsModel.anglesErrors[0][0], pitch = errorsModel.anglesErrors[1][0], roll = errorsModel.anglesErrors[2][0] }));
+                new DisplayedData(outputPointsList[index].InDegrees,outputVelocityList[index].Value, outputAnglesList[index].Value));
 
+            outputDisplayedDataError.Add(
+                new DisplayedData(outputPointsList[index].ErrorInDegrees, outputVelocityList[index].Error, outputAnglesList[index].Error));
+
+            outputDisplayedDataWithError.Add(
+                new DisplayedData(outputPointsList[outputPointsList.Count - 1].InDegreesWithError,
+                outputVelocityList[outputVelocityList.Count - 1].ValueWithError, outputAnglesList[index].WithError));
+            
             localParams.Add(parameters);
         }
     }

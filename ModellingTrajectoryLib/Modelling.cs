@@ -14,8 +14,10 @@ namespace ModellingTrajectoryLib
         TrajectoryModel Model = new TrajectoryModel();
         public List<PointSet> points { get; private set; }
         public List<VelocitySet> velocities { get; private set; }
+        public List<AnglesSet> angles { get; private set; }
         public List<DisplayedData> displayedDatasIdeal { get; private set; }
         public List<DisplayedData> displayedDatasError { get; private set; }
+        public List<DisplayedData> displayedDatasWithError { get; private set; }
         public Modelling(InputData inputData, InitErrors initErrors)
         {
             double[] inputLatArray = Converter.DegToRad(inputData.latitude);
@@ -26,8 +28,10 @@ namespace ModellingTrajectoryLib
             //points = Converter.RadToDeg(Model.returnedPoints);
             points = Model.outputPointsList;
             velocities = Model.outputVelocityList;
+            angles = Model.outputAnglesList;
             displayedDatasIdeal = Model.outputDisplayedDataIdeal;
             displayedDatasError = Model.outputDisplayedDataError;
+            displayedDatasWithError = Model.outputDisplayedDataWithError;
         }
     }
 }

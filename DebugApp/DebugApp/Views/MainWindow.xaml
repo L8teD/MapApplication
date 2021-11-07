@@ -1,0 +1,178 @@
+﻿<Window x:Class="DebugApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:uc="clr-namespace:DebugApp.UserControls"
+        xmlns:local="clr-namespace:DebugApp" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1200" WindowState="Maximized">
+    <Window.Resources>
+        <ResourceDictionary Source="../Styles/ButtonDict.xaml"></ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="1.5*"></ColumnDefinition>
+            <ColumnDefinition Width="1.5*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ListView x:Name="lv_Routes" ItemsSource="{Binding Path=initData.rtpList}" Grid.Column="0" Margin="0,0,0.2,0.4">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Path=ID}" Width="25">ID</GridViewColumn>
+                    <GridViewColumn Width="150">Latitude [deg]
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Latitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Width="150">Longitude [deg]
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="150">Altitude [m]
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="150">Velocity [km/h]
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn  Width="35">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path= DataContext.Cmd_RemoveRTP}"
+                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{StaticResource btn_Style}"></Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StackPanel Grid.Column="1">
+            <Grid DataContext="{Binding RTP}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Latitude"></TextBlock>
+                <TextBox Text="{Binding Path=Latitude}" Grid.Column="1"></TextBox>
+                <TextBlock Text="Longtitude" Grid.Row="1"></TextBlock>
+                <TextBox Text="{Binding Path=Longitude}" Grid.Column="1" Grid.Row="1"></TextBox>
+                <TextBlock Text="Altitude" Grid.Row="2"></TextBlock>
+                <TextBox Text="{Binding Path=Altitude}" Grid.Column="1" Grid.Row="2"></TextBox>
+                <TextBlock Text="Velocity" Grid.Row="3"></TextBlock>
+                <TextBox Text="{Binding Path=Velocity}" Grid.Column="1" Grid.Row="3"></TextBox>
+            </Grid>
+            <Button Grid.ColumnSpan="2" Grid.Row="4" Margin="30,10" Content="Add PPM" Command="{Binding Cmd_AddRTP}" 
+                    CommandParameter="{Binding initData.rtpList}"></Button>
+        </StackPanel>
+        <ListView ItemsSource="{Binding Path=initData.insErrors}" Grid.Column="2" HorizontalAlignment="Stretch"  >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="50">
+                        <TextBlock Text="Name"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="12"></TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="75">
+                        <TextBlock Text="Value"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Value}" Width="60" HorizontalAlignment="Center" FontSize="12"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="60">
+                        <TextBlock Text="Dimension"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="12"></TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <ListView ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="3" HorizontalAlignment="Stretch"  >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="50">
+                        <TextBlock Text="Name"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="12"></TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="75">
+                        <TextBlock Text="Value"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Value}" Width="60" HorizontalAlignment="Center" FontSize="12"></TextBox>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="60">
+                        <TextBlock Text="Dimension"></TextBlock>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="12"></TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Grid.Column="1" Content="Compute" Command="{Binding Cmd_Compute}" Margin="0,220,0,0"></Button>
+        <Grid Grid.Row="1" Grid.ColumnSpan="4" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <uc:Plot Title="Longitude"></uc:Plot>
+            <uc:Plot Title="Latitude" Grid.Column="1"></uc:Plot>
+            <uc:Plot Title="Altitude" Grid.Column="2"></uc:Plot>
+            <uc:Plot Title="Velocity East" Grid.Row="1"></uc:Plot>
+            <uc:Plot Title="Velocity North" Grid.Row="1" Grid.Column="1"></uc:Plot>
+            <uc:Plot Title="Velocity H" Grid.Row="1" Grid.Column="2"></uc:Plot>
+            <uc:Plot Title="Heading" Grid.Row="2"></uc:Plot>
+            <uc:Plot Title="Pitch" Grid.Row="2" Grid.Column="1"></uc:Plot>
+            <uc:Plot Title="Roll" Grid.Row="2" Grid.Column="2"></uc:Plot>
+        </Grid>
+
+    </Grid>
+</Window>

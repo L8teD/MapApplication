@@ -97,6 +97,23 @@ namespace CommonLib
                 value = _value;
             }
         }
+        public struct AnglesSet
+        {
+            public Angles Value;
+            public Angles Error;
+            public Angles WithError;
+            public AnglesSet(Angles angles, double[][] error)
+            {
+                Value = new Angles() { heading = angles.heading, pitch = angles.pitch, roll = angles.roll };
+                Error = new Angles() { heading = error[0][0], pitch = error[1][0], roll = error[2][0] };
+                WithError = new Angles()
+                {
+                    heading = Value.heading + Error.heading,
+                    pitch = Value.pitch + Error.pitch,
+                    roll = Value.roll + Error.roll
+                };
+            }
+        }
         public struct InputData
         {
             public double[] latitude;
