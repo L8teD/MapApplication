@@ -4,18 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:uc="clr-namespace:DebugApp.UserControls"
-        xmlns:local="clr-namespace:DebugApp" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        xmlns:ie="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:DebugApp"  d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200" WindowState="Maximized">
     <Window.Resources>
         <ResourceDictionary Source="../Styles/ButtonDict.xaml"></ResourceDictionary>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Cmd_DeleteLogElement}" Key="Delete"></KeyBinding>
+    </Window.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="1.5*"></ColumnDefinition>
-            <ColumnDefinition Width="1.5*"></ColumnDefinition>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -33,24 +39,24 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Width="150">Longitude [deg]
+                    <GridViewColumn Width="120">Longitude [deg]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center"></TextBox>
+                                <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="150">Altitude [m]
+                    <GridViewColumn Width="120">Altitude [m]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center"></TextBox>
+                                <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="150">Velocity [km/h]
+                    <GridViewColumn Width="120">Velocity [km/h]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center"></TextBox>
+                                <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -152,7 +158,7 @@
             </ListView.View>
         </ListView>
         <Button Grid.Column="1" Content="Compute" Command="{Binding Cmd_Compute}" Margin="0,220,0,0"></Button>
-        <Grid Grid.Row="1" Grid.ColumnSpan="4" Margin="5">
+        <Grid Grid.Row="1" Grid.ColumnSpan="5" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
@@ -164,15 +170,35 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <uc:Plot Title="Longitude"></uc:Plot>
-            <uc:Plot Title="Latitude" Grid.Column="1"></uc:Plot>
-            <uc:Plot Title="Altitude" Grid.Column="2"></uc:Plot>
-            <uc:Plot Title="Velocity East" Grid.Row="1"></uc:Plot>
-            <uc:Plot Title="Velocity North" Grid.Row="1" Grid.Column="1"></uc:Plot>
-            <uc:Plot Title="Velocity H" Grid.Row="1" Grid.Column="2"></uc:Plot>
-            <uc:Plot Title="Heading" Grid.Row="2"></uc:Plot>
-            <uc:Plot Title="Pitch" Grid.Row="2" Grid.Column="1"></uc:Plot>
+            <uc:Plot Title="Latitude" Grid.Column="1" ></uc:Plot>
+            <uc:Plot Title="Altitude" Grid.Column="2" ></uc:Plot>
+            <uc:Plot Title="Velocity East" Grid.Row="1" ></uc:Plot>
+            <uc:Plot Title="Velocity North" Grid.Row="1" Grid.Column="1" ></uc:Plot>
+            <uc:Plot Title="Velocity H" Grid.Row="1" Grid.Column="2" ></uc:Plot>
+            <uc:Plot Title="Heading" Grid.Row="2" ></uc:Plot>
+            <uc:Plot Title="Pitch" Grid.Row="2" Grid.Column="1" ></uc:Plot>
             <uc:Plot Title="Roll" Grid.Row="2" Grid.Column="2"></uc:Plot>
         </Grid>
-
+        <GroupBox Header="LogInfo" Grid.Column="4">
+            <ListBox x:Name="lb_LoggerInfo" ItemsSource="{Binding loggerInfoList, Mode=TwoWay}" >
+                <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="BorderBrush" Value="Gray" />
+                </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Element, Mode=TwoWay}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ie:Interaction.Triggers>
+                    <ie:EventTrigger EventName="SelectionChanged">
+                        <ie:InvokeCommandAction Command="{Binding Cmd_SelectionChanged}"  CommandParameter="{Binding ElementName=lb_LoggerInfo, Path=SelectedItem}"/>
+                    </ie:EventTrigger>
+                </ie:Interaction.Triggers>
+            </ListBox>
+        </GroupBox>
+        
     </Grid>
 </Window>

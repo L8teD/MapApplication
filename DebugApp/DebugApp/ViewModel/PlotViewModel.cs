@@ -28,6 +28,19 @@ namespace DebugApp
                 }));
             }
         }
+        private RelayCommand cmd_Switch;
+        public RelayCommand Cmd_Switch
+        {
+            get
+            {
+                return cmd_Switch ??
+                (cmd_Switch = new RelayCommand(obj =>
+                {
+                    m_PlotModel.Switch();
+
+                }));
+            }
+        }
         public PlotViewModel(string title)
         {
             m_PlotModel = new PlotControllerModel(title);

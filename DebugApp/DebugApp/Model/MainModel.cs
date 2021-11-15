@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using static DebugApp.Logger;
 using static DebugApp.Types;
 
 namespace DebugApp
@@ -13,6 +14,8 @@ namespace DebugApp
     class MainModel
     {
         OutputData outputData;
+        List<DebugInfo> infoList;
+        DebugInfo selectedInfo;
         public void AddRTP(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
         {
             ListViewWorker.UpdateData(rtpList, RTP);
@@ -25,7 +28,14 @@ namespace DebugApp
         public void Compute(InitData initData)
         {
             outputData = new OutputData();
-            Execute.CreateTrajectory(initData, ref outputData);
+            try
+            {
+                Execute.CreateTrajectory(initData, ref outputData);
+            }
+            catch(Exception ex)
+            {
+                Logger.PrintErrorInfo(ex.Message, initData);
+            }
 
             CreatePlotData();
         }
@@ -33,7 +43,7 @@ namespace DebugApp
         {
             PlotWorker.InitListOfPlotData();
             PlotWorker.dataIsUpdated = true;
-            for (int i = 0; i <outputData.FullDisplayedData.DisplayedDatasIdeal.Count; i++)
+            for (int i = 0; i < outputData.FullDisplayedData.DisplayedDatasIdeal.Count; i++)
             {
                 PlotWorker.AddPlotDataToStruct(outputData.FullDisplayedData, i);
             }
@@ -42,13 +52,53 @@ namespace DebugApp
         {
             
         }
+        public void SetDataFromLogger(LogInfo info, ObservableCollection<RouteTurningPoint> rtpList)
+        {
+            string[] infoString = info.Element.Split('|');
+            int ID = Convert.ToInt32(infoString[7].Split(' ')[1]);
+            selectedInfo = infoList.Find(item => item.id == ID);
+            string[] latitude = selectedInfo.input.latitude.Split(' ');
+            string[] longitude = selectedInfo.input.longitude.Split(' ');
+            string[] altitude = selectedInfo.input.altitude.Split(' ');
+            string[] velocity = selectedInfo.input.velocity.Split(' ');
+            rtpList.Clear();
+            for (int i = 0; i < selectedInfo.CountOfPoints; i++)
+            {
+                RouteTurningPoint RTP = new RouteTurningPoint();
+                RTP.Latitude = Convert.ToDouble(latitude[i]);
+                RTP.Longitude = Convert.ToDouble(longitude[i]);
+                RTP.Altitude = Convert.ToDouble(altitude[i]);
+                RTP.Velocity = Convert.ToDouble(velocity[i]);
+                AddRTP(rtpList, RTP);
+            }
+        }
+        public void RemoveDataFromLogger()
+        {
+            Logger.RemoveDataFromDB(selectedInfo.id);
+        }
+        public ObservableCollection<LogInfo> GetInfoFromLogger()
+        {
+            ObservableCollection<LogInfo> logInfo = new ObservableCollection<LogInfo>();
+            infoList = ReadInfoFromDB();
+
+            foreach (DebugInfo info in infoList)
+            {
+                string temp = "Date: " + info.Date + "\n|"
+                    +"Error: "+ info.Message + "\n|"
+                    + "Input:\n|" + "Lat: " + info.input.latitude + "\n|" + "Lon: " + info.input.longitude + "\n|"
+                    + "Alt: "+ info.input.altitude + "\n|" + "Vel: " + info.input.velocity + "\n|" + "ID: " + info.id.ToString();
+                
+                logInfo.Add(new LogInfo() {Element=temp });
+            }
+            return logInfo;
+        }
         public RouteTurningPoint SetRTP()
         {
             return new RouteTurningPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 1224 };
         }
         public (ObservableCollection<InputError>, ObservableCollection<InputError>) SetInputErrors()
         {
-            ObservableCollection<InputError>  insErrors = new ObservableCollection<InputError>();
+            ObservableCollection<InputError> insErrors = new ObservableCollection<InputError>();
             ObservableCollection<InputError> sensorErrors = new ObservableCollection<InputError>();
 
             insErrors.Add(new InputError() { Name = "α", Value = 0.25, Dimension = "[deg/h]" });
