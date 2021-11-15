@@ -26,7 +26,6 @@ namespace DebugApp
             }
         }
         public InitData initData { get; set; }
-        public ObservableCollection<LogInfo> loggerInfoList { get; set; }
 
         #region Commands
         private RelayCommand cmd_AddRTP;
@@ -56,33 +55,6 @@ namespace DebugApp
                 }));
             }
         }
-        private RelayCommand cmd_SelectionChanged;
-        public RelayCommand Cmd_SelectionChanged
-        {
-            get
-            {
-                return cmd_SelectionChanged ??
-                (cmd_SelectionChanged = new RelayCommand(obj =>
-                {
-
-                    m_Model.SetDataFromLogger((LogInfo)obj, initData.rtpList);
-
-                }));
-            }
-        }
-        private RelayCommand cmd_DeleteLogElement;
-        public RelayCommand Cmd_DeleteLogElement
-        {
-            get
-            {
-                return cmd_DeleteLogElement ??
-                (cmd_DeleteLogElement = new RelayCommand(obj =>
-                {
-                    m_Model.RemoveDataFromLogger();
-                    loggerInfoList = m_Model.GetInfoFromLogger();
-                }));
-            }
-        }
         private RelayCommand cmd_Compute;
         public RelayCommand Cmd_Compute
         {
@@ -101,14 +73,11 @@ namespace DebugApp
         public MainViewModel()
         {
             m_Model = new MainModel();
-            //RTP = new RouteTurningPoint();
             RTP = m_Model.SetRTP();
 
             initData = new InitData();
             initData.rtpList = new ObservableCollection<RouteTurningPoint>();
             (initData.insErrors, initData.sensorErrors) = m_Model.SetInputErrors();
-            loggerInfoList = m_Model.GetInfoFromLogger();
-            
         }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
@@ -116,7 +85,6 @@ namespace DebugApp
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
-
 
     }
 }
