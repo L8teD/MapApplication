@@ -24,11 +24,6 @@ namespace DebugApp
         string lastXAxesName;
         string lastYAxesName;
         string lastTitle;
-        string dimension;
-
-        ChoosenData choosenData;
-        List<LineSeries> errorSeries;
-        List<LineSeries> mainSeries;
         List<LineSeries> lastSeriesData = new List<LineSeries>();
         public PlotControllerModel(string title)
         {
@@ -47,7 +42,7 @@ namespace DebugApp
         {
             if (PlotWorker.dataIsUpdated)
             {
-                Plot();
+                Plot(mainTitle);
 
                 PlotWorker.dataIsUpdated = false;
             }
@@ -121,23 +116,17 @@ namespace DebugApp
             //plot.FixAxes(plotData.lineSeriesData[plotTitle]);
 
         }
-        public void Plot()
+        public void Plot(string plotTitle)
         {
-            List<PlotData> idealPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal Data");
-            List<PlotData> errorPlotData = PlotWorker.FindRequiredData(mainTitle, "Error Data");
-            List<PlotData> withErrorPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal+Error Data");
+            List<DataPoint> idealDataPoints = PlotWorker.CreateDatapointList(plotTitle, "Ideal Data");
+            List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(plotTitle, "Error Data");
+            List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(plotTitle, "Ideal+Error Data");
 
-
-            List<DataPoint> idealDataPoints = PlotWorker.CreateDatapointList(idealPlotData);
-            List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(errorPlotData);
-            List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
-
-            errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints) };
-            mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
+            List<LineSeries> errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints) };
+            List<LineSeries> mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
                                                                    PlotWorker.CreateLineSeries(withErrorDataPoints, false) };
-            string lastDimension = idealPlotData[0].dimension;
-            choosenData = ChoosenData.Full;
-            SetPlotState("Time, [sec]", idealPlotData[0].name + " " + lastDimension, mainTitle, mainSeries);
+
+            SetPlotState("Time, [sec]", PlotWorker.plotDataList[0].name + " " + PlotWorker.plotDataList[0].dimension, plotTitle, mainSeries);
 
             //OrdinaryPlotWindow ordinaryPlotWindow = new OrdinaryPlotWindow(message);
         }
@@ -146,24 +135,5 @@ namespace DebugApp
             if (lastXAxesName != null && lastYAxesName != null)
                 SetPlotState(lastXAxesName, lastYAxesName, lastTitle, lastSeriesData);
         }
-        public void Switch()
-        {
-            if (choosenData == ChoosenData.Full)
-            {
-                SetPlotState("Time, [sec]", lastYAxesName + " " + dimension, mainTitle, errorSeries);
-                choosenData = ChoosenData.Error;
-            }
-            else if(choosenData == ChoosenData.Error)
-            {
-                SetPlotState("Time, [sec]", lastYAxesName + " " + dimension, mainTitle, mainSeries);
-                choosenData = ChoosenData.Full;
-            }
-        }
-        enum ChoosenData
-        {
-            Full,
-            Error
-        }
     }
-
 }

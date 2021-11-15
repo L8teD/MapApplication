@@ -68,7 +68,7 @@ namespace DebugApp
             set
             {
                 altitude = value;
-                OnPropertyChanged("Altitude");
+                OnPropertyChanged("Velocity");
             }
         }
     }

@@ -53,16 +53,14 @@ namespace DebugApp
             plotDataList.Add(new PlotData("Pitch", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Pitch, "[deg]"));
         }
 
-        public static List<DataPoint> CreateDatapointList(List<PlotData> currentPlotDataList)
+        public static List<DataPoint> CreateDatapointList(string plotTitle, string plotFactor)
         {
+            List<PlotData> currentPlotDataList = plotDataList.FindAll(item => item.name == plotTitle && item.valid == plotFactor);
+
             List<DataPoint> dataPoints = new List<DataPoint>();
             for (int i = 0; i < currentPlotDataList.Count; i++)
                 dataPoints.Add(new DataPoint(i, currentPlotDataList[i].value));
             return dataPoints;
-        }
-        public static List<PlotData> FindRequiredData(string plotTitle, string plotFactor)
-        {
-            return plotDataList.FindAll(item => item.name == plotTitle && item.valid == plotFactor);
         }
         public static LineSeries CreateLineSeries(List<DataPoint> data, bool isBlue = true)
         {

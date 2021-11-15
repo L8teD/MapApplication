@@ -116,10 +116,10 @@ namespace CommonLib
         }
         public struct InputData
         {
-            public double[] latitude { get; set; }
-            public double[] longitude { get; set; }
-            public double[] altitude { get; set; }
-            public double[] velocity { get; set; }
+            public double[] latitude;
+            public double[] longitude;
+            public double[] altitude;
+            public double[] velocity;
         }
     }
 }

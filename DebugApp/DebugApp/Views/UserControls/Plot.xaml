@@ -9,18 +9,13 @@
              d:DataContext="{d:DesignInstance Type=global:PlotViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <ResourceDictionary Source="../../Styles/ButtonDict.xaml"></ResourceDictionary>
-    </UserControl.Resources>
     <Border BorderBrush="Gray" BorderThickness="1">
         <Grid Margin="2">
             <oxy:PlotView Model="{Binding MyPlotModel}" Controller="{Binding MyPlotController}">
             </oxy:PlotView>
-            <Button x:Name="btn_Home" HorizontalAlignment="Right" VerticalAlignment="Top" Height="30" Width="30" Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}">
-                <Image Source="pack://application:,,,/Resources/dog-house.png" Stretch="Fill" ></Image>
+            <Button x:Name="btn_Home" HorizontalAlignment="Right" VerticalAlignment="Top" Height="30" Width="30" Command="{Binding Cmd_Home}">
+                <Image Source="pack://application:,,,/Resources/dog-house.png" Stretch="Fill"></Image>
             </Button>
-            <Button x:Name="btn_Switch" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="60" Content="Switch" FontSize="20"
-                    Command="{Binding Cmd_Switch}" Style="{StaticResource btn_Style}"></Button>
         </Grid>
 
     </Border>
