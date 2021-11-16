@@ -51,6 +51,12 @@ namespace DebugApp
 
                 PlotWorker.dataIsUpdated = false;
             }
+            else if(PlotWorker.fullOpenedTitle == MyPlotModel.Title && PlotWorker.fullOpenedTitle != null)
+            {
+                Plot();
+
+                PlotWorker.fullOpenedTitle = null;
+            }
         }
 
         private void X_Axis_AxisChanged(object sender, AxisChangedEventArgs e)
@@ -132,7 +138,7 @@ namespace DebugApp
             List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(errorPlotData);
             List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
 
-            errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints) };
+            errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false)};
             mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
                                                                    PlotWorker.CreateLineSeries(withErrorDataPoints, false) };
             string lastDimension = idealPlotData[0].dimension;
@@ -145,6 +151,12 @@ namespace DebugApp
         {
             if (lastXAxesName != null && lastYAxesName != null)
                 SetPlotState(lastXAxesName, lastYAxesName, lastTitle, lastSeriesData);
+        }
+        public void Full()
+        {
+            PlotWorker.fullOpenedTitle = MyPlotModel.Title;
+            PlotWindow plotWindow = new PlotWindow(MyPlotModel);
+            plotWindow.Show();
         }
         public void Switch()
         {

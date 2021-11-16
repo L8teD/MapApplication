@@ -11,7 +11,7 @@ namespace CommonLib
     {
         public static double DegToRad(double valueDeg)
         {
-            return valueDeg * Math.PI / 180;
+            return valueDeg * Math.PI / 180.0;
         }
         public static double[] DegToRad(double[] valuesDeg)
         {
@@ -33,7 +33,7 @@ namespace CommonLib
 
         public static double RadToDeg(double valueRad)
         {
-            return valueRad * 180 / Math.PI;
+            return valueRad * 180.0 / Math.PI;
         }
         public static double[] RadToDeg(double[] valuesRad)
         {

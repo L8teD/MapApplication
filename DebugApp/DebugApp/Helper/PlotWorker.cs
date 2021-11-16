@@ -12,6 +12,7 @@ namespace DebugApp
     public class PlotWorker
     {
         public static bool dataIsUpdated { get; set; }
+        public static string fullOpenedTitle { get; set; }
         public static List<PlotData> plotDataList;
         public static void InitListOfPlotData()
         {
@@ -74,7 +75,7 @@ namespace DebugApp
                 StrokeThickness = 2,
                 MarkerSize = 0,
                 LineStyle = LineStyle.Solid,
-                Color = !isBlue ? OxyColors.Blue : OxyColors.Red,
+                Color = isBlue ? OxyColors.Blue : OxyColors.Red,
                 MarkerType = MarkerType.None,
             };
             foreach (DataPoint point in data)

@@ -28,6 +28,20 @@ namespace DebugApp
                 }));
             }
         }
+        private RelayCommand cmd_Full;
+        public RelayCommand Cmd_Full
+        {
+            get
+            {
+                return cmd_Full ??
+                (cmd_Full = new RelayCommand(obj =>
+                {
+
+                    m_PlotModel.Full();
+
+                }));
+            }
+        }
         private RelayCommand cmd_Switch;
         public RelayCommand Cmd_Switch
         {

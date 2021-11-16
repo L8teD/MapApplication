@@ -31,13 +31,14 @@ namespace DebugApp
             try
             {
                 Execute.CreateTrajectory(initData, ref outputData);
+                CreatePlotData();
             }
             catch(Exception ex)
             {
                 Logger.PrintErrorInfo(ex.Message, initData);
             }
 
-            CreatePlotData();
+            
         }
         private void CreatePlotData()
         {

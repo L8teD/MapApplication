@@ -79,6 +79,9 @@
     <Compile Include="Types.cs" />
     <Compile Include="ViewModel\LogInfo.cs" />
     <Compile Include="ViewModel\PlotViewModel.cs" />
+    <Compile Include="Views\PlotWindow.xaml.cs">
+      <DependentUpon>PlotWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UserControls\Plot.xaml.cs">
       <DependentUpon>Plot.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\PlotWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\UserControls\Plot.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -154,6 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\dog-house.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\full_display.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
