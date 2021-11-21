@@ -28,7 +28,7 @@ namespace ModellingTrajectoryLib
         double[] dH;
         double[] roll;
 
-        double rollTarget = -20;
+        double rollTarget = Converter.DegToRad(-20);
         double UR;
         double radiusTurn;
         double timeTurn;
@@ -95,7 +95,7 @@ namespace ModellingTrajectoryLib
             dH = MakeArray(startedPoints.Length);
             for (int i = 0; i < dH.Length; i++)
             {
-                dH[i] = 0;
+                dH[i] = startedPoints[i+1].alt - startedPoints[i].alt;
             }
             dLon = MakeArray(startedPoints.Length);
             ortDist = MakeArray(startedPoints.Length);
@@ -146,7 +146,7 @@ namespace ModellingTrajectoryLib
 
             rollTarget = UR >= 0 ? Math.Abs(rollTarget) : rollTarget;
 
-            radiusTurn = Math.Pow(velAbs[k], 2) / (g * Math.Tan(Converter.DegToRad(rollTarget)));
+            radiusTurn = Math.Pow(velAbs[k], 2) / (g * Math.Tan(rollTarget));
             timeTurn = radiusTurn * UR / velAbs[k];
             LUR_Distance = radiusTurn * Math.Tan(0.5 * UR);
         }
