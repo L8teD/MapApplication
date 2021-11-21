@@ -55,9 +55,9 @@ namespace DebugApp
                 }));
             }
         }
-        public PlotViewModel(string title)
+        public PlotViewModel(string title, bool newWindow = false)
         {
-            m_PlotModel = new PlotControllerModel(title);
+            m_PlotModel = new PlotControllerModel(title, newWindow);
 
             MyPlotModel = m_PlotModel.MyPlotModel;
             MyPlotController = m_PlotModel.MyPlotController;

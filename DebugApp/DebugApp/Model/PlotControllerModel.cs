@@ -12,7 +12,9 @@ namespace DebugApp
 {
     public class PlotControllerModel
     {
-        Timer timer = new Timer();
+        Timer timer;
+        private bool plotWindowIsCreated;
+        private bool plotIsNeedToCreate;
         public PlotModel MyPlotModel { get; set; }
         public PlotController MyPlotController { get; set; }
 
@@ -24,14 +26,17 @@ namespace DebugApp
         string lastXAxesName;
         string lastYAxesName;
         string lastTitle;
-        string dimension;
+        string lastDimension;
 
         ChoosenData choosenData;
         List<LineSeries> errorSeries;
         List<LineSeries> mainSeries;
         List<LineSeries> lastSeriesData = new List<LineSeries>();
-        public PlotControllerModel(string title)
+        public PlotControllerModel(string title, bool newWindow = false)
         {
+            timer = new Timer();
+            plotIsNeedToCreate = newWindow;
+            plotWindowIsCreated = false;
             MyPlotModel = new PlotModel();
             MyPlotController = new PlotController();
             mainTitle = title;
@@ -39,24 +44,28 @@ namespace DebugApp
             timer.Interval = 1000;
             timer.Start();
             
-
             //CreateAxes("testX", "testY");
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (PlotWorker.dataIsUpdated)
+            if (mainTitle != null && PlotWorker.plotDataList != null)
             {
-                Plot();
 
-                PlotWorker.dataIsUpdated = false;
-            }
-            else if(PlotWorker.fullOpenedTitle == MyPlotModel.Title && PlotWorker.fullOpenedTitle != null)
-            {
                 Plot();
-
-                PlotWorker.fullOpenedTitle = null;
+                plotWindowIsCreated = false;
+                plotIsNeedToCreate = false;
+                timer.Stop();
+                
+                //else if (!plotWindowIsCreated && plotIsNeedToCreate)
+                //{
+                //    timer.Enabled = false;
+                //    Plot();
+                //    plotWindowIsCreated = true;
+                //    timer.Enabled = true;
+                //}
             }
+            
         }
 
         private void X_Axis_AxisChanged(object sender, AxisChangedEventArgs e)
@@ -129,21 +138,25 @@ namespace DebugApp
         }
         public void Plot()
         {
-            List<PlotData> idealPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal Data");
-            List<PlotData> errorPlotData = PlotWorker.FindRequiredData(mainTitle, "Error Data");
-            List<PlotData> withErrorPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal+Error Data");
+            if (PlotWorker.plotDataList != null)
+            {
+                List<PlotData> idealPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal Data");
+                List<PlotData> errorPlotData = PlotWorker.FindRequiredData(mainTitle, "Error Data");
+                List<PlotData> withErrorPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal+Error Data");
 
 
-            List<DataPoint> idealDataPoints = PlotWorker.CreateDatapointList(idealPlotData);
-            List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(errorPlotData);
-            List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
+                List<DataPoint> idealDataPoints = PlotWorker.CreateDatapointList(idealPlotData);
+                List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(errorPlotData);
+                List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
 
-            errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false)};
-            mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
+                errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false) };
+                mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
                                                                    PlotWorker.CreateLineSeries(withErrorDataPoints, false) };
-            string lastDimension = idealPlotData[0].dimension;
-            choosenData = ChoosenData.Full;
-            SetPlotState("Time, [sec]", idealPlotData[0].name + " " + lastDimension, mainTitle, mainSeries);
+                lastDimension = idealPlotData[0].dimension;
+                choosenData = ChoosenData.Full;
+                SetPlotState("Time, [sec]", idealPlotData[0].name + " " + lastDimension, mainTitle, mainSeries);
+
+            }
 
             //OrdinaryPlotWindow ordinaryPlotWindow = new OrdinaryPlotWindow(message);
         }
@@ -154,22 +167,28 @@ namespace DebugApp
         }
         public void Full()
         {
-            PlotWorker.fullOpenedTitle = MyPlotModel.Title;
-            PlotWindow plotWindow = new PlotWindow(MyPlotModel);
-            plotWindow.Show();
+            //PlotWorker.fullOpened = true;
+            if (MyPlotModel != null)
+            {
+                PlotWindow plotWindow = new PlotWindow(MyPlotModel.Title);
+                plotWindow.Show();
+            }
+
         }
         public void Switch()
         {
+            timer.Start();
             if (choosenData == ChoosenData.Full)
             {
-                SetPlotState("Time, [sec]", lastYAxesName + " " + dimension, mainTitle, errorSeries);
+                SetPlotState("Time, [sec]", lastYAxesName + " " + lastDimension, mainTitle, errorSeries);
                 choosenData = ChoosenData.Error;
             }
             else if(choosenData == ChoosenData.Error)
             {
-                SetPlotState("Time, [sec]", lastYAxesName + " " + dimension, mainTitle, mainSeries);
+                SetPlotState("Time, [sec]", lastYAxesName + " " + lastDimension, mainTitle, mainSeries);
                 choosenData = ChoosenData.Full;
             }
+            timer.Stop();
         }
         enum ChoosenData
         {

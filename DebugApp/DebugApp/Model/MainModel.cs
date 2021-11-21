@@ -43,7 +43,6 @@ namespace DebugApp
         private void CreatePlotData()
         {
             PlotWorker.InitListOfPlotData();
-            PlotWorker.dataIsUpdated = true;
             for (int i = 0; i < outputData.FullDisplayedData.DisplayedDatasIdeal.Count; i++)
             {
                 PlotWorker.AddPlotDataToStruct(outputData.FullDisplayedData, i);

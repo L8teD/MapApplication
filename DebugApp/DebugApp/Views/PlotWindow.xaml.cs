@@ -20,17 +20,16 @@ namespace DebugApp
     /// </summary>
     public partial class PlotWindow : Window
     {
-        private PlotModel MyPlotModel;
-        public PlotWindow(PlotModel plotModel)
+        public PlotWindow(string title)
         {
             InitializeComponent();
-            MyPlotModel = plotModel;
+            plot.Title = title;
             this.Loaded += PlotWindow_Loaded;
         }
 
         private void PlotWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = new PlotViewModel(MyPlotModel.Title);
+            this.DataContext = new PlotViewModel(plot.Title, true);
         }
     }
 }

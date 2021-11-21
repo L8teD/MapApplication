@@ -11,8 +11,6 @@ namespace DebugApp
 {
     public class PlotWorker
     {
-        public static bool dataIsUpdated { get; set; }
-        public static string fullOpenedTitle { get; set; }
         public static List<PlotData> plotDataList;
         public static void InitListOfPlotData()
         {
@@ -63,7 +61,10 @@ namespace DebugApp
         }
         public static List<PlotData> FindRequiredData(string plotTitle, string plotFactor)
         {
-            return plotDataList.FindAll(item => item.name == plotTitle && item.valid == plotFactor);
+            if (plotDataList == null)
+                return new List<PlotData>();
+            else
+                return plotDataList.FindAll(item => item.name == plotTitle && item.valid == plotFactor);
         }
         public static LineSeries CreateLineSeries(List<DataPoint> data, bool isBlue = true)
         {
