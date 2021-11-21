@@ -13,6 +13,7 @@ namespace DebugApp
     public class PlotControllerModel
     {
         Timer timer;
+        Timer timerForLaunchMainTimer;
         private bool plotWindowIsCreated;
         private bool plotIsNeedToCreate;
         public PlotModel MyPlotModel { get; set; }
@@ -35,16 +36,28 @@ namespace DebugApp
         public PlotControllerModel(string title, bool newWindow = false)
         {
             timer = new Timer();
+            timerForLaunchMainTimer = new Timer();
             plotIsNeedToCreate = newWindow;
             plotWindowIsCreated = false;
             MyPlotModel = new PlotModel();
             MyPlotController = new PlotController();
             mainTitle = title;
             timer.Elapsed += Timer_Elapsed;
-            timer.Interval = 1000;
+            timer.Interval = 500;
             timer.Start();
+            timerForLaunchMainTimer.Elapsed += TimerForLaunchMainTimer_Elapsed;
+            timerForLaunchMainTimer.Interval = 1000;
+            timerForLaunchMainTimer.Start();
             
             //CreateAxes("testX", "testY");
+        }
+
+        private void TimerForLaunchMainTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (PlotWorker.dataIsUpdated)
+            {
+                timer.Start();
+            }
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -56,7 +69,8 @@ namespace DebugApp
                 plotWindowIsCreated = false;
                 plotIsNeedToCreate = false;
                 timer.Stop();
-                
+                PlotWorker.dataIsUpdated = false;
+
                 //else if (!plotWindowIsCreated && plotIsNeedToCreate)
                 //{
                 //    timer.Enabled = false;
@@ -65,7 +79,7 @@ namespace DebugApp
                 //    timer.Enabled = true;
                 //}
             }
-            
+
         }
 
         private void X_Axis_AxisChanged(object sender, AxisChangedEventArgs e)

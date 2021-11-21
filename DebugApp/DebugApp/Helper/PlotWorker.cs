@@ -12,6 +12,7 @@ namespace DebugApp
     public class PlotWorker
     {
         public static List<PlotData> plotDataList;
+        public static bool dataIsUpdated { get; set; }
         public static void InitListOfPlotData()
         {
             plotDataList = new List<PlotData>();

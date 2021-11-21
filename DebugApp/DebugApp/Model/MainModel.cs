@@ -30,6 +30,7 @@ namespace DebugApp
             outputData = new OutputData();
             try
             {
+                PlotWorker.dataIsUpdated = true;
                 Execute.CreateTrajectory(initData, ref outputData);
                 CreatePlotData();
             }
