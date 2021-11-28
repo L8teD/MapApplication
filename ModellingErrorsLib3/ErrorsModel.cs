@@ -66,7 +66,7 @@ namespace ModellingErrorsLib3
 
             Model(initErrors, parameters.acceleration, parameters.omegaGyro, parameters.earthModel, parameters.angles);
             IncrementX();
-            IcrementAngle();
+            IncrementAngle();
         }
         private void IncrementX()
         {
@@ -77,7 +77,7 @@ namespace ModellingErrorsLib3
             MathTransformation.IncrementValue(ref X[4][0], X_Dot[4][0]);
             MathTransformation.IncrementValue(ref X[5][0], X_Dot[5][0]);
         }
-        private void IcrementAngle()
+        private void IncrementAngle()
         {
             MathTransformation.IncrementValue(ref anglesErrors[0][0], angles_Dot[0][0]);
             MathTransformation.IncrementValue(ref anglesErrors[1][0], angles_Dot[1][0]);

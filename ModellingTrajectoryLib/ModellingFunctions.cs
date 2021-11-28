@@ -181,7 +181,7 @@ namespace ModellingTrajectoryLib
         }
         internal double[][] CreateMatrixC(Parameters parameters)
         {
-            return Create.MatrixC(parameters.angles.heading, parameters.angles.pitch, parameters.angles.roll);
+            return Create.MatrixC(parameters.angles);
         }
         internal void SetAngles(ref Parameters parameters, int k)
         {

@@ -20,28 +20,28 @@ namespace ModellingErrorsLib3
             ErrorMatrix = MatrixOperations.Zeros(6, 6);
             ErrorMatrix[0][1] = 1;
 
-            ErrorMatrix[1][0] = Math.Pow(omegaGyro.Y, 2) + Math.Pow(omegaGyro.Z, 2) - Math.Pow(earthModel.shulerFrequency, 2);
+            ErrorMatrix[1][0] = Math.Pow(omegaGyro.N, 2) + Math.Pow(omegaGyro.H, 2) - Math.Pow(earthModel.shulerFrequency, 2);
 
-            ErrorMatrix[1][2] = omegaGyro.Z_dot - omegaGyro.X * omegaGyro.Y;
-            ErrorMatrix[1][3] = 2 * omegaGyro.Z;
-            ErrorMatrix[1][4] = -(omegaGyro.Y_dot + omegaGyro.X * omegaGyro.Z);
-            ErrorMatrix[1][5] = -2 * omegaGyro.Y;
+            ErrorMatrix[1][2] = omegaGyro.Z_dot - omegaGyro.E * omegaGyro.N;
+            ErrorMatrix[1][3] = 2 * omegaGyro.H;
+            ErrorMatrix[1][4] = -(omegaGyro.Y_dot + omegaGyro.E * omegaGyro.H);
+            ErrorMatrix[1][5] = -2 * omegaGyro.N;
 
             ErrorMatrix[2][3] = 1;
 
-            ErrorMatrix[3][0] = -(omegaGyro.X * omegaGyro.Y + omegaGyro.Z_dot);
+            ErrorMatrix[3][0] = -(omegaGyro.E * omegaGyro.N + omegaGyro.Z_dot);
             ErrorMatrix[3][1] = -2 * omegaGyro.Z;
-            ErrorMatrix[3][2] = Math.Pow(omegaGyro.X, 2) + Math.Pow(omegaGyro.Z, 2) - Math.Pow(earthModel.shulerFrequency, 2);
-            ErrorMatrix[3][4] = omegaGyro.X_dot - omegaGyro.Y * omegaGyro.Z;
-            ErrorMatrix[3][5] = 2 * omegaGyro.X;
+            ErrorMatrix[3][2] = Math.Pow(omegaGyro.E, 2) + Math.Pow(omegaGyro.H, 2) - Math.Pow(earthModel.shulerFrequency, 2);
+            ErrorMatrix[3][4] = omegaGyro.X_dot - omegaGyro.N * omegaGyro.H;
+            ErrorMatrix[3][5] = 2 * omegaGyro.E;
 
             ErrorMatrix[4][5] = 1;
 
-            ErrorMatrix[5][0] = omegaGyro.Y_dot - omegaGyro.X * omegaGyro.Z; 
-            ErrorMatrix[5][1] = 2 * omegaGyro.Y;
-            ErrorMatrix[5][2] = -(omegaGyro.X_dot - omegaGyro.Y * omegaGyro.Z);
-            ErrorMatrix[5][3] = 2 * omegaGyro.X;
-            ErrorMatrix[5][4] = 2 * Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(omegaGyro.X, 2) + Math.Pow(omegaGyro.Y, 2);
+            ErrorMatrix[5][0] = omegaGyro.Y_dot - omegaGyro.E * omegaGyro.H; 
+            ErrorMatrix[5][1] = 2 * omegaGyro.N;
+            ErrorMatrix[5][2] = -(omegaGyro.X_dot - omegaGyro.N * omegaGyro.H);
+            ErrorMatrix[5][3] = 2 * omegaGyro.E;
+            ErrorMatrix[5][4] = 2 * Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(omegaGyro.E, 2) + Math.Pow(omegaGyro.N, 2);
 
         }
         public static void CreateAnglesMatrix(double alfa, double betta, double gamma)
@@ -58,9 +58,9 @@ namespace ModellingErrorsLib3
         public static void CreateMatrixOrientation(OmegaGyro omegaGyro)
         {
             MatrixOrientation = MatrixOperations.Create(3, 3);
-            MatrixOrientation[0] = new double[] { 0, omegaGyro.Z, -omegaGyro.Y };
-            MatrixOrientation[1] = new double[] { -omegaGyro.Z, 0, omegaGyro.X };
-            MatrixOrientation[2] = new double[] { omegaGyro.Y, -omegaGyro.X, 0 };
+            MatrixOrientation[0] = new double[] { 0, omegaGyro.H, -omegaGyro.N };
+            MatrixOrientation[1] = new double[] { -omegaGyro.H, 0, omegaGyro.E };
+            MatrixOrientation[2] = new double[] { omegaGyro.N, -omegaGyro.E, 0 };
         }
         public static double[][] CreateM(double heading, double pitch)
         {
