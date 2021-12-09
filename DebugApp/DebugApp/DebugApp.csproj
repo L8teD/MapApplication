@@ -74,6 +74,7 @@
     <Compile Include="Helper\ListViewWorker.cs" />
     <Compile Include="Helper\Logger.cs" />
     <Compile Include="Helper\PlotWorker.cs" />
+    <Compile Include="Helper\Saver.cs" />
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\PlotControllerModel.cs" />
     <Compile Include="Types.cs" />
@@ -143,6 +144,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper">
+      <Version>27.2.1</Version>
+    </PackageReference>
     <PackageReference Include="Expression.Interaction">
       <Version>3.0.40218</Version>
     </PackageReference>

@@ -12,8 +12,10 @@ namespace DebugApp
 {
     class Execute
     {
-        public static void CreateTrajectory(InitData initData, ref OutputData outputData)
+        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref List<P_out> p_Outs)
         {
+            p_Outs = new List<P_out>();
+
             InputData inputData = new InputData();
             inputData.latitude = new double[initData.rtpList.Count];
             inputData.longitude = new double[initData.rtpList.Count];
@@ -34,10 +36,14 @@ namespace DebugApp
             outputData.Angles = model.angles;
 
             FullDisplayedData fullDisplayedData = new FullDisplayedData();
-            fullDisplayedData.DisplayedDatasIdeal = model.displayedDatasIdeal;
-            fullDisplayedData.DisplayedDatasError = model.displayedDatasError;
-            fullDisplayedData.DisplayedDatasWithError = model.displayedDatasWithError;
+            fullDisplayedData.ideal = model.dDataIdeal;
+            fullDisplayedData.error= model.dDataError;
+            fullDisplayedData.real= model.dDataReal;
+            fullDisplayedData.estimated= model.dDataEstimate;
+           
             outputData.FullDisplayedData = fullDisplayedData;
+
+            p_Outs = model.p_Outs;
         }
         private static InitErrors SetInitErrors(InitData initData)
         {

@@ -11,13 +11,14 @@ using static ModellingErrorsLib3.Types;
 
 namespace EstimateLib
 {
-    public class ErrorsModel
+    public class KalmanModel
     {
         public double[][] X;
         public double[][] X_dot;
         public double[][] F;
         public double[][] G;
         public double[][] W;
+        double[][] W_withoutNoise;
         public double[][] H;
         public double[][] Z;
         public double[][] P;
@@ -30,19 +31,66 @@ namespace EstimateLib
         double[][] R;
         double[][] K;
         double[][] S;
+        double[][] orientationAngles;
+        public double[][] anglesErrors;
 
-        private void InitX(InitErrors initErrors, Point point, OmegaGyro omegaGyro, EarthModel earthModel, Velocity velocity)
+        private CoordAccuracy coordAccuracy;
+        private VelocityAccuracy velocityAccuracy;
+
+        private void InitX(InitErrors initErrors, Point point, OmegaGyro omegaGyro, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
         {
             X = MatrixOperations.Zeros(21, 1);
 
-            X[0][0] = initErrors.coordAccuracy.longitude * Math.Cos(point.lat);
-            X[2][0] = initErrors.coordAccuracy.latitude;
-            X[4][0] = initErrors.coordAccuracy.altitude;
+            if (Init)
+            {
+                X[0][0] = initErrors.coordAccuracy.longitude * Math.Cos(point.lat);
+                X[1][0] = initErrors.coordAccuracy.latitude;
+                X[2][0] = initErrors.coordAccuracy.altitude;
+
+                X[3][0] = initErrors.velocityAccuracy.east + (velocity.H / earthModel.R2 + omegaGyro.E * Math.Tan(point.lat)) * X[0][0] + omegaGyro.H * X[2][0];
+                X[4][0] = initErrors.velocityAccuracy.north + velocity.H / earthModel.R1 * X[0][0];
+                X[5][0] = initErrors.velocityAccuracy.H;
+
+                coordAccuracy = new CoordAccuracy();
+                coordAccuracy.longitude = initErrors.coordAccuracy.longitude;
+                coordAccuracy.latitude = initErrors.coordAccuracy.latitude;
+                coordAccuracy.altitude = initErrors.coordAccuracy.altitude;
+
+                velocityAccuracy = new VelocityAccuracy();
+                velocityAccuracy.east = initErrors.velocityAccuracy.east;
+                velocityAccuracy.north = initErrors.velocityAccuracy.north;
+                velocityAccuracy.H = initErrors.velocityAccuracy.H;
+            }
+            else
+            {
+                coordAccuracy.longitude += X_dot[0][0];
+                coordAccuracy.latitude += X_dot[1][0];
+                coordAccuracy.altitude += X_dot[2][0];
+
+                velocityAccuracy.east += X_dot[3][0];
+                velocityAccuracy.north += X_dot[4][0];
+                velocityAccuracy.H += X_dot[5][0];
+
+                X[0][0] = coordAccuracy.longitude * Math.Cos(point.lat);
+                X[1][0] = coordAccuracy.latitude;
+                X[2][0] = coordAccuracy.altitude;
 
 
-            X[1][0] = initErrors.velocityAccuracy.east + (velocity.H / earthModel.R2 + omegaGyro.E * Math.Tan(point.lat)) * X[0][0] + omegaGyro.H * X[2][0];
-            X[3][0] = initErrors.velocityAccuracy.north + velocity.H / earthModel.R1 * X[0][0];
-            X[5][0] = initErrors.velocityAccuracy.H;
+                X[3][0] = velocityAccuracy.east + (velocity.H / earthModel.R2 + omegaGyro.E * Math.Tan(point.lat)) * X[0][0] + omegaGyro.H * X[2][0];
+                X[4][0] = velocityAccuracy.north + velocity.H / earthModel.R1 * X[0][0];
+                X[5][0] = velocityAccuracy.H;
+            }
+
+            double[][] M = Create.MatrixM(angles.heading, angles.pitch);
+            
+            double[][] orientationErrors = MatrixOperations.Product(MatrixOperations.Inverted(M), anglesErrors);
+
+            orientationAngles[0][0] = orientationErrors[0][0] + X_dot[6][0];
+            orientationAngles[1][0] = orientationErrors[1][0] + X_dot[7][0];
+            orientationAngles[2][0] = orientationErrors[2][0] + X_dot[8][0];
+
+            anglesErrors = MatrixOperations.Product(M, orientationAngles);
+
 
             X[6][0] = initErrors.angleAccuracy.heading;
             X[7][0] = initErrors.angleAccuracy.roll;
@@ -169,12 +217,22 @@ namespace EstimateLib
             Random random = new Random();
             W = new double[][]
             {
-                new double[] {Converter.DegToRad(gyro_noise * random.Next(0,1)) },
-                new double[] {Converter.DegToRad(gyro_noise * random.Next(0,1)) },
-                new double[] {Converter.DegToRad(gyro_noise * random.Next(0,1)) },
-                new double[] {Converter.DegToRad(acc_noise * random.Next(0,1)) },
-                new double[] {Converter.DegToRad(acc_noise * random.Next(0,1)) },
-                new double[] {Converter.DegToRad(acc_noise * random.Next(0,1)) }
+                new double[] {gyro_noise * random.NextDouble() },
+                new double[] {gyro_noise * random.NextDouble() },
+                new double[] {gyro_noise * random.NextDouble() },
+                new double[] {acc_noise * random.NextDouble() },
+                new double[] {acc_noise * random.NextDouble() },
+                new double[] {acc_noise * random.NextDouble() }
+            };
+
+            W_withoutNoise = new double[][]
+            {
+                new double[] {Converter.DegToRad(gyro_noise) },
+                new double[] {Converter.DegToRad(gyro_noise) },
+                new double[] {Converter.DegToRad(gyro_noise) },
+                new double[] {Converter.DegToRad(acc_noise ) },
+                new double[] {Converter.DegToRad(acc_noise ) },
+                new double[] {Converter.DegToRad(acc_noise ) }
             };
         }
         private void InitH(Point point, EarthModel earth, OmegaGyro omegaGyro, Velocity velocity)
@@ -183,13 +241,13 @@ namespace EstimateLib
 
             H[0][0] = 1.0 / (earth.R2 * Math.Cos(point.lat));
             H[1][1] = 1.0 / earth.R1;
-            H[2][2] = 1;
+            H[2][2] = 1.0;
             H[3][1] = velocity.H / earth.R2 + omegaGyro.E * Math.Tan(point.lat);
             H[3][2] = -omegaGyro.H;
-            H[3][3] = 1;
+            H[3][3] = 1.0;
             H[4][1] = -velocity.H / earth.R1;
-            H[4][4] = 1;
-            H[5][5] = 1;
+            H[4][4] = 1.0;
+            H[5][5] = 1.0;
 
         }
         private void InitZ(Point point, Velocity velocity, EarthModel earth)
@@ -217,12 +275,12 @@ namespace EstimateLib
             };
             double[][] Z_sns = new double[][]
             {
-                new double[] { point.lon * earth.R2  + snsErrors[0][0] * random.Next(0,1)},
-                new double[] { point.lat * earth.R1 + snsErrors[1][0] * random.Next(0,1)},
-                new double[] { point.alt + snsErrors[2][0] * random.Next(0,1)},
-                new double[] { velocity.E + snsErrors[3][1] * random.Next(0,1)},
-                new double[] { velocity.N + snsErrors[4][1] * random.Next(0,1)},
-                new double[] { velocity.H + snsErrors[5][1] * random.Next(0,1)}
+                new double[] { point.lon + snsErrors[0][0] * random.NextDouble()},
+                new double[] { point.lat + snsErrors[1][0] * random.NextDouble()},
+                new double[] { point.alt + snsErrors[2][0] * random.NextDouble()},
+                new double[] { velocity.E + snsErrors[3][0] * random.NextDouble()},
+                new double[] { velocity.N + snsErrors[4][0] * random.NextDouble()},
+                new double[] { velocity.H + snsErrors[5][0] * random.NextDouble()}
             };
             Z = new double[][] 
             {
@@ -230,9 +288,24 @@ namespace EstimateLib
                 new double[] {Z_ins[1][0] - Z_sns[1][0] },
                 new double[] {Z_ins[2][0] - Z_sns[2][0] },
                 new double[] {Z_ins[3][0] - Z_sns[3][0] },
+                new double[] {Z_ins[4][0] - Z_sns[4][0] },
+                new double[] {Z_ins[5][0] - Z_sns[5][0] },
             };
-            R = MatrixOperations.DiagMatrix(snsErrors);
+            R = MatrixOperations.Pow(MatrixOperations.DiagMatrix(snsErrors),2);
 
+        }
+        private void InitAnglesError(InitErrors initErrors)
+        {
+            orientationAngles = new double[3][]
+            {
+                new double[1],
+                new double[1],
+                new double[1]
+            };
+            anglesErrors = new double[][] {
+                new double[] { Converter.DegToRad(initErrors.angleAccuracy.heading) },
+                new double[] { Converter.DegToRad(initErrors.angleAccuracy.roll) },
+                new double[] { Converter.DegToRad(initErrors.angleAccuracy.pitch) } };
         }
         private void IncrementX()
         {
@@ -251,31 +324,28 @@ namespace EstimateLib
         }
         private void Kalman()
         {
-            eyeMatrix = MatrixOperations.Eye(19);
+            eyeMatrix = MatrixOperations.Eye(21);
             F_discrete = MatrixOperations.Sum(MatrixOperations.Sum(eyeMatrix, F), MatrixOperations.Pow(F, 2));
             
             if (P == null)
             {
                 P = MatrixOperations.Pow(MatrixOperations.DiagMatrix(X), 2);
-                
             }
 
             else
             {
                 S = MatrixOperations.Sum(
                     MatrixOperations.Product(MatrixOperations.Product(F_discrete, P), MatrixOperations.Transporation(F_discrete)),
-                    MatrixOperations.Product(MatrixOperations.Product(G_discrete, Q), MatrixOperations.Transporation(F_discrete))
+                    MatrixOperations.Product(MatrixOperations.Product(G_discrete, Q), MatrixOperations.Transporation(G_discrete))
                     );
-                K = MatrixOperations.Product(
-                    MatrixOperations.Product(S, MatrixOperations.Transporation(H)),
+                K = MatrixOperations.Product(MatrixOperations.Product(S, MatrixOperations.Transporation(H)),
                     MatrixOperations.Inverted(MatrixOperations.Sum(MatrixOperations.Product(
-                        MatrixOperations.Product(H, S), MatrixOperations.Transporation(H)), R))
-                    );
+                        MatrixOperations.Product(H, S), MatrixOperations.Transporation(H)), R)));
                 P = MatrixOperations.Product(MatrixOperations.Difference(eyeMatrix, MatrixOperations.Product(K, H)), S);
             }
-            G_discrete = MatrixOperations.Product(MatrixOperations.Sum(eyeMatrix,
-                 MatrixOperations.Multiplication(F, 0.5)), G);
-            Q = MatrixOperations.Pow(MatrixOperations.DiagMatrix(W),2);
+            G_discrete = MatrixOperations.Product(MatrixOperations.Sum(eyeMatrix, MatrixOperations.Multiplication(F, 0.5)), G);
+            
+            Q = MatrixOperations.Pow(MatrixOperations.DiagMatrix(W_withoutNoise),2);
             if (X_estimate == null)
             {
                 X_estimate = X;
@@ -290,27 +360,35 @@ namespace EstimateLib
 
             X_previous = X_estimate;
         }
-        public void Model(InitErrors initErrors, Point point, OmegaGyro omegaGyro, EarthModel earthModel, Velocity velocity, 
-            Acceleration acceleration, double[][] C)
+        public void Model(InitErrors initErrors, Parameters parameters, double[][] C)
         {
             if (X == null)
-                InitX(initErrors, point, omegaGyro, earthModel, velocity);
+            {
+                X_dot = MatrixOperations.Zeros(21, 1);
+                InitAnglesError(initErrors);
+                InitX(initErrors, parameters.point, parameters.omegaGyro, parameters.earthModel, parameters.velocity, parameters.angles, true);
 
-            InitF(omegaGyro, earthModel, acceleration, C);
+            }
+            else
+            {
+                InitX(initErrors, parameters.point, parameters.omegaGyro, parameters.earthModel, parameters.velocity, parameters.angles);
+            }
+
+            
+            InitF(parameters.omegaGyro, parameters.earthModel, parameters.acceleration, C);
             InitG(C);
             InitW(initErrors);
 
-            if (X_dot == null)
-                X_dot = MatrixOperations.Zeros(21, 1);
+           
 
             X_dot = MatrixOperations.Sum(MatrixOperations.Product(F, X), MatrixOperations.Product(G, W));
 
-            InitH(point, earthModel, omegaGyro, velocity);
-            InitZ(point, velocity, earthModel);
+            InitH(parameters.point, parameters.earthModel, parameters.omegaGyro, parameters.velocity);
+            InitZ(parameters.point, parameters.velocity, parameters.earthModel);
             
             Kalman();
-            IncrementX();
-            IncrementAngle();
+            //IncrementX();
+            //IncrementAngle();
         }
     }
 }

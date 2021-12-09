@@ -27,9 +27,10 @@ namespace DebugApp
         }
         public struct FullDisplayedData
         {
-            public List<DisplayedData> DisplayedDatasIdeal { get; set; }
-            public List<DisplayedData> DisplayedDatasError { get; set; }
-            public List<DisplayedData> DisplayedDatasWithError { get; set; }
+            public List<DisplayedData> ideal { get; set; }
+            public List<DisplayedData> error { get; set; }
+            public List<DisplayedData> real { get; set; }
+            public List<DisplayedData> estimated { get; set; }
 
         }
     }

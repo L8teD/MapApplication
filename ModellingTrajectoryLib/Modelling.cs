@@ -15,9 +15,11 @@ namespace ModellingTrajectoryLib
         public List<PointSet> points { get; private set; }
         public List<VelocitySet> velocities { get; private set; }
         public List<AnglesSet> angles { get; private set; }
-        public List<DisplayedData> displayedDatasIdeal { get; private set; }
-        public List<DisplayedData> displayedDatasError { get; private set; }
-        public List<DisplayedData> displayedDatasWithError { get; private set; }
+        public List<DisplayedData> dDataIdeal { get; private set; }
+        public List<DisplayedData> dDataError { get; private set; }
+        public List<DisplayedData> dDataReal { get; private set; }
+        public List<DisplayedData> dDataEstimate { get; private set; }
+        public List<P_out> p_Outs { get; set; }
         public Modelling(InputData inputData, InitErrors initErrors)
         {
             double[] inputLatArray = Converter.DegToRad(inputData.latitude);
@@ -26,12 +28,14 @@ namespace ModellingTrajectoryLib
             double[] velocity = inputData.velocity;
             Model.Model(inputLatArray, inputLonArray, inputAltArray, velocity, initErrors);
             //points = Converter.RadToDeg(Model.returnedPoints);
-            points = Model.outputPointsList;
-            velocities = Model.outputVelocityList;
-            angles = Model.outputAnglesList;
-            displayedDatasIdeal = Model.outputDisplayedDataIdeal;
-            displayedDatasError = Model.outputDisplayedDataError;
-            displayedDatasWithError = Model.outputDisplayedDataWithError;
+            points = Model.pointsList;
+            velocities = Model.velocityList;
+            angles = Model.anglesList;
+            dDataIdeal = Model.dDataIdeal;
+            dDataError = Model.dDataError;
+            dDataReal = Model.dDataReal;
+            dDataEstimate = Model.dDataEstimate;
+            p_Outs = Model.p_Outs;
         }
     }
 }

@@ -19,38 +19,49 @@ namespace DebugApp
         }
         public static void AddPlotDataToStruct(FullDisplayedData fullDisplayedData, int index)
         {
-            plotDataList.Add(new PlotData("Latitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Latitude, "[deg]"));
-            plotDataList.Add(new PlotData("Longitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Longitude, "[deg]"));
-            plotDataList.Add(new PlotData("Altitude", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Altitude, "[m]"));
-            plotDataList.Add(new PlotData("Velocity", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Velocity, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity East", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityEast, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity North", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityNorth, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity H", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].VelocityH, "[m/sec]"));
-            plotDataList.Add(new PlotData("Heading", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Heading, "[deg]"));
-            plotDataList.Add(new PlotData("Roll", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Roll, "[deg]"));
-            plotDataList.Add(new PlotData("Pitch", "Ideal Data", fullDisplayedData.DisplayedDatasIdeal[index].Pitch, "[deg]"));
+            plotDataList.Add(new PlotData("Latitude", "Ideal Data", fullDisplayedData.ideal[index].Latitude, "[deg]"));
+            plotDataList.Add(new PlotData("Longitude", "Ideal Data", fullDisplayedData.ideal[index].Longitude, "[deg]"));
+            plotDataList.Add(new PlotData("Altitude", "Ideal Data", fullDisplayedData.ideal[index].Altitude, "[m]"));
+            plotDataList.Add(new PlotData("Velocity", "Ideal Data", fullDisplayedData.ideal[index].Velocity, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity East", "Ideal Data", fullDisplayedData.ideal[index].VelocityEast, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity North", "Ideal Data", fullDisplayedData.ideal[index].VelocityNorth, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity H", "Ideal Data", fullDisplayedData.ideal[index].VelocityH, "[m/sec]"));
+            plotDataList.Add(new PlotData("Heading", "Ideal Data", fullDisplayedData.ideal[index].Heading, "[deg]"));
+            plotDataList.Add(new PlotData("Roll", "Ideal Data", fullDisplayedData.ideal[index].Roll, "[deg]"));
+            plotDataList.Add(new PlotData("Pitch", "Ideal Data", fullDisplayedData.ideal[index].Pitch, "[deg]"));
 
-            plotDataList.Add(new PlotData("Latitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Latitude, "[deg]"));
-            plotDataList.Add(new PlotData("Longitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Longitude, "[deg]"));
-            plotDataList.Add(new PlotData("Altitude", "Error Data", fullDisplayedData.DisplayedDatasError[index].Altitude, "[m]"));
-            plotDataList.Add(new PlotData("Velocity", "Error Data", fullDisplayedData.DisplayedDatasError[index].Velocity, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity East", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityEast, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity North", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityNorth, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity H", "Error Data", fullDisplayedData.DisplayedDatasError[index].VelocityH, "[m/sec]"));
-            plotDataList.Add(new PlotData("Heading", "Error Data", fullDisplayedData.DisplayedDatasError[index].Heading, "[deg]"));
-            plotDataList.Add(new PlotData("Roll", "Error Data", fullDisplayedData.DisplayedDatasError[index].Roll, "[deg]"));
-            plotDataList.Add(new PlotData("Pitch", "Error Data", fullDisplayedData.DisplayedDatasError[index].Pitch, "[deg]"));
+            plotDataList.Add(new PlotData("Latitude", "Error Data", fullDisplayedData.error[index].Latitude, "[deg]"));
+            plotDataList.Add(new PlotData("Longitude", "Error Data", fullDisplayedData.error[index].Longitude, "[deg]"));
+            plotDataList.Add(new PlotData("Altitude", "Error Data", fullDisplayedData.error[index].Altitude, "[m]"));
+            plotDataList.Add(new PlotData("Velocity", "Error Data", fullDisplayedData.error[index].Velocity, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity East", "Error Data", fullDisplayedData.error[index].VelocityEast, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity North", "Error Data", fullDisplayedData.error[index].VelocityNorth, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity H", "Error Data", fullDisplayedData.error[index].VelocityH, "[m/sec]"));
+            plotDataList.Add(new PlotData("Heading", "Error Data", fullDisplayedData.error[index].Heading, "[deg]"));
+            plotDataList.Add(new PlotData("Roll", "Error Data", fullDisplayedData.error[index].Roll, "[deg]"));
+            plotDataList.Add(new PlotData("Pitch", "Error Data", fullDisplayedData.error[index].Pitch, "[deg]"));
 
-            plotDataList.Add(new PlotData("Latitude", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Latitude, "[deg]"));
-            plotDataList.Add(new PlotData("Longitude", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Longitude, "[deg]"));
-            plotDataList.Add(new PlotData("Altitude", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Altitude,"[m]"));
-            plotDataList.Add(new PlotData("Velocity", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Velocity, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity East", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].VelocityEast, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity North", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].VelocityNorth, "[m/sec]"));
-            plotDataList.Add(new PlotData("Velocity H", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].VelocityH, "[m/sec]"));
-            plotDataList.Add(new PlotData("Heading", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Heading, "[deg]"));
-            plotDataList.Add(new PlotData("Roll", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Roll, "[deg]"));
-            plotDataList.Add(new PlotData("Pitch", "Ideal+Error Data", fullDisplayedData.DisplayedDatasWithError[index].Pitch, "[deg]"));
+            plotDataList.Add(new PlotData("Latitude", "Ideal+Error Data", fullDisplayedData.real[index].Latitude, "[deg]"));
+            plotDataList.Add(new PlotData("Longitude", "Ideal+Error Data", fullDisplayedData.real[index].Longitude, "[deg]"));
+            plotDataList.Add(new PlotData("Altitude", "Ideal+Error Data", fullDisplayedData.real[index].Altitude,"[m]"));
+            plotDataList.Add(new PlotData("Velocity", "Ideal+Error Data", fullDisplayedData.real[index].Velocity, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity East", "Ideal+Error Data", fullDisplayedData.real[index].VelocityEast, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity North", "Ideal+Error Data", fullDisplayedData.real[index].VelocityNorth, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity H", "Ideal+Error Data", fullDisplayedData.real[index].VelocityH, "[m/sec]"));
+            plotDataList.Add(new PlotData("Heading", "Ideal+Error Data", fullDisplayedData.real[index].Heading, "[deg]"));
+            plotDataList.Add(new PlotData("Roll", "Ideal+Error Data", fullDisplayedData.real[index].Roll, "[deg]"));
+            plotDataList.Add(new PlotData("Pitch", "Ideal+Error Data", fullDisplayedData.real[index].Pitch, "[deg]"));
+
+            plotDataList.Add(new PlotData("Latitude", "Estimate Data", fullDisplayedData.estimated[index].Latitude, "[deg]"));
+            plotDataList.Add(new PlotData("Longitude", "Estimate Data", fullDisplayedData.estimated[index].Longitude, "[deg]"));
+            //plotDataList.Add(new PlotData("Altitude", "Estimate Data", fullDisplayedData.estimated[index].Altitude, "[m]"));
+            plotDataList.Add(new PlotData("Velocity", "Estimate Data", fullDisplayedData.estimated[index].Velocity, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity East", "Estimate Data", fullDisplayedData.estimated[index].VelocityEast, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity North", "Estimate Data", fullDisplayedData.estimated[index].VelocityNorth, "[m/sec]"));
+            //plotDataList.Add(new PlotData("Velocity H", "Estimate Data", fullDisplayedData.estimated[index].VelocityH, "[m/sec]"));
+            //plotDataList.Add(new PlotData("Heading", "Estimate Data", fullDisplayedData.estimated[index].Heading, "[deg]"));
+            //plotDataList.Add(new PlotData("Roll", "Estimate Data", fullDisplayedData.estimated[index].Roll, "[deg]"));
+            //plotDataList.Add(new PlotData("Pitch", "Estimate Data", fullDisplayedData.estimated[index].Pitch, "[deg]"));
         }
 
         public static List<DataPoint> CreateDatapointList(List<PlotData> currentPlotDataList)

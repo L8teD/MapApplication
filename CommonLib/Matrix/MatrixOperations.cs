@@ -27,7 +27,7 @@ namespace CommonLib.Matrix
         }
         public static double[][] DiagMatrix(double[][] input)
         {
-            double[][] diag = Zeros(input.Length, input[0].Length);
+            double[][] diag = Zeros(input.Length, input.Length);
             for (int i = 0; i < input.Length; i++)
                 diag[i][i] = input[i][0];
             return diag;
@@ -142,10 +142,22 @@ namespace CommonLib.Matrix
             
             return result;
         }
-
-        public static double DeterminantDI(double[][] matrix)
+        public static double[][] Copy(double[][] input)
+        {
+            double[][] output = Zeros(input.Length, input[0].Length);
+            for (int i = 0; i < input.Length; i++)
+            {
+                for (int j = 0; j < input[0].Length; j++)
+                {
+                    output[i][j] = input[i][j];
+                }
+            }
+            return output;
+        }
+        public static double DeterminantDI(double[][] matrix_input)
         {
             double det = 1;
+            double[][] matrix = Copy(matrix_input);
             //определяем переменную EPS
             const double EPS = 1E-9;
             //размерность матрицы
@@ -284,6 +296,8 @@ namespace CommonLib.Matrix
 
             //double det = Determinant(matrix);
             double det = DeterminantDI(matrix);
+            //double det = Determinant(matrix);
+
             result = Inverted(matrix, det);
             
 

@@ -157,13 +157,16 @@ namespace DebugApp
                 List<PlotData> idealPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal Data");
                 List<PlotData> errorPlotData = PlotWorker.FindRequiredData(mainTitle, "Error Data");
                 List<PlotData> withErrorPlotData = PlotWorker.FindRequiredData(mainTitle, "Ideal+Error Data");
+                List<PlotData> estimatedData = PlotWorker.FindRequiredData(mainTitle, "Estimate Data");
 
 
                 List<DataPoint> idealDataPoints = PlotWorker.CreateDatapointList(idealPlotData);
                 List<DataPoint> errorDataPoints = PlotWorker.CreateDatapointList(errorPlotData);
                 List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
+                List<DataPoint> estimatedDataPoints = PlotWorker.CreateDatapointList(estimatedData);
 
-                errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false) };
+                errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false),
+                                                            PlotWorker.CreateLineSeries(estimatedDataPoints)};
                 mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
                                                                    PlotWorker.CreateLineSeries(withErrorDataPoints, false) };
                 lastDimension = idealPlotData[0].dimension;

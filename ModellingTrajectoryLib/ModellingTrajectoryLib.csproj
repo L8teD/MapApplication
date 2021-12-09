@@ -34,6 +34,10 @@
     <Reference Include="CommonLib">
       <HintPath>..\CommonLib\bin\Debug\CommonLib.dll</HintPath>
     </Reference>
+    <Reference Include="EstimateLib" />
+    <Reference Include="EstimateLib">
+      <HintPath>..\EstimateLib\bin\Debug\EstimateLib.dll</HintPath>
+    </Reference>
     <Reference Include="ModellingErrorsLib">
       <HintPath>..\ModellingErrorsLib\bin\Debug\ModellingErrorsLib.dll</HintPath>
     </Reference>

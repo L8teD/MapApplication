@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using static CommonLib.Types;
 using static DebugApp.Logger;
 using static DebugApp.Types;
 
@@ -30,21 +31,29 @@ namespace DebugApp
             outputData = new OutputData();
             try
             {
-                PlotWorker.dataIsUpdated = true;
-                Execute.CreateTrajectory(initData, ref outputData);
-                CreatePlotData();
+                List<P_out> p_Outs = new List<P_out>();
+                //MessageBox.Show(p_Outs[32].ToString());
+            PlotWorker.dataIsUpdated = true;
+            Execute.CreateTrajectory(initData, ref outputData, ref p_Outs);
+            CreatePlotData();
+            Saver.WriteCSV(outputData.FullDisplayedData.error, "../../../../matlab_scripts/test_csv/error.csv");
+            Saver.WriteCSV(outputData.FullDisplayedData.estimated, "../../../../matlab_scripts/test_csv/estimated.csv");
+            Saver.WriteCSV(outputData.FullDisplayedData.ideal, "../../../../matlab_scripts/test_csv/ideal.csv");
+            Saver.WriteCSV(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
+               
             }
             catch(Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 Logger.PrintErrorInfo(ex.Message, initData);
             }
 
-            
-        }
+
+}
         private void CreatePlotData()
         {
             PlotWorker.InitListOfPlotData();
-            for (int i = 0; i < outputData.FullDisplayedData.DisplayedDatasIdeal.Count; i++)
+            for (int i = 0; i < outputData.FullDisplayedData.ideal.Count; i++)
             {
                 PlotWorker.AddPlotDataToStruct(outputData.FullDisplayedData, i);
             }

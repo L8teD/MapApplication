@@ -62,23 +62,5 @@ namespace ModellingErrorsLib3
             MatrixOrientation[1] = new double[] { -omegaGyro.H, 0, omegaGyro.E };
             MatrixOrientation[2] = new double[] { omegaGyro.N, -omegaGyro.E, 0 };
         }
-        public static double[][] CreateM(double heading, double pitch)
-        {
-            double[][] M = MatrixOperations.Create(3, 3);
-            double headingReverse = MathTransformation.ReverseAngle(heading);
-
-            M[0][0] = Math.Sin(headingReverse) * Math.Tan(pitch);
-            M[0][1] = Math.Cos(headingReverse) * Math.Tan(pitch);
-            M[0][2] = -1;
-            M[1][0] = Math.Cos(headingReverse);
-            M[1][1] = -Math.Sin(headingReverse);
-            M[1][2] = 0;
-            M[2][0] = Math.Sin(headingReverse) / Math.Cos(pitch);
-            M[2][1] = Math.Cos(-headingReverse) / Math.Cos(pitch);
-            M[2][2] = 0;
-
-            return M;
-        }
-
     }
 }

@@ -9,6 +9,15 @@ namespace CommonLib
 {
     public class Types
     {
+        public struct P_out
+        {
+            public double lon { get; set; }
+            public double lat { get; set; }
+            public double alt { get; set; }
+            public double ve { get; set; }
+            public double vn { get; set; }
+            public double vh { get; set; }
+        }
         public struct Parameters
         {
             public AbsoluteOmega absOmega;
