@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EstimateLib", "..\EstimateL
 		{AF08B59B-0BA3-48E3-AE9E-01611F110F97} = {AF08B59B-0BA3-48E3-AE9E-01611F110F97}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyMatrix", "..\..\..\..\Projects\MyMatrix\MyMatrix\MyMatrix.csproj", "{3C5669CC-9719-489D-A24F-BEA2135B2314}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{0A6A8839-61D8-41D2-B69B-60C13488DFCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A6A8839-61D8-41D2-B69B-60C13488DFCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A6A8839-61D8-41D2-B69B-60C13488DFCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C5669CC-9719-489D-A24F-BEA2135B2314}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C5669CC-9719-489D-A24F-BEA2135B2314}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C5669CC-9719-489D-A24F-BEA2135B2314}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C5669CC-9719-489D-A24F-BEA2135B2314}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

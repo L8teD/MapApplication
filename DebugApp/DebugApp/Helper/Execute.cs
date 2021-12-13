@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CommonLib.Types;
-using static DebugApp.Types;
+using static DebugApp.Model.Types;
 using static ModellingErrorsLib3.Types;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
     class Execute
     {
-        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref List<P_out> p_Outs)
+        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref List<P_out> p_Outs,
+            ref List<X_dot_out> x_Dot_Outs, ref List<MatlabData> matlabData) 
         {
             p_Outs = new List<P_out>();
 
@@ -44,6 +45,8 @@ namespace DebugApp
             outputData.FullDisplayedData = fullDisplayedData;
 
             p_Outs = model.p_Outs;
+            x_Dot_Outs = model.x_Dot_Outs;
+            matlabData = model.matlabData;
         }
         private static InitErrors SetInitErrors(InitData initData)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DebugApp.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 using static CommonLib.Types;
 using static ModellingErrorsLib3.Types;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
     public class Types
     {

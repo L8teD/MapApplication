@@ -1,4 +1,4 @@
-﻿using CommonLib.Matrix;
+﻿using MyMatrix;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace CommonLib.Params
         public double X_dot { get; private set; }
         public double Y_dot { get; private set; }
         public double Z_dot { get; private set; }
-        public OmegaGyro(Parameters parameters, double[][] C)
+        public OmegaGyro(Parameters parameters, Matrix C)
         {
             GetProjectionsNZSK(parameters.absOmega, parameters.omegaEarth);
             GetProjectionSSK(C);
@@ -34,13 +34,13 @@ namespace CommonLib.Params
             H = absOmega.H + omegaEarth.H;
             //return omegaGyro;
         }
-        private void GetProjectionSSK(double[][] C)
+        private void GetProjectionSSK(Matrix C)
         {
-            double[][] omega_NEH = new double[][] { new double[] { E }, new double[] { N }, new double[] { H } };
-            double[][] omega_XYZ = MatrixOperations.Product(MatrixOperations.Inverted(C), omega_NEH);
-            X = omega_XYZ[0][0];
-            Y = omega_XYZ[1][0];
-            Z = omega_XYZ[2][0];
+            Vector omega_ENH = new Vector(E, N, H);
+            Vector omega_XYZ = !C * omega_ENH;
+            X = omega_XYZ[1];
+            Y = omega_XYZ[2];
+            Z = omega_XYZ[3];
         }
         private void GetDot(Point point, Velocity velocity, Acceleration acceleration, EarthModel earth, OmegaEarth omegaEarth)
         {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using static DebugApp.Types;
+using static DebugApp.Model.Types;
 using System.Windows;
 using static CommonLib.Types;
 using System.Text.Json;
@@ -12,8 +12,9 @@ using System.Configuration;
 using System.Data.SQLite;
 using System.Data;
 using System.Data.SqlClient;
+using DebugApp.ViewModel;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
     public class Logger
     {

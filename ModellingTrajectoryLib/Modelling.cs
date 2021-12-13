@@ -20,6 +20,8 @@ namespace ModellingTrajectoryLib
         public List<DisplayedData> dDataReal { get; private set; }
         public List<DisplayedData> dDataEstimate { get; private set; }
         public List<P_out> p_Outs { get; set; }
+        public List<X_dot_out> x_Dot_Outs{ get; set; }
+        public List<MatlabData> matlabData { get; set; }
         public Modelling(InputData inputData, InitErrors initErrors)
         {
             double[] inputLatArray = Converter.DegToRad(inputData.latitude);
@@ -36,6 +38,8 @@ namespace ModellingTrajectoryLib
             dDataReal = Model.dDataReal;
             dDataEstimate = Model.dDataEstimate;
             p_Outs = Model.p_Outs;
+            x_Dot_Outs = Model.x_Dot_Outs;
+            matlabData = Model.matlabData;
         }
     }
 }

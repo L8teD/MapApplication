@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DebugApp
+namespace DebugApp.ViewModel
 {
     public class PlotViewModel : BaseViewModel
     {
@@ -51,7 +51,6 @@ namespace DebugApp
                 (cmd_Switch = new RelayCommand(obj =>
                 {
                     m_PlotModel.Switch();
-
                 }));
             }
         }

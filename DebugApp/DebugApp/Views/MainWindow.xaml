@@ -1,17 +1,16 @@
-﻿<Window x:Class="DebugApp.MainWindow"
+﻿<Window x:Class="DebugApp.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:uc="clr-namespace:DebugApp.UserControls"
         xmlns:ie="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:local="clr-namespace:DebugApp"  d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        xmlns:v="clr-namespace:DebugApp.View"
+        xmlns:vm="clr-namespace:DebugApp.ViewModel"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         Title="MainWindow" Height="800" Width="1200" WindowState="Maximized">
-    <Window.Resources>
-        <ResourceDictionary Source="../Styles/ButtonDict.xaml"></ResourceDictionary>
-    </Window.Resources>
+    
     <Window.InputBindings>
         <KeyBinding Command="{Binding Cmd_DeleteLogElement}" Key="Delete"></KeyBinding>
     </Window.InputBindings>
@@ -65,7 +64,7 @@
                             <DataTemplate>
                                 <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path= DataContext.Cmd_RemoveRTP}"
-                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{StaticResource btn_Style}"></Button>
+                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{DynamicResource btn_Style}"></Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -169,15 +168,33 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <uc:Plot Title="Longitude"></uc:Plot>
-            <uc:Plot Title="Latitude" Grid.Column="1" ></uc:Plot>
-            <uc:Plot Title="Altitude" Grid.Column="2" ></uc:Plot>
-            <uc:Plot Title="Velocity East" Grid.Row="1" ></uc:Plot>
-            <uc:Plot Title="Velocity North" Grid.Row="1" Grid.Column="1" ></uc:Plot>
-            <uc:Plot Title="Velocity H" Grid.Row="1" Grid.Column="2" ></uc:Plot>
-            <uc:Plot Title="Heading" Grid.Row="2" ></uc:Plot>
-            <uc:Plot Title="Pitch" Grid.Row="2" Grid.Column="1" ></uc:Plot>
-            <uc:Plot Title="Roll" Grid.Row="2" Grid.Column="2"></uc:Plot>
+            <v:Plot>
+                <ContentControl Content="{Binding LongitudePlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Column="1" >
+                <ContentControl Content="{Binding LatitudePlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Column="2" >
+                <ContentControl Content="{Binding AltitudePlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="1" >
+                <ContentControl Content="{Binding VePlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="1" Grid.Column="1" >
+                <ContentControl Content="{Binding VnPlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="1" Grid.Column="2" >
+                <ContentControl Content="{Binding VhPlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="2" >
+                <ContentControl Content="{Binding HeadingPlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="2" Grid.Column="1" >
+                <ContentControl Content="{Binding RollPlot}"></ContentControl>
+            </v:Plot>
+            <v:Plot Grid.Row="2" Grid.Column="2">
+                <ContentControl Content="{Binding PitchPlot}"></ContentControl>
+            </v:Plot>
         </Grid>
         <GroupBox Header="LogInfo" Grid.Column="4">
             <ListBox x:Name="lb_LoggerInfo" ItemsSource="{Binding loggerInfoList, Mode=TwoWay}" >

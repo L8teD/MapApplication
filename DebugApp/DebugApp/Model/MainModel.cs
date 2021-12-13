@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DebugApp.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,16 +8,20 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using static CommonLib.Types;
-using static DebugApp.Logger;
-using static DebugApp.Types;
+using static DebugApp.Model.Logger;
+using static DebugApp.Model.Types;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
-    class MainModel
+    public class MainModel
     {
         OutputData outputData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
+        public MainModel()
+        {
+            
+        }
         public void AddRTP(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
         {
             ListViewWorker.UpdateData(rtpList, RTP);
@@ -32,14 +37,18 @@ namespace DebugApp
             try
             {
                 List<P_out> p_Outs = new List<P_out>();
+                List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
+                List<MatlabData> matlabData= new List<MatlabData>();
                 //MessageBox.Show(p_Outs[32].ToString());
-            PlotWorker.dataIsUpdated = true;
-            Execute.CreateTrajectory(initData, ref outputData, ref p_Outs);
-            CreatePlotData();
-            Saver.WriteCSV(outputData.FullDisplayedData.error, "../../../../matlab_scripts/test_csv/error.csv");
-            Saver.WriteCSV(outputData.FullDisplayedData.estimated, "../../../../matlab_scripts/test_csv/estimated.csv");
-            Saver.WriteCSV(outputData.FullDisplayedData.ideal, "../../../../matlab_scripts/test_csv/ideal.csv");
-            Saver.WriteCSV(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
+                PlotWorker.dataIsUpdated = true;
+                Execute.CreateTrajectory(initData, ref outputData, ref p_Outs, ref x_Dot_Outs, ref matlabData);
+                CreatePlotData();
+                Saver.WriteCSV(outputData.FullDisplayedData.error, "../../../../matlab_scripts/test_csv/error.csv");
+                Saver.WriteCSV(outputData.FullDisplayedData.estimated, "../../../../matlab_scripts/test_csv/estimated.csv");
+                Saver.WriteCSV(outputData.FullDisplayedData.ideal, "../../../../matlab_scripts/test_csv/ideal.csv");
+                Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
+                Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
+                Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
                
             }
             catch(Exception ex)
@@ -58,10 +67,7 @@ namespace DebugApp
                 PlotWorker.AddPlotDataToStruct(outputData.FullDisplayedData, i);
             }
         }
-        public MainModel()
-        {
-            
-        }
+
         public void SetDataFromLogger(LogInfo info, ObservableCollection<RouteTurningPoint> rtpList)
         {
             string[] infoString = info.Element.Split('|');

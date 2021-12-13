@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using static CommonLib.Types;
 using CsvHelper;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
     class Saver
     {
@@ -26,7 +26,7 @@ namespace DebugApp
                 }
             }
         }
-        public static void WriteCSV(List<P_out> data, string filename)
+        public static void WriteCSV<T>(List<T> data, string filename)
         {
             using (var writer = new StreamWriter(filename))
             {

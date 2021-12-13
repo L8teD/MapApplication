@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:DebugApp"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Views/Resources/DataTemplates.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/ButtonDict.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,5 +1,8 @@
-﻿using OxyPlot;
+﻿using DebugApp.Model;
+using DebugApp.View;
+using OxyPlot;
 using OxyPlot.Axes;
+using OxyPlot.Legends;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
@@ -22,7 +25,7 @@ namespace DebugApp
         LinearAxis yAxis;
         LinearAxis xAxis;
 
-        string mainTitle;
+        public string mainTitle;
 
         string lastXAxesName;
         string lastYAxesName;
@@ -136,13 +139,15 @@ namespace DebugApp
         {
             MyPlotModel.Series.Clear();
             MyPlotModel.Title = title;
+            MyPlotModel.IsLegendVisible = true;
+            MyPlotModel.Legends = new ElementCollection<LegendBase>(MyPlotModel);
+
             RefreshAxes(xAxisName, yAxisName, title);
             foreach (Series serie in lineSeriesData)
             {
                 MyPlotModel.Series.Add(serie);
             }
             MyPlotModel.InvalidatePlot(true);
-
             lastXAxesName = xAxisName;
             lastYAxesName = yAxisName;
             lastTitle = title;
@@ -165,10 +170,11 @@ namespace DebugApp
                 List<DataPoint> withErrorDataPoints = PlotWorker.CreateDatapointList(withErrorPlotData);
                 List<DataPoint> estimatedDataPoints = PlotWorker.CreateDatapointList(estimatedData);
 
-                errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false),
-                                                            PlotWorker.CreateLineSeries(estimatedDataPoints)};
-                mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints),
-                                                                   PlotWorker.CreateLineSeries(withErrorDataPoints, false) };
+                //errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, false)};
+                errorSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(errorDataPoints, "error", false),
+                                                            PlotWorker.CreateLineSeries(estimatedDataPoints, "estimate")};
+                mainSeries = new List<LineSeries>() { PlotWorker.CreateLineSeries(idealDataPoints, "ideal"),
+                                                                   PlotWorker.CreateLineSeries(withErrorDataPoints,"real", false) };
                 lastDimension = idealPlotData[0].dimension;
                 choosenData = ChoosenData.Full;
                 SetPlotState("Time, [sec]", idealPlotData[0].name + " " + lastDimension, mainTitle, mainSeries);

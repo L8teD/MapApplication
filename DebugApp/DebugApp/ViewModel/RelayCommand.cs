@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace DebugApp
+namespace DebugApp.ViewModel
 {
     public class RelayCommand : ICommand
     {

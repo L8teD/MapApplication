@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DebugApp.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DebugApp.UserControls
+namespace DebugApp.View
 {
     public partial class Plot : UserControl
     {
@@ -20,12 +21,12 @@ namespace DebugApp.UserControls
         public Plot()
         {
             InitializeComponent();
-            this.Loaded += Plot_Loaded;
+            //this.Loaded += Plot_Loaded;
         }
 
         private void Plot_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = new PlotViewModel(Title);
+            //this.DataContext = new PlotViewModel(Title);
         }
     }
 }

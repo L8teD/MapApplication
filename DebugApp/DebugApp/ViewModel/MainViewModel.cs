@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DebugApp.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,14 +9,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using static DebugApp.Types;
+using static DebugApp.Model.Types;
 
-namespace DebugApp
+namespace DebugApp.ViewModel
 {
-    public class MainViewModel : DependencyObject
+    public class MainViewModel : BaseViewModel
     {
         private MainModel m_Model;
         private RouteTurningPoint rtp;
+
+        public PlotViewModel LongitudePlot { get; set; }
+        public PlotViewModel LatitudePlot { get; set; }
+        public PlotViewModel AltitudePlot { get; set; }
+        public PlotViewModel VePlot { get; set; }
+        public PlotViewModel VnPlot { get; set; }
+        public PlotViewModel VhPlot { get; set; }
+        public PlotViewModel HeadingPlot { get; set; }
+        public PlotViewModel PitchPlot { get; set; }
+        public PlotViewModel RollPlot { get; set; }
+
+
         public RouteTurningPoint RTP
         {
             get { return rtp; }
@@ -101,21 +114,24 @@ namespace DebugApp
         public MainViewModel()
         {
             m_Model = new MainModel();
-            //RTP = new RouteTurningPoint();
             RTP = m_Model.SetRTP();
+
+            LongitudePlot = new PlotViewModel("Longitude");
+            LatitudePlot = new PlotViewModel("Latitude");
+            AltitudePlot = new PlotViewModel("Altitude");
+            VePlot = new PlotViewModel("Velocity East");
+            VnPlot = new PlotViewModel("Velocity North");
+            VhPlot = new PlotViewModel("Velocity H");
+            HeadingPlot = new PlotViewModel("Heading");
+            RollPlot = new PlotViewModel("Roll");
+            PitchPlot = new PlotViewModel("Pitch");
 
             initData = new InitData();
             initData.rtpList = new ObservableCollection<RouteTurningPoint>();
             (initData.insErrors, initData.sensorErrors) = m_Model.SetInputErrors();
             loggerInfoList = m_Model.GetInfoFromLogger();
+        }
 
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
 
 
     }

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static DebugApp.Types;
+using static DebugApp.Model.Types;
 
-namespace DebugApp
+namespace DebugApp.Model
 {
     public class PlotWorker
     {
@@ -78,7 +78,7 @@ namespace DebugApp
             else
                 return plotDataList.FindAll(item => item.name == plotTitle && item.valid == plotFactor);
         }
-        public static LineSeries CreateLineSeries(List<DataPoint> data, bool isBlue = true)
+        public static LineSeries CreateLineSeries(List<DataPoint> data, string title, bool isBlue = true)
         {
             LineSeries series = new LineSeries()
             {
@@ -90,6 +90,9 @@ namespace DebugApp
                 LineStyle = LineStyle.Solid,
                 Color = isBlue ? OxyColors.Blue : OxyColors.Red,
                 MarkerType = MarkerType.None,
+                Title = title,
+                LegendKey = title,
+                LineLegendPosition = LineLegendPosition.End
             };
             foreach (DataPoint point in data)
             {

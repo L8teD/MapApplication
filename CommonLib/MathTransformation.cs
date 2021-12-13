@@ -17,6 +17,10 @@ namespace CommonLib
         {
             value += increment;
         }
+        public static double IncrementValue(double value, double increment)
+        {
+            return value + increment;
+        }
         public static Point SumCoordsAndErrors(Point coord, Point error)
         {
             return new Point(

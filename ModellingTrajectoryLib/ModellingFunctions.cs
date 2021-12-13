@@ -1,5 +1,4 @@
 ﻿using CommonLib;
-using CommonLib.Matrix;
 using CommonLib.Params;
 using ModellingErrorsLib;
 using ModellingTrajectoryLib.Helper;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using static CommonLib.Types;
 using static ModellingErrorsLib.Types;
 using static ModellingTrajectoryLib.Types;
+using MyMatrix;
 
 namespace ModellingTrajectoryLib
 {
@@ -179,7 +179,7 @@ namespace ModellingTrajectoryLib
             }
             CountOfWindCall++;
         }
-        internal double[][] CreateMatrixC(Parameters parameters)
+        internal Matrix CreateMatrixC(Parameters parameters)
         {
             return Create.MatrixC(parameters.angles);
         }

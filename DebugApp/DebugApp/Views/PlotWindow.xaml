@@ -1,13 +1,12 @@
-﻿<Window x:Class="DebugApp.PlotWindow"
+﻿<Window x:Class="DebugApp.View.PlotWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DebugApp"
-        xmlns:uc="clr-namespace:DebugApp.UserControls"
+        xmlns:v="clr-namespace:DebugApp.View"
         mc:Ignorable="d"
         Title="PlotWindow" Height="450" Width="800">
     <Grid>
-        <uc:Plot x:Name="plot"></uc:Plot>
+        <v:Plot x:Name="plot"></v:Plot>
     </Grid>
 </Window>

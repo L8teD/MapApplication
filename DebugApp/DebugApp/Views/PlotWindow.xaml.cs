@@ -1,4 +1,5 @@
-﻿using OxyPlot;
+﻿using DebugApp.ViewModel;
+using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DebugApp
+namespace DebugApp.View
 {
     /// <summary>
     /// Логика взаимодействия для PlotWindow.xaml
