@@ -19,7 +19,7 @@ namespace ModellingTrajectoryLib
     {
         ModellingFunctions functions = new ModellingFunctions();
         ErrorsModel errorsModel = new ErrorsModel();
-        KalmanModel2 kalmanModel = new KalmanModel2();
+        KalmanModel kalmanModel = new KalmanModel();
         private List<Parameters> localParams = new List<Parameters>();
 
 
@@ -115,7 +115,7 @@ namespace ModellingTrajectoryLib
             parameters.point = Point.GetCoords(parameters, dt);
 
             errorsModel.ModellingErrors(initErrors, parameters);
-            kalmanModel.Model(initErrors, parameters, C); //ПРОВЕРИТЬ ЭЛЕМЕНТЫ F
+            kalmanModel.Model(initErrors, parameters, C); 
 
             //pointsList.Add(new PointSet(parameters, errorsModel.X));
             pointsList.Add(new PointSet(parameters, kalmanModel.X));
@@ -134,19 +134,18 @@ namespace ModellingTrajectoryLib
                 new DisplayedData(pointsList[pointsList.Count - 1].InDegreesWithError,
                 velocityList[velocityList.Count - 1].ValueWithError, anglesList[index].WithError));
 
-            Point estPoint = new Point(kalmanModel.X_estimate[2], kalmanModel.X_estimate[1], 0.0);
-            VelocityValue estVelocityValue = new VelocityValue(kalmanModel.X_estimate[3], kalmanModel.X_estimate[4], 0.0, 0.0);
-            //Angles estAngles = new Angles() { heading = kalmanModel.X_estimate[6][0], roll = kalmanModel.X_estimate[7][0], pitch = kalmanModel.X_estimate[8][0] };
+            Point estPoint = new Point(kalmanModel.X_estimate[2], kalmanModel.X_estimate[1], kalmanModel.X_estimate[3]);
+            VelocityValue estVelocityValue = new VelocityValue(kalmanModel.X_estimate[4], kalmanModel.X_estimate[5], kalmanModel.X_estimate[6], 0.0);
             Angles estAngles = new Angles() { heading = kalmanModel.orientationAngles[1], roll = kalmanModel.orientationAngles[2], pitch = kalmanModel.orientationAngles[3] };
             dDataEstimate.Add(new DisplayedData(estPoint, estVelocityValue, estAngles));
 
             P_out p_Out = new P_out();
             p_Out.lon = kalmanModel.P[1,1];
             p_Out.lat = kalmanModel.P[2,2];
-            //p_Out.alt = kalmanModel.P[2][2];
-            p_Out.ve = kalmanModel.P[3,3];
-            p_Out.vn = kalmanModel.P[4,4];
-            //p_Out.vh = kalmanModel.P[4][4];
+            p_Out.alt = kalmanModel.P[3,3];
+            p_Out.ve = kalmanModel.P[4,4];
+            p_Out.vn = kalmanModel.P[5,5];
+            p_Out.vh = kalmanModel.P[6,6];
             p_Outs.Add(p_Out);
 
             X_dot_out x_Dot_Out = new X_dot_out();

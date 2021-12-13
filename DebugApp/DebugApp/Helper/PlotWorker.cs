@@ -54,11 +54,11 @@ namespace DebugApp.Model
 
             plotDataList.Add(new PlotData("Latitude", "Estimate Data", fullDisplayedData.estimated[index].Latitude, "[deg]"));
             plotDataList.Add(new PlotData("Longitude", "Estimate Data", fullDisplayedData.estimated[index].Longitude, "[deg]"));
-            //plotDataList.Add(new PlotData("Altitude", "Estimate Data", fullDisplayedData.estimated[index].Altitude, "[m]"));
+            plotDataList.Add(new PlotData("Altitude", "Estimate Data", fullDisplayedData.estimated[index].Altitude, "[m]"));
             plotDataList.Add(new PlotData("Velocity", "Estimate Data", fullDisplayedData.estimated[index].Velocity, "[m/sec]"));
             plotDataList.Add(new PlotData("Velocity East", "Estimate Data", fullDisplayedData.estimated[index].VelocityEast, "[m/sec]"));
             plotDataList.Add(new PlotData("Velocity North", "Estimate Data", fullDisplayedData.estimated[index].VelocityNorth, "[m/sec]"));
-            //plotDataList.Add(new PlotData("Velocity H", "Estimate Data", fullDisplayedData.estimated[index].VelocityH, "[m/sec]"));
+            plotDataList.Add(new PlotData("Velocity H", "Estimate Data", fullDisplayedData.estimated[index].VelocityH, "[m/sec]"));
             //plotDataList.Add(new PlotData("Heading", "Estimate Data", fullDisplayedData.estimated[index].Heading, "[deg]"));
             //plotDataList.Add(new PlotData("Roll", "Estimate Data", fullDisplayedData.estimated[index].Roll, "[deg]"));
             //plotDataList.Add(new PlotData("Pitch", "Estimate Data", fullDisplayedData.estimated[index].Pitch, "[deg]"));

@@ -112,7 +112,7 @@ namespace CommonLib
                 InDegrees = Converter.RadToDeg(parameters.point);
                 InMeters = Converter.DegreesToMeters(InDegrees, parameters.point.lat, parameters.earthModel);
                 //ErrorInMeters = new Point(_error[3], _error[1], _error[5]);
-                ErrorInMeters = new Point(_error[2], _error[1], 0);
+                ErrorInMeters = new Point(_error[2], _error[1], _error[3]);
                 ErrorInDegrees = Converter.MetersToDegrees(ErrorInMeters, parameters.point.lat, parameters.earthModel);
                 InDegreesWithError = MathTransformation.SumCoordsAndErrors(InDegrees, ErrorInDegrees);
                 InMetersWithError = MathTransformation.SumCoordsAndErrors(InMeters, ErrorInMeters);
@@ -126,8 +126,8 @@ namespace CommonLib
             public VelocitySet(Velocity _velocity, Vector _error)
             {
                 Value = new VelocityValue(_velocity.E, _velocity.N, _velocity.H, _velocity.value);
-                //Error = new VelocityValue(_error[2], _error[4], _error[6], Math.Sqrt(Math.Pow(_error[2], 2) + Math.Pow(_error[4], 2) + Math.Pow(_error[6],2)));
-                Error = new VelocityValue(_error[3], _error[4], 0, Math.Sqrt(Math.Pow(_error[3], 2) + Math.Pow(_error[4], 2) +0));
+                Error = new VelocityValue(_error[4], _error[5], _error[6], Math.Sqrt(Math.Pow(_error[2], 2) + Math.Pow(_error[4], 2) + Math.Pow(_error[6],2)));
+                //Error = new VelocityValue(_error[3], _error[4], 0, Math.Sqrt(Math.Pow(_error[3], 2) + Math.Pow(_error[4], 2) +0));
                 ValueWithError = new VelocityValue(Value.E + Error.E, Value.N + Error.N, Value.H + Error.H, Value.value + Error.value);
             }
         }

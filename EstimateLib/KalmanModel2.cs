@@ -43,7 +43,7 @@ namespace EstimateLib
         private CoordAccuracy coordAccuracy;
         private VelocityAccuracy velocityAccuracy;
 
-        private void InitX(InitErrors initErrors, Point point, OmegaGyro omegaGyro,AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
+        private void InitX(InitErrors initErrors, Point point,AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
         {
             X = Vector.Zero(19);
 
@@ -72,7 +72,7 @@ namespace EstimateLib
             X[1] = coordAccuracy.longitude;
             X[2] = coordAccuracy.latitude;
 
-            X[3] = velocityAccuracy.east + (velocity.H / earthModel.R2 + omegaGyro.E * Math.Tan(point.lat)) * X[1] + omegaGyro.H * X[2];
+            X[3] = velocityAccuracy.east + (velocity.H / earthModel.R2 + absOmega.E * Math.Tan(point.lat)) * X[1] + absOmega.H * X[2];
             X[4] = velocityAccuracy.north + velocity.H / earthModel.R1 * X[1];
 
             Matrix M = Create.MatrixM(angles.heading, angles.pitch);
@@ -129,7 +129,7 @@ namespace EstimateLib
             F[3, 18] = C[1, 2] * acceleration.Y;
             F[3, 19] = C[1, 3] * acceleration.Z;
 
-            F[4, 1] = -(omegaGyro.Z_dot - omegaGyro.E * omegaGyro.N);
+            F[4, 1] = -(omegaGyro.Z_dot - absOmega.E * absOmega.N);
             F[4, 2] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(omegaGyro.E, 2) + Math.Pow(omegaGyro.H, 2);
             F[4, 3] = -2 * omegaGyro.H;
 
@@ -203,13 +203,13 @@ namespace EstimateLib
             double acc_noise = 9.78 * 0.05 * initErrors.accelerationError.first;//default = 0.05
             Random random = new Random();
 
-            W = Vector.Zero(6);
-            W[1] = gyro_noise * random.NextDouble();
-            W[2] = gyro_noise * random.NextDouble();
-            W[3] = gyro_noise * random.NextDouble();
-            W[4] = acc_noise * random.NextDouble();
-            W[5] = acc_noise * random.NextDouble();
-            W[6] = acc_noise * random.NextDouble();
+            W = Vector.Zero(19);
+            W[14] = gyro_noise * random.NextDouble();
+            W[15] = gyro_noise * random.NextDouble();
+            W[16] = gyro_noise * random.NextDouble();
+            W[17] = acc_noise * random.NextDouble();
+            W[18] = acc_noise * random.NextDouble();
+            W[19] = acc_noise * random.NextDouble();
 
             W_withoutNoise = Vector.Zero(19);
             W_withoutNoise[14] = gyro_noise;
@@ -246,8 +246,8 @@ namespace EstimateLib
             Vector estimatedParams = new Vector(_estimatedParams);
             Vector Z_ins = estimatedParams + H * X;
             double[] _snsErrors = new double[] {
-                5/(earth.R2*Math.Cos(point.lat)),
-                5 / earth.R1,
+                5.0 / (earth.R2*Math.Cos(point.lat)),
+                5.0 / earth.R1,
                 0.05,
                 0.05
             };
@@ -289,10 +289,8 @@ namespace EstimateLib
         private void Kalman()
         {
             eyeMatrix = Matrix.Identity(19);
-            Matrix a = eyeMatrix + F;
-            Matrix b = (F ^ 2);
-            Matrix c = b * 0.5;
-            F_discrete =  a + c;
+
+            F_discrete = eyeMatrix + F + (F ^ 2) * 0.5;
 
             if (P == null)
             {
@@ -325,12 +323,12 @@ namespace EstimateLib
             {
                 X_dot = Vector.Zero(19);
                 InitAnglesError(initErrors);
-                InitX(initErrors, parameters.point, parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);
+                InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);
 
             }
             else
             {
-                InitX(initErrors, parameters.point, parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
+                InitX(initErrors, parameters.point,  parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
             }
 
 
@@ -342,7 +340,7 @@ namespace EstimateLib
 
             //X_dot = MatrixOperations.Sum(MatrixOperations.Product(F, X), MatrixOperations.Product(G, W));
 
-            X_dot = F * X;// + G * W; // шумы повторяются
+            X_dot = F * X + G * W; // шумы повторяются
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
             InitZ(parameters.point, parameters.velocity, parameters.earthModel);
