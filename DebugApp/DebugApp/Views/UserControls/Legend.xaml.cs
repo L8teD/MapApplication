@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace DebugApp.View
 {
     /// <summary>
-    /// Логика взаимодействия для Plot.xaml
+    /// Логика взаимодействия для Legend.xaml
     /// </summary>
-    public partial class Plot : UserControl
+    public partial class Legend : UserControl
     {
-        public Plot()
+        public Legend()
         {
             InitializeComponent();
         }

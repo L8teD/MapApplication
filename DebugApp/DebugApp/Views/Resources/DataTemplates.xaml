@@ -2,7 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:DebugApp.ViewModel"
                     xmlns:v="clr-namespace:DebugApp.View">
-    <DataTemplate DataType="{x:Type vm:PlotViewModel}">
+    <DataTemplate DataType="{x:Type vm:PlotVM}">
         <v:Plot></v:Plot>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:PlotControlVM}">
+        <v:PlotControl></v:PlotControl>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:LegendButtonVM}">
+        <v:LegendElement></v:LegendElement>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:LegendVM}">
+        <v:Legend></v:Legend>
     </DataTemplate>
 </ResourceDictionary>

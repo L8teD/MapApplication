@@ -1,4 +1,5 @@
 ﻿using DebugApp.ViewModel;
+using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,21 +19,47 @@ namespace DebugApp.Model
             public ObservableCollection<InputError> insErrors { get; set; }
             public ObservableCollection<InputError> sensorErrors { get; set; }
         }
-        public struct OutputData
+        public class PlotData
         {
-            public List<PointSet> Points { get; set; }
-            public List<VelocitySet> Velocities { get; set; }
-            public List<AnglesSet> Angles { get; set; }
-            public FullDisplayedData FullDisplayedData { get; set; }
-
+            public PlotName name;
+            public PlotCharacter character;
+            public List<DataPoint> values;
+            public string xAxisName;
+            public string yAxisName;
+            public PlotData(PlotName _name, PlotCharacter character, List<double> _values)
+            {
+                name = _name;
+                character = character;
+                xAxisName = "time, sec";
+                yAxisName = PlotWorker.SelectPlotAxisName(_name) + ", " + PlotWorker.SelectPlotDimension(_name, character);
+                values = new List<DataPoint>();
+                for (int i = 0; i < _values.Count; i++)
+                {
+                    values.Add(new DataPoint(i, _values[i]));
+                }
+            }
         }
-        public struct FullDisplayedData
+        public enum PlotCharacter
         {
-            public List<DisplayedData> ideal { get; set; }
-            public List<DisplayedData> error { get; set; }
-            public List<DisplayedData> real { get; set; }
-            public List<DisplayedData> estimated { get; set; }
-
+            Ideal,
+            Error,
+            Real,
+            Estimate,
+            CorrectError,
+            CorrectTrajectory,
+            None
+        }
+        public enum PlotName
+        {
+            Longitude,
+            Latitude,
+            Altitude,
+            VelocityEast,
+            VelocityNorth,
+            VelocityH,
+            Heading,
+            Roll,
+            Pitch
         }
     }
 }

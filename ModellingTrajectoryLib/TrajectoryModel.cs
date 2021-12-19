@@ -26,16 +26,17 @@ namespace ModellingTrajectoryLib
         public List<PointSet> pointsList = new List<PointSet>();
         public List<VelocitySet> velocityList = new List<VelocitySet>();
         public List<AnglesSet> anglesList = new List<AnglesSet>();
-        public List<DisplayedData> dDataIdeal = new List<DisplayedData>();
-        public List<DisplayedData> dDataError = new List<DisplayedData>();
-        public List<DisplayedData> dDataReal = new List<DisplayedData>();
-        public List<DisplayedData> dDataEstimate = new List<DisplayedData>();
-        public List<DisplayedData> dDataCorrect = new List<DisplayedData>();
+        public OutputData outputData = new OutputData();
+        
         public List<P_out> p_Outs = new List<P_out>();
         public List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
         public List<MatlabData> matlabData = new List<MatlabData>();
         public void Model(double[] latArray, double[] lonArray, double[] altArray, double[] velocity, InitErrors initErrors)
         {
+            outputData.points = new List<PointSet>();
+            outputData.velocities = new List<VelocitySet>();
+            outputData.angles = new List<AnglesSet>();
+
             int inputPointsCount = latArray.Length;
 
             functions.InitStartedData(latArray, lonArray, altArray, velocity);
@@ -58,7 +59,7 @@ namespace ModellingTrajectoryLib
 
                     if (Init)
                     {
-                        parameters.point = new Point(latArray[0], lonArray[0], altArray[0]);
+                        parameters.point = new Point(latArray[0], lonArray[0], altArray[0], Dimension.InRadians);
                         Init = false;
                     }
                     else
@@ -112,32 +113,18 @@ namespace ModellingTrajectoryLib
             parameters.absOmega = new AbsoluteOmega(parameters);
             parameters.acceleration = new Acceleration(parameters, C);
             parameters.omegaGyro = new OmegaGyro(parameters, C);
-            parameters.point = Point.GetCoords(parameters, dt);
+            parameters.point = Point.GetCoords(parameters, dt, Dimension.InRadians);
 
             errorsModel.ModellingErrors(initErrors, parameters);
-            kalmanModel.Model(initErrors, parameters, C); 
+            kalmanModel.Model(initErrors, parameters, C);
 
-            //pointsList.Add(new PointSet(parameters, errorsModel.X));
-            pointsList.Add(new PointSet(parameters, kalmanModel.X));
-            velocityList.Add(new VelocitySet(parameters.velocity, kalmanModel.X));
-            anglesList.Add(new AnglesSet(parameters.angles, kalmanModel.orientationAngles));
 
-            int index = pointsList.Count - 1;
+            outputData.points.Add(new PointSet(
+                parameters.point, kalmanModel.X, kalmanModel.X_estimate, parameters.earthModel));
 
-            dDataIdeal.Add(
-                new DisplayedData(pointsList[index].InDegrees,velocityList[index].Value, anglesList[index].Value));
+            outputData.velocities.Add(new VelocitySet(parameters.velocity, kalmanModel.X, kalmanModel.X_estimate));
 
-            dDataError.Add(
-                new DisplayedData(pointsList[index].ErrorInMeters, velocityList[index].Error, anglesList[index].Error));
-
-            dDataReal.Add(
-                new DisplayedData(pointsList[pointsList.Count - 1].InDegreesWithError,
-                velocityList[velocityList.Count - 1].ValueWithError, anglesList[index].WithError));
-
-            Point estPoint = new Point(kalmanModel.X_estimate[2], kalmanModel.X_estimate[1], kalmanModel.X_estimate[3]);
-            VelocityValue estVelocityValue = new VelocityValue(kalmanModel.X_estimate[4], kalmanModel.X_estimate[5], kalmanModel.X_estimate[6], 0.0);
-            Angles estAngles = new Angles() { heading = kalmanModel.orientationAngles[1], roll = kalmanModel.orientationAngles[2], pitch = kalmanModel.orientationAngles[3] };
-            dDataEstimate.Add(new DisplayedData(estPoint, estVelocityValue, estAngles));
+            outputData.angles.Add(new AnglesSet(parameters.angles, kalmanModel.X));
 
             P_out p_Out = new P_out();
             p_Out.lon = kalmanModel.P[1,1];

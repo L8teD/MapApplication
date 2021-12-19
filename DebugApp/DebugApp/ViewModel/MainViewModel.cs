@@ -1,4 +1,5 @@
 ﻿using DebugApp.Model;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,16 +19,7 @@ namespace DebugApp.ViewModel
         private MainModel m_Model;
         private RouteTurningPoint rtp;
 
-        public PlotViewModel LongitudePlot { get; set; }
-        public PlotViewModel LatitudePlot { get; set; }
-        public PlotViewModel AltitudePlot { get; set; }
-        public PlotViewModel VePlot { get; set; }
-        public PlotViewModel VnPlot { get; set; }
-        public PlotViewModel VhPlot { get; set; }
-        public PlotViewModel HeadingPlot { get; set; }
-        public PlotViewModel PitchPlot { get; set; }
-        public PlotViewModel RollPlot { get; set; }
-
+        public PlotControlVM longitudePlotControlVM { get; set; }
 
         public RouteTurningPoint RTP
         {
@@ -116,15 +108,8 @@ namespace DebugApp.ViewModel
             m_Model = new MainModel();
             RTP = m_Model.SetRTP();
 
-            LongitudePlot = new PlotViewModel("Longitude");
-            LatitudePlot = new PlotViewModel("Latitude");
-            AltitudePlot = new PlotViewModel("Altitude");
-            VePlot = new PlotViewModel("Velocity East");
-            VnPlot = new PlotViewModel("Velocity North");
-            VhPlot = new PlotViewModel("Velocity H");
-            HeadingPlot = new PlotViewModel("Heading");
-            RollPlot = new PlotViewModel("Roll");
-            PitchPlot = new PlotViewModel("Pitch");
+            longitudePlotControlVM = new PlotControlVM("Longitude", m_Model);
+            m_Model.RefreshLongitudePlot += M_Model_RefreshLongitudePlot;
 
             initData = new InitData();
             initData.rtpList = new ObservableCollection<RouteTurningPoint>();
@@ -132,7 +117,9 @@ namespace DebugApp.ViewModel
             loggerInfoList = m_Model.GetInfoFromLogger();
         }
 
-
-
+        private void M_Model_RefreshLongitudePlot(string xAxisName, string yAxisName,List<LineSeries> seriesList)
+        {
+            longitudePlotControlVM.Plot(xAxisName, yAxisName, seriesList);
+        }
     }
 }

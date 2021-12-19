@@ -168,9 +168,9 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <v:Plot>
-                <ContentControl Content="{Binding LongitudePlot}"></ContentControl>
-            </v:Plot>
+            <v:PlotControl>
+                <ContentControl Content="{Binding longitudePlotControlVM}"></ContentControl>
+            </v:PlotControl>
             <v:Plot Grid.Column="1" >
                 <ContentControl Content="{Binding LatitudePlot}"></ContentControl>
             </v:Plot>

@@ -23,11 +23,13 @@ namespace CommonLib
         }
         public static Point SumCoordsAndErrors(Point coord, Point error)
         {
+            if (coord.dimension != error.dimension)
+                throw new Exception("Points have different dimensions");
             return new Point(
                 coord.lat + error.lat,
                 coord.lon + error.lon,
-                coord.alt + error.alt
-                );
+                coord.alt + error.alt,
+                coord.dimension);
         }
     }
 }

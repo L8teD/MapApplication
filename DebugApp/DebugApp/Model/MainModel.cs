@@ -1,4 +1,6 @@
 ﻿using DebugApp.ViewModel;
+using OxyPlot;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,10 +20,18 @@ namespace DebugApp.Model
         OutputData outputData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
+        List<PlotData> plotDataList;
+        public event Action<string, string, List<LineSeries>> RefreshLongitudePlot;
+
+        public List<LineSeries> IndicatedSeries;
+
+        
         public MainModel()
         {
-            
+           
         }
+
+        
         public void AddRTP(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
         {
             ListViewWorker.UpdateData(rtpList, RTP);
@@ -40,12 +50,11 @@ namespace DebugApp.Model
                 List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
                 List<MatlabData> matlabData= new List<MatlabData>();
                 //MessageBox.Show(p_Outs[32].ToString());
-                PlotWorker.dataIsUpdated = true;
                 Execute.CreateTrajectory(initData, ref outputData, ref p_Outs, ref x_Dot_Outs, ref matlabData);
                 CreatePlotData();
-                Saver.WriteCSV(outputData.FullDisplayedData.error, "../../../../matlab_scripts/test_csv/error.csv");
-                Saver.WriteCSV(outputData.FullDisplayedData.estimated, "../../../../matlab_scripts/test_csv/estimated.csv");
-                Saver.WriteCSV(outputData.FullDisplayedData.ideal, "../../../../matlab_scripts/test_csv/ideal.csv");
+                RefreshPlots();
+
+
                 Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
                 Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
                 Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
@@ -56,16 +65,17 @@ namespace DebugApp.Model
                 MessageBox.Show(ex.Message);
                 Logger.PrintErrorInfo(ex.Message, initData);
             }
-
-
-}
+        }
+        public void RefreshPlots()
+        {
+            List<LineSeries> lineSeriesList = new List<LineSeries>();
+            PlotData longData = PlotWorker.SelectData(PlotName.Longitude, PlotCharacter.Ideal, plotDataList);
+            lineSeriesList.Add(PlotWorker.CreateLineSeries(longData.values));
+            RefreshLongitudePlot(longData.xAxisName, longData.yAxisName, lineSeriesList);
+        }
         private void CreatePlotData()
         {
-            PlotWorker.InitListOfPlotData();
-            for (int i = 0; i < outputData.FullDisplayedData.ideal.Count; i++)
-            {
-                PlotWorker.AddPlotDataToStruct(outputData.FullDisplayedData, i);
-            }
+            plotDataList = PlotWorker.CreatePlotData(outputData);
         }
 
         public void SetDataFromLogger(LogInfo info, ObservableCollection<RouteTurningPoint> rtpList)
@@ -143,6 +153,30 @@ namespace DebugApp.Model
             //SaveInitDataHandler += ListViewWorker.SaveInitDataHandler;
 
             return (insErrors, sensorErrors);
+        }
+        public List<LineSeries> DublicateLineSeriesList(List<LineSeries> seriesList)
+        {
+            List<LineSeries> copyList = new List<LineSeries>();
+            foreach (LineSeries series in seriesList)
+                copyList.Add(DublicateLineSeries(series));
+            return copyList;
+        }
+        public LineSeries DublicateLineSeries(LineSeries series)
+        {
+            LineSeries lineSeries = new LineSeries()
+            {
+                DataFieldX = "x",
+                DataFieldY = "Y",
+                StrokeThickness = 2,
+                MarkerSize = 0,
+                LineStyle = series.LineStyle,
+                Color = series.Color,
+                MarkerType = series.MarkerType,
+                Title = series.Title
+            };
+            foreach (var point in series.Points)
+                lineSeries.Points.Add(point);
+            return lineSeries;
         }
     }
 }

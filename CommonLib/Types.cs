@@ -72,63 +72,118 @@ namespace CommonLib
             public double heading;
             public double roll;
             public double pitch;
-        }
-        public struct DisplayedData
-        {
-            public double Latitude { get; private set; }
-            public double Longitude { get; private set; }
-            public double Altitude { get; private set; }
-            public double Velocity { get; private set; }
-            public double VelocityEast { get; private set; }
-            public double VelocityNorth { get; private set; }
-            public double VelocityH { get; private set; }
-            public double Heading { get; private set; }
-            public double Pitch { get; private set; }
-            public double Roll { get; private set; }
-            public DisplayedData(Point point, VelocityValue velocity, Angles angles)
+            public Dimension dimension;
+            public Angles(double _heading, double _roll, double _pitch, Dimension dim)
             {
-                Latitude = Math.Round(point.lat, 8);
-                Longitude = Math.Round(point.lon, 8);
-                Altitude = Math.Round(point.alt, 8);
-                Velocity = Math.Round(velocity.value, 8);
-                VelocityEast = Math.Round(velocity.E, 8);
-                VelocityNorth = Math.Round(velocity.N, 8);
-                VelocityH = Math.Round(velocity.H, 8);
-                Heading = Math.Round(Converter.RadToDeg(angles.heading), 8);
-                Pitch = Math.Round(Converter.RadToDeg(angles.pitch), 8);
-                Roll = Math.Round(Converter.RadToDeg(angles.roll), 8);
+                heading = _heading;
+                roll = _roll;
+                pitch = _pitch;
+                dimension = dim;
+            }
+        }
+        public struct OutputData
+        {
+            public List<PointSet> points;
+            public List<VelocitySet> velocities;
+            public List<AnglesSet> angles;
+        }
+        public struct PointValue
+        {
+            public Point Degrees;
+            public Point Radians;
+            public Point Meters;
+            public PointValue(Point point, EarthModel earth, double latitude)
+            {
+                switch (point.dimension)
+                {
+                    case Dimension.InDegrees:
+                        Degrees = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                        Radians = Converter.DegToRad(point);
+                        Meters = Converter.DegreesToMeters(point, earth);
+                        break;
+                        
+                    case Dimension.InRadians:                  
+                        Degrees = Converter.RadToDeg(point);
+                        Radians = new Point(point.lat, point.lon, point.alt, Dimension.InRadians);
+                        Meters = Converter.RadiansToMeters(point, earth);
+                        break;
+                        
+                    case Dimension.InMeters:
+                        
+                        Degrees = Converter.MetersToDegrees(point, latitude, earth);
+                        Radians = Converter.MetersToRadians(point, latitude, earth);
+                        Meters = new Point(point.lat, point.lon, point.alt, Dimension.InMeters);
+                        break;
+                        
+                    default:
+                        Degrees= new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                        Radians= new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                        Meters = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                        break;
+                        
+                }
             }
         }
         public struct PointSet
         {
-            public Point InDegrees { get; private set; }
-            public Point InMeters { get; private set; }
-            public Point ErrorInDegrees { get; private set; }
-            public Point ErrorInMeters { get; private set; }
-            public Point InDegreesWithError { get; private set; }
-            public Point InMetersWithError { get; private set; }
-            public PointSet(Parameters parameters, Vector _error)
+            public PointValue Ideal;
+            public PointValue Error;
+            public PointValue Real;
+            public PointValue Estimate;
+            public PointValue CorrectError;
+            public PointValue CorrectTrajectory;
+            public PointSet(Point idP, Vector error, Vector estimate, EarthModel earth)
             {
-                InDegrees = Converter.RadToDeg(parameters.point);
-                InMeters = Converter.DegreesToMeters(InDegrees, parameters.point.lat, parameters.earthModel);
-                //ErrorInMeters = new Point(_error[3], _error[1], _error[5]);
-                ErrorInMeters = new Point(_error[2], _error[1], _error[3]);
-                ErrorInDegrees = Converter.MetersToDegrees(ErrorInMeters, parameters.point.lat, parameters.earthModel);
-                InDegreesWithError = MathTransformation.SumCoordsAndErrors(InDegrees, ErrorInDegrees);
-                InMetersWithError = MathTransformation.SumCoordsAndErrors(InMeters, ErrorInMeters);
+                Ideal = new PointValue(idP, earth, idP.lat);
+                Point errP = new Point(error[2], error[1], error[3], Dimension.InMeters);
+                Error = new PointValue(errP, earth, idP.lat);
+                Point realP = new Point(
+                    Ideal.Meters.lat + Error.Meters.lat,
+                    Ideal.Meters.lon + Error.Meters.lon,
+                    Ideal.Meters.alt + Error.Meters.alt,
+                    Dimension.InMeters);
+                Real = new PointValue(realP, earth, idP.lat);
+                Point estP = new Point(estimate[2], estimate[1], estimate[3], Dimension.InMeters);
+                Estimate = new PointValue(estP, earth, idP.lat);
+                Point corErrP = new Point(
+                    Error.Meters.lat - Estimate.Meters.lat,
+                    Error.Meters.lon - Estimate.Meters.lon,
+                    Error.Meters.alt - Estimate.Meters.alt,
+                    Dimension.InMeters);
+                CorrectError = new PointValue(corErrP, earth, idP.lat);
+                Point corTrajP = new Point(
+                    Ideal.Meters.lat + CorrectError.Meters.lat,
+                    Ideal.Meters.lon + CorrectError.Meters.lon,
+                    Ideal.Meters.alt + CorrectError.Meters.alt,
+                    Dimension.InMeters);
+                CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
             }
         }
         public struct VelocitySet
         {
-            public VelocityValue Value { get; private set; }
-            public VelocityValue Error { get; private set; }
-            public VelocityValue ValueWithError { get; private set; }
-            public VelocitySet(Velocity _velocity, Vector _error)
+            public VelocityValue Ideal;
+            public VelocityValue Error;
+            public VelocityValue Real;
+            public VelocityValue Estimate;
+            public VelocityValue CorrectError;
+            public VelocityValue CorrectTrajectory;
+            public VelocitySet(Velocity velocity, Vector error, Vector estimate)
             {
-                Value = new VelocityValue(_velocity.E, _velocity.N, _velocity.H, _velocity.value);
-                Error = new VelocityValue(_error[4], _error[5], _error[6], Math.Sqrt(Math.Pow(_error[2], 2) + Math.Pow(_error[4], 2) + Math.Pow(_error[6],2)));
-                //Error = new VelocityValue(_error[3], _error[4], 0, Math.Sqrt(Math.Pow(_error[3], 2) + Math.Pow(_error[4], 2) +0));
-                ValueWithError = new VelocityValue(Value.E + Error.E, Value.N + Error.N, Value.H + Error.H, Value.value + Error.value);
+                Ideal = new VelocityValue(velocity.E, velocity.N, velocity.H);
+                Error = new VelocityValue(error[4], error[5], error[6]);
+                Real = new VelocityValue(
+                    Ideal.E + Error.E,
+                    Ideal.N + Error.N,
+                    Ideal.H + Error.H);
+                Estimate = new VelocityValue(estimate[4], estimate[5], estimate[6]);
+                CorrectError = new VelocityValue(
+                    Error.E - Estimate.E,
+                    Error.N - Estimate.N,
+                    Error.H - Estimate.H);
+                CorrectTrajectory = new VelocityValue(
+                    Ideal.E + CorrectError.E,
+                    Ideal.N + CorrectError.N,
+                    Ideal.H + CorrectError.H);
             }
         }
         public struct VelocityValue
@@ -136,30 +191,60 @@ namespace CommonLib
             public double E { get; private set; }
             public double N { get; private set; }
             public double H { get; private set; }
-            public double value { get; private set; }
-            public VelocityValue(double _E, double _N, double _H, double _value)
+            public VelocityValue(double _E, double _N, double _H)
             {
                 E = _E;
                 N = _N;
                 H = _H;
-                value = _value;
             }
         }
         public struct AnglesSet
         {
-            public Angles Value;
-            public Angles Error;
-            public Angles WithError;
+            public AngleValue Ideal;
+            public AngleValue Error;
+            public AngleValue Real;
             public AnglesSet(Angles angles, Vector error)
             {
-                Value = new Angles() { heading = angles.heading, pitch = angles.pitch, roll = angles.roll };
-                Error = new Angles() { heading = error[1], pitch = error[2], roll = error[3] };
-                WithError = new Angles()
+                Ideal = new AngleValue(angles);
+                Angles errAngles = new Angles(error[7], error[8], error[9], Dimension.InRadians);
+                Error = new AngleValue(errAngles);
+                Angles realAngles = new Angles(
+                    Ideal.Radians.heading + Error.Radians.heading,
+                    Ideal.Radians.roll + Error.Radians.roll,
+                    Ideal.Radians.pitch + Error.Radians.pitch,
+                    Dimension.InRadians);
+                Real = new AngleValue(realAngles);
+            }
+        }
+        public struct AngleValue
+        {
+            public Angles Radians;
+            public Angles Degrees;
+            public AngleValue(Angles angles)
+            {
+                switch (angles.dimension)
                 {
-                    heading = Value.heading + Error.heading,
-                    pitch = Value.pitch + Error.pitch,
-                    roll = Value.roll + Error.roll
-                };
+                    case Dimension.InDegrees:
+                        Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InDegrees);
+                        Radians = new Angles(
+                            Converter.DegToRad(angles.heading),
+                            Converter.DegToRad(angles.roll),
+                            Converter.DegToRad(angles.pitch),
+                            Dimension.InRadians);
+                        break;
+                    case Dimension.InRadians:
+                        Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InRadians);
+                        Degrees = new Angles(
+                            Converter.RadToDeg(angles.heading),
+                            Converter.RadToDeg(angles.roll),
+                            Converter.RadToDeg(angles.pitch),
+                            Dimension.InDegrees);
+                        break;
+                    default:
+                        Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InRadians);
+                        Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InDegrees);
+                        break;
+                }
             }
         }
         public struct InputData
@@ -168,6 +253,12 @@ namespace CommonLib
             public double[] longitude { get; set; }
             public double[] altitude { get; set; }
             public double[] velocity { get; set; }
+        }
+        public enum Dimension
+        {
+            InDegrees,
+            InRadians,
+            InMeters
         }
     }
 }

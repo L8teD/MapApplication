@@ -32,17 +32,7 @@ namespace DebugApp.Model
             InitErrors initErrors = SetInitErrors(initData);
 
             Modelling model = new Modelling(inputData, initErrors);
-            outputData.Points = model.points;
-            outputData.Velocities = model.velocities;
-            outputData.Angles = model.angles;
-
-            FullDisplayedData fullDisplayedData = new FullDisplayedData();
-            fullDisplayedData.ideal = model.dDataIdeal;
-            fullDisplayedData.error= model.dDataError;
-            fullDisplayedData.real= model.dDataReal;
-            fullDisplayedData.estimated= model.dDataEstimate;
-           
-            outputData.FullDisplayedData = fullDisplayedData;
+            outputData = model.outputData;
 
             p_Outs = model.p_Outs;
             x_Dot_Outs = model.x_Dot_Outs;

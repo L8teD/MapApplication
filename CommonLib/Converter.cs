@@ -48,7 +48,8 @@ namespace CommonLib
 
                 DegToRad(pointInDegrees.lat),
                 DegToRad(pointInDegrees.lon),
-                pointInDegrees.alt
+                pointInDegrees.alt,
+                Types.Dimension.InRadians
             );
 
         }
@@ -58,28 +59,12 @@ namespace CommonLib
 
                 RadToDeg(pointInDegrees.lat),
                 RadToDeg(pointInDegrees.lon),
-                pointInDegrees.alt
+                pointInDegrees.alt,
+                Types.Dimension.InDegrees
             );
 
         }
-        public static List<Point> RadToDeg(List<Point> listRad)
-        {
-            (double[] latArrayRad, double[] lonArrayRad, double[] altArray) = ListInPointsToDoubleCoords(listRad);
-            double[] latArrayDeg = RadToDeg(latArrayRad);
-            double[] lonArrayDeg = RadToDeg(lonArrayRad);
-
-            return DoubleCoordsToListInPoints(latArrayDeg, lonArrayDeg, altArray);
-
-        }
-        public static List<Point> DoubleCoordsToListInPoints(double[] latArray, double[] lonArray, double[] altArray)
-        {
-            List<Point> points = new List<Point>();
-            for (int i = 0; i < latArray.Length; i++)
-            {
-                points.Add(new Point(latArray[i], lonArray[i], altArray[i]));
-            }
-            return points;
-        }
+       
         public static (double[], double[], double[]) ListInPointsToDoubleCoords(List<Point> points)
         {
             double[] latArray = new double[points.Count];
@@ -112,22 +97,22 @@ namespace CommonLib
             Point outPoint = new Point(
                 inputPoint.lat / (earthModel.R2 * Math.Cos(latitude)),
                 inputPoint.lon / earthModel.R1,
-                inputPoint.alt
-                );
+                inputPoint.alt,
+                Types.Dimension.InRadians);
             return outPoint;
         }
-        public static Point DegreesToMeters(Point inputPointInDegrees, double latitude, EarthModel earthModel)
+        public static Point DegreesToMeters(Point inputPointInDegrees, EarthModel earthModel)
         {
-            return RadiansToMeters(DegToRad(inputPointInDegrees), latitude, earthModel);
+            return RadiansToMeters(DegToRad(inputPointInDegrees), earthModel);
         }
-        public static Point RadiansToMeters(Point inputPointInRadians, double latitude, EarthModel earthModel)
+        public static Point RadiansToMeters(Point inputPointInRadians, EarthModel earthModel)
         {
 
             Point outPoint = new Point(
-                inputPointInRadians.lat * (earthModel.R2 * Math.Cos(latitude)),
+                inputPointInRadians.lat * (earthModel.R2 * Math.Cos(inputPointInRadians.lat)),
                 inputPointInRadians.lon * earthModel.R1,
-                inputPointInRadians.alt
-                );
+                inputPointInRadians.alt,
+                Types.Dimension.InMeters);
             return outPoint;
         }
     }

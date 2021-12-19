@@ -68,6 +68,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\LegendButtonConverter.cs" />
     <Compile Include="Helper\Converter.cs" />
     <Compile Include="Helper\DataBaseWorker.cs" />
     <Compile Include="Helper\Execute.cs" />
@@ -76,15 +77,27 @@
     <Compile Include="Helper\PlotWorker.cs" />
     <Compile Include="Helper\Saver.cs" />
     <Compile Include="Model\MainModel.cs" />
-    <Compile Include="Model\PlotControllerModel.cs" />
     <Compile Include="Types.cs" />
+    <Compile Include="ViewModel\LegendButtonVM.cs" />
+    <Compile Include="ViewModel\LegendVM.cs" />
     <Compile Include="ViewModel\LogInfo.cs" />
-    <Compile Include="ViewModel\PlotViewModel.cs" />
+    <Compile Include="ViewModel\PlotControlVM.cs" />
+    <Compile Include="ViewModel\PlotVM.cs" />
+    <Compile Include="ViewModel\PlotWindowVM.cs" />
     <Compile Include="Views\PlotWindow.xaml.cs">
       <DependentUpon>PlotWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\UserControls\Legend.xaml.cs">
+      <DependentUpon>Legend.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\LegendElement.xaml.cs">
+      <DependentUpon>LegendElement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UserControls\Plot.xaml.cs">
       <DependentUpon>Plot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserControls\PlotControl.xaml.cs">
+      <DependentUpon>PlotControl.xaml</DependentUpon>
     </Compile>
     <Page Include="Styles\ButtonDict.xaml">
       <SubType>Designer</SubType>
@@ -115,9 +128,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\UserControls\Legend.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\LegendElement.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\UserControls\Plot.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserControls\PlotControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using DebugApp.ViewModel;
+﻿using DebugApp.Model;
+using DebugApp.ViewModel;
 using OxyPlot;
 using System;
 using System.Collections.Generic;
@@ -21,16 +22,20 @@ namespace DebugApp.View
     /// </summary>
     public partial class PlotWindow : Window
     {
-        public PlotWindow(string title)
+        string m_title;
+        MainModel m_Model;
+        //public PlotControlVM plotWindowVM { get; set; }
+        public PlotWindow()
         {
             InitializeComponent();
-            plot.Title = title;
-            this.Loaded += PlotWindow_Loaded;
+            //m_title = title;
+            //m_Model = model;
+            //this.Loaded += PlotWindow_Loaded;
         }
 
         private void PlotWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DataContext = new PlotViewModel(plot.Title, true);
+            //DataContext = new PlotControlVM(m_title, m_Model);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace ModellingTrajectoryLib
             startedPoints = new Point[latArray.Length];
             for (int i = 0; i < latArray.Length; i++)
             {
-                startedPoints[i] = new Point(latArray[i], lonArray[i], altArray[i]);
+                startedPoints[i] = new Point(latArray[i], lonArray[i], altArray[i], Dimension.InRadians);
             }
         }
         private void InitStartedVelocitites(double[] velocity)

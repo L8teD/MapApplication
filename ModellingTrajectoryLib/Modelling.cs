@@ -12,13 +12,7 @@ namespace ModellingTrajectoryLib
     public class Modelling
     {
         TrajectoryModel Model = new TrajectoryModel();
-        public List<PointSet> points { get; private set; }
-        public List<VelocitySet> velocities { get; private set; }
-        public List<AnglesSet> angles { get; private set; }
-        public List<DisplayedData> dDataIdeal { get; private set; }
-        public List<DisplayedData> dDataError { get; private set; }
-        public List<DisplayedData> dDataReal { get; private set; }
-        public List<DisplayedData> dDataEstimate { get; private set; }
+        public OutputData outputData;
         public List<P_out> p_Outs { get; set; }
         public List<X_dot_out> x_Dot_Outs{ get; set; }
         public List<MatlabData> matlabData { get; set; }
@@ -29,14 +23,9 @@ namespace ModellingTrajectoryLib
             double[] inputAltArray = inputData.altitude;
             double[] velocity = inputData.velocity;
             Model.Model(inputLatArray, inputLonArray, inputAltArray, velocity, initErrors);
-            //points = Converter.RadToDeg(Model.returnedPoints);
-            points = Model.pointsList;
-            velocities = Model.velocityList;
-            angles = Model.anglesList;
-            dDataIdeal = Model.dDataIdeal;
-            dDataError = Model.dDataError;
-            dDataReal = Model.dDataReal;
-            dDataEstimate = Model.dDataEstimate;
+
+            outputData = Model.outputData;
+
             p_Outs = Model.p_Outs;
             x_Dot_Outs = Model.x_Dot_Outs;
             matlabData = Model.matlabData;
