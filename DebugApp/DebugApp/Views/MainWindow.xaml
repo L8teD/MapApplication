@@ -169,32 +169,32 @@
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <v:PlotControl>
-                <ContentControl Content="{Binding longitudePlotControlVM}"></ContentControl>
+                <ContentControl Content="{Binding LongitudePlotControlVM}"></ContentControl>
             </v:PlotControl>
-            <v:Plot Grid.Column="1" >
-                <ContentControl Content="{Binding LatitudePlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Column="2" >
-                <ContentControl Content="{Binding AltitudePlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="1" >
-                <ContentControl Content="{Binding VePlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="1" Grid.Column="1" >
-                <ContentControl Content="{Binding VnPlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="1" Grid.Column="2" >
-                <ContentControl Content="{Binding VhPlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="2" >
-                <ContentControl Content="{Binding HeadingPlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="2" Grid.Column="1" >
-                <ContentControl Content="{Binding RollPlot}"></ContentControl>
-            </v:Plot>
-            <v:Plot Grid.Row="2" Grid.Column="2">
-                <ContentControl Content="{Binding PitchPlot}"></ContentControl>
-            </v:Plot>
+            <v:PlotControl Grid.Column="1" >
+                <ContentControl Content="{Binding LatitudePlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Column="2" >
+                <ContentControl Content="{Binding AltitudePlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="1" >
+                <ContentControl Content="{Binding V_EastPlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="1" Grid.Column="1" >
+                <ContentControl Content="{Binding V_NorthPlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="1" Grid.Column="2" >
+                <ContentControl Content="{Binding V_VerticalPlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="2" >
+                <ContentControl Content="{Binding HeadingPlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="2" Grid.Column="1" >
+                <ContentControl Content="{Binding RollPlotControlVM}"></ContentControl>
+            </v:PlotControl>
+            <v:PlotControl Grid.Row="2" Grid.Column="2">
+                <ContentControl Content="{Binding PitchPlotControlVM}"></ContentControl>
+            </v:PlotControl>
         </Grid>
         <GroupBox Header="LogInfo" Grid.Column="4">
             <ListBox x:Name="lb_LoggerInfo" ItemsSource="{Binding loggerInfoList, Mode=TwoWay}" >

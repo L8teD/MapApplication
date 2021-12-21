@@ -26,12 +26,12 @@ namespace DebugApp.Model
             public List<DataPoint> values;
             public string xAxisName;
             public string yAxisName;
-            public PlotData(PlotName _name, PlotCharacter character, List<double> _values)
+            public PlotData(PlotName _name, PlotCharacter _character, List<double> _values)
             {
                 name = _name;
-                character = character;
+                character = _character;
                 xAxisName = "time, sec";
-                yAxisName = PlotWorker.SelectPlotAxisName(_name) + ", " + PlotWorker.SelectPlotDimension(_name, character);
+                yAxisName = PlotWorker.SelectPlotName(_name) + ", " + PlotWorker.SelectPlotDimension(_name, character);
                 values = new List<DataPoint>();
                 for (int i = 0; i < _values.Count; i++)
                 {
@@ -47,6 +47,7 @@ namespace DebugApp.Model
             Estimate,
             CorrectError,
             CorrectTrajectory,
+            P,
             None
         }
         public enum PlotName

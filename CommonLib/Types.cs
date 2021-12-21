@@ -86,6 +86,7 @@ namespace CommonLib
             public List<PointSet> points;
             public List<VelocitySet> velocities;
             public List<AnglesSet> angles;
+            public List<P_out> p_OutList;
         }
         public struct PointValue
         {

@@ -3,6 +3,7 @@ using CommonLib.Params;
 using ModellingErrorsLib3;
 using ModellingTrajectoryLib.Helper;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,11 +32,17 @@ namespace ModellingTrajectoryLib
         public List<P_out> p_Outs = new List<P_out>();
         public List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
         public List<MatlabData> matlabData = new List<MatlabData>();
+        double timeTrajectory = 0;
+        double timeErrors = 0;
+        double timeKalman = 0;
+        double timeSave = 0;
+        double timeTemp = 0;
         public void Model(double[] latArray, double[] lonArray, double[] altArray, double[] velocity, InitErrors initErrors)
         {
             outputData.points = new List<PointSet>();
             outputData.velocities = new List<VelocitySet>();
             outputData.angles = new List<AnglesSet>();
+            outputData.p_OutList = new List<P_out>();
 
             int inputPointsCount = latArray.Length;
 
@@ -96,10 +103,18 @@ namespace ModellingTrajectoryLib
                     }
                 }
 
-            }
+            }  
+            Trace.WriteLine("   '''Trajectory'''    " + timeTrajectory.ToString());
+            Trace.WriteLine("   '''Errors'''    " + timeErrors.ToString());
+            Trace.WriteLine("   '''Kalman'''    " + timeKalman.ToString());
+            Trace.WriteLine("   '''Saver'''    " + timeSave.ToString());
+
+
         }
         private void ComputeParametersData(ref Parameters parameters, InitErrors initErrors, int k, double dt)
         {
+            //Trace.WriteLine(k.ToString() + "   '''Compute trajectory'''    " + DateTime.Now.ToShortTimeString());
+            timeTemp = Converter.DateTimeToUnix(DateTime.Now);
             functions.SetAngles(ref parameters, k);
 
             Matrix C = functions.CreateMatrixC(parameters);
@@ -115,9 +130,14 @@ namespace ModellingTrajectoryLib
             parameters.omegaGyro = new OmegaGyro(parameters, C);
             parameters.point = Point.GetCoords(parameters, dt, Dimension.InRadians);
 
+            timeTrajectory += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
+            timeTemp = Converter.DateTimeToUnix(DateTime.Now);
             errorsModel.ModellingErrors(initErrors, parameters);
-            kalmanModel.Model(initErrors, parameters, C);
+            timeErrors += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
 
+            timeTemp = Converter.DateTimeToUnix(DateTime.Now);
+            kalmanModel.Model(initErrors, parameters, C);
+            timeKalman += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
 
             outputData.points.Add(new PointSet(
                 parameters.point, kalmanModel.X, kalmanModel.X_estimate, parameters.earthModel));
@@ -134,6 +154,8 @@ namespace ModellingTrajectoryLib
             p_Out.vn = kalmanModel.P[5,5];
             p_Out.vh = kalmanModel.P[6,6];
             p_Outs.Add(p_Out);
+
+            outputData.p_OutList.Add(p_Out);
 
             X_dot_out x_Dot_Out = new X_dot_out();
             x_Dot_Out.lon = kalmanModel.X_dot[1];
@@ -173,6 +195,7 @@ namespace ModellingTrajectoryLib
             matlabData.Add(mData);
 
             localParams.Add(parameters);
+
         }
     }
 }

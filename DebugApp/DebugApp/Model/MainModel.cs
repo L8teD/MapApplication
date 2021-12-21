@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +21,17 @@ namespace DebugApp.Model
         OutputData outputData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
-        List<PlotData> plotDataList;
+        public List<PlotData> plotDataList;
         public event Action<string, string, List<LineSeries>> RefreshLongitudePlot;
+        public event Action<string, string, List<LineSeries>> RefreshLatitudePlot;
+        public event Action<string, string, List<LineSeries>> RefreshAltitudePlot;
+        public event Action<string, string, List<LineSeries>> RefreshV_EastPlot;
+        public event Action<string, string, List<LineSeries>> RefreshV_NorthPlot;
+        public event Action<string, string, List<LineSeries>> RefreshV_VerticalPlot;
+        public event Action<string, string, List<LineSeries>> RefreshHeadingPlot;
+        public event Action<string, string, List<LineSeries>> RefreshPitchPlot;
+        public event Action<string, string, List<LineSeries>> RefreshRollPlot;
 
-        public List<LineSeries> IndicatedSeries;
 
         
         public MainModel()
@@ -55,6 +63,7 @@ namespace DebugApp.Model
                 RefreshPlots();
 
 
+
                 Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
                 Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
                 Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
@@ -68,10 +77,35 @@ namespace DebugApp.Model
         }
         public void RefreshPlots()
         {
+            Plot(RefreshLongitudePlot, PlotName.Longitude);
+            Plot(RefreshLatitudePlot, PlotName.Latitude);
+            Plot(RefreshAltitudePlot, PlotName.Altitude);
+            Plot(RefreshV_EastPlot, PlotName.VelocityEast);
+            Plot(RefreshV_NorthPlot, PlotName.VelocityNorth);
+            Plot(RefreshV_VerticalPlot, PlotName.VelocityH);
+            Plot(RefreshHeadingPlot, PlotName.Heading);
+            Plot(RefreshPitchPlot, PlotName.Pitch);
+            Plot(RefreshRollPlot, PlotName.Roll);
+
+        }
+        private void Plot(Action<string,string, List<LineSeries>> action, PlotName name)
+        {
+            PlotData plotData;
             List<LineSeries> lineSeriesList = new List<LineSeries>();
-            PlotData longData = PlotWorker.SelectData(PlotName.Longitude, PlotCharacter.Ideal, plotDataList);
-            lineSeriesList.Add(PlotWorker.CreateLineSeries(longData.values));
-            RefreshLongitudePlot(longData.xAxisName, longData.yAxisName, lineSeriesList);
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, plotDataList);
+
+            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Real, plotDataList);
+            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+
+            if (name != PlotName.Pitch && name != PlotName.Heading && name != PlotName.Roll)
+            {
+                plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, plotDataList);
+                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+            }
+
+            action.Invoke(plotData.xAxisName, plotData.yAxisName, lineSeriesList);
         }
         private void CreatePlotData()
         {

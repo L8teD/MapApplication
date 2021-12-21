@@ -5,16 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DebugApp.Model.Types;
 
 namespace DebugApp.ViewModel
 {
     public class PlotWindowVM : BaseViewModel
     {
         public PlotControlVM plotWindowControlVM { get; set; }
-        public PlotWindowVM(string title, MainModel model)
+        public PlotWindowVM(PlotName name, PlotControlVM plotControlVM, MainModel model)
         {
-            plotWindowControlVM = new PlotControlVM(title+" jopa", model);
-            plotWindowControlVM.Plot("x", "y", model.IndicatedSeries);
+            plotWindowControlVM = new PlotControlVM(name, model);
+            plotWindowControlVM.Plot("x", "y", plotControlVM.IndicatedSeries);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using static DebugApp.Model.Types;
 
 namespace DebugApp.ViewModel
 {
@@ -18,7 +19,9 @@ namespace DebugApp.ViewModel
         public LegendVM legendControlVM { get; set; }
         private MainModel m_Model;
         private RelayCommand cmd_Home;
-        private string currentTitle;
+        private PlotName currentTitle;
+        public List<LineSeries> IndicatedSeries;
+        public List<LineSeries> RemovedSeries;
         public RelayCommand Cmd_Home
         {
             get
@@ -39,7 +42,18 @@ namespace DebugApp.ViewModel
                 return cmd_Trajectory ??
                 (cmd_Trajectory = new RelayCommand(obj =>
                 {
-                    Plot("opa", "trajectory", m_Model.IndicatedSeries);
+                    IndicatedSeries.Clear();
+                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Ideal, m_Model.plotDataList);
+                    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+
+                    plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Real, m_Model.plotDataList);
+                    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+                    if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
+                    {
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectTrajectory, m_Model.plotDataList);
+                        IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+                    }
+                    Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
 
                 }));
             }
@@ -52,8 +66,21 @@ namespace DebugApp.ViewModel
                 return cmd_Error ??
                 (cmd_Error = new RelayCommand(obj =>
                 {
-                    //m_Model.IndicatedSeries = m_Model.series2;
-                    Plot("z", "j", m_Model.IndicatedSeries);
+                    IndicatedSeries.Clear();
+
+                    
+                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Error, m_Model.plotDataList);
+                    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+
+                    if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
+                    {
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Estimate, m_Model.plotDataList);
+                        IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectError, m_Model.plotDataList);
+                        IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+                    }
+                    Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
                 }));
             }
         }
@@ -65,8 +92,14 @@ namespace DebugApp.ViewModel
                 return cmd_Covar ??
                 (cmd_Covar = new RelayCommand(obj =>
                 {
-                    //m_Model.IndicatedSeries = m_Model.series3;
-                    Plot("x", "y", m_Model.IndicatedSeries);
+                IndicatedSeries.Clear();
+                if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
+                {
+                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.P, m_Model.plotDataList);
+                    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+
+                    Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
+                }
 
                 }));
             }
@@ -82,22 +115,26 @@ namespace DebugApp.ViewModel
                 {
                     //plotWindowVM = new PlotControlVM(currentTitle, m_Model);
                     PlotWindow plotWindow = new PlotWindow();
-                    plotWindow.DataContext = new PlotWindowVM(currentTitle, m_Model);
+                    plotWindow.DataContext = new PlotWindowVM(currentTitle, this, m_Model);
                     plotWindow.Show();
                     //plotWindowVM.plotVM.Plot(new List<LineSeries>());
                 }));
             }
         }
-        public PlotControlVM(string title, MainModel model)
+        public PlotControlVM(PlotName plotName, MainModel model)
         {
             m_Model = model;
+            string title = PlotWorker.SelectPlotName(plotName);
             plotVM = new PlotVM(title);
-            currentTitle = title;
-            legendControlVM = new LegendVM(model, plotVM);
+            currentTitle = plotName;
+            legendControlVM = new LegendVM(this, plotVM);
+            IndicatedSeries = new List<LineSeries>();
+            RemovedSeries = new List<LineSeries>();
         }
         public void Plot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
         {
             plotVM.Plot(xAxisName, yAxisName, seriesList);
+            IndicatedSeries = seriesList;
             for (int i = 0; i < 5; i++)
             {
                 if (i < seriesList.Count)
@@ -111,6 +148,8 @@ namespace DebugApp.ViewModel
                 else
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i]);
             }
+            
+            
         }
     }
 }

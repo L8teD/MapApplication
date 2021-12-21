@@ -37,14 +37,19 @@ namespace DebugApp.ViewModel
         }
         public static readonly DependencyProperty ColorProperty =
             DependencyProperty.Register("ColorPropertyName", typeof(SolidColorBrush), typeof(LegendButtonVM), new PropertyMetadata(default(SolidColorBrush)));
-        private MainModel m_Model;
-        private PlotVM m_plotVM;
-        private List<LineSeries> removedSeries;
-        public LegendButtonVM(MainModel model, PlotVM plotVM)
+        public bool IsCheckedPropertyName
         {
-            m_Model = model;
+            get { return (bool)GetValue(IsCheckedProperty); }
+            set { SetValue(IsCheckedProperty, value); }
+        }
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register("IsCheckedPropertyName", typeof(bool), typeof(LegendButtonVM), new PropertyMetadata(true));
+        private PlotControlVM m_PlotControlVM;
+        private PlotVM m_plotVM;
+        public LegendButtonVM(PlotControlVM plotControlVM, PlotVM plotVM)
+        {
+            m_PlotControlVM = plotControlVM;
             m_plotVM = plotVM;
-            removedSeries = new List<LineSeries>();
         }
         private RelayCommand cmd_Pressed;
         public RelayCommand Cmd_Pressed
@@ -57,19 +62,27 @@ namespace DebugApp.ViewModel
                     LegendButtonValue legBtnVal = obj as LegendButtonValue;
                     if (!legBtnVal.btnIsChecked)
                     {
-                        LineSeries lineSeries = m_Model.IndicatedSeries.Find(item => item.Title == legBtnVal.seriesText);
-                        m_Model.IndicatedSeries.Remove(lineSeries);
-                        removedSeries.Add(lineSeries);
+                        LineSeries lineSeries = m_PlotControlVM.IndicatedSeries.Find(item => item.Title == legBtnVal.seriesText);
+                        m_PlotControlVM.IndicatedSeries.Remove(lineSeries);
+                        m_PlotControlVM.RemovedSeries.Add(lineSeries);
                     }
                     else
                     {
-                        LineSeries lineSeries = removedSeries.Find(item => item.Title == legBtnVal.seriesText);
-                        m_Model.IndicatedSeries.Add(lineSeries);
-                        removedSeries.Remove(lineSeries);
+                        LineSeries lineSeries = m_PlotControlVM.RemovedSeries.Find(item => item.Title == legBtnVal.seriesText);
+                        m_PlotControlVM.IndicatedSeries.Add(lineSeries);
+                        m_PlotControlVM.RemovedSeries.Remove(lineSeries);
                     }
-                    m_plotVM.Plot(m_Model.IndicatedSeries);
+                    m_plotVM.Plot(m_PlotControlVM.IndicatedSeries);
                 }));
             }
+        }
+        public void UpdateLegendIsChecked(bool obj)
+        {
+            syncContext.Send(SendIsChecked, obj);
+        }
+        private void SendIsChecked(object isChecked)
+        {
+            IsCheckedPropertyName = (bool)isChecked;
         }
         public void UpdateLegendVis(Visibility obj)
         {

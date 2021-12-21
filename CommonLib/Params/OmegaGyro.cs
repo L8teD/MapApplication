@@ -28,16 +28,13 @@ namespace CommonLib.Params
 
         private void GetProjectionsNZSK(AbsoluteOmega absOmega, OmegaEarth omegaEarth)
         {
-            //OmegaGyro omegaGyro = new OmegaGyro();
             E = absOmega.E;
             N = absOmega.N + omegaEarth.N;
             H = absOmega.H + omegaEarth.H;
-            //return omegaGyro;
         }
         private void GetProjectionSSK(Matrix C)
         {
-            Vector omega_ENH = new Vector(E, N, H);
-            Vector omega_XYZ = !C * omega_ENH;
+            Vector omega_XYZ = !C * new Vector(E, N, H);
             X = omega_XYZ[1];
             Y = omega_XYZ[2];
             Z = omega_XYZ[3];

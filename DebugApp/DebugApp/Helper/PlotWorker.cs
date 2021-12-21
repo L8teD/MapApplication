@@ -165,13 +165,87 @@ namespace DebugApp.Model
             plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CorrectError,  VnCorrectError));
             plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CorrectError, VhCorrectError));
             #endregion
+
+            #region Angles Lists
+            List<double> headingIdeal = new List<double>();
+            List<double> pitchIdeal = new List<double>();
+            List<double> rollIdeal = new List<double>();
+
+            List<double> headingReal = new List<double>();
+            List<double> pitchReal = new List<double>();
+            List<double> rollReal = new List<double>();
+
+            List<double> headingError = new List<double>();
+            List<double> pitchError = new List<double>();
+            List<double> rollError = new List<double>();
+
+            foreach (AnglesSet anglesSet in outputData.angles)
+            {
+                headingIdeal.Add(anglesSet.Ideal.Degrees.heading);
+                pitchIdeal.Add(anglesSet.Ideal.Degrees.pitch);
+                rollIdeal.Add(anglesSet.Ideal.Degrees.roll);
+
+                headingReal.Add(anglesSet.Real.Degrees.heading);
+                pitchReal.Add(anglesSet.Real.Degrees.pitch);
+                rollReal.Add(anglesSet.Real.Degrees.roll);
+
+                headingError.Add(anglesSet.Error.Degrees.heading);
+                pitchError.Add(anglesSet.Error.Degrees.pitch);
+                rollError.Add(anglesSet.Error.Degrees.roll);
+
+            }
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Ideal, headingIdeal));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Ideal, pitchIdeal));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Ideal, rollIdeal));
+
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Real, headingReal));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Real, pitchReal));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Real, rollReal));
+
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Error, headingError));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Error, pitchError));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Error, rollError));
+
+            #endregion
+
+            #region P Lists
+            List<double> long_P = new List<double>();
+            List<double> lat_P = new List<double>();
+            List<double> alt_P = new List<double>();
+
+            List<double> Ve_P = new List<double>();
+            List<double> Vn_P = new List<double>();
+            List<double> Vh_P = new List<double>();
+
+
+            foreach (P_out p in outputData.p_OutList)
+            {
+                long_P.Add(p.lon);
+                lat_P.Add(p.lat);
+                alt_P.Add(p.alt);
+
+                Ve_P.Add(p.ve);
+                Vn_P.Add(p.vn);
+                Vh_P.Add(p.vh);
+            }
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.P, long_P));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.P, lat_P));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.P, alt_P));
+
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.P, Ve_P));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.P, Vn_P));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.P, Vh_P));
+
+            
+
+            #endregion
             return plotDatas;
         }
         public static PlotData SelectData(PlotName name, PlotCharacter character, List<PlotData> plotDataList)
         {
             return plotDataList.Find(item => item.name == name && item.character == character);
         }
-        public static LineSeries CreateLineSeries(List<DataPoint> points)
+        public static LineSeries CreateLineSeries(PlotData data)
         {
             LineSeries series = new LineSeries()
             {
@@ -181,15 +255,51 @@ namespace DebugApp.Model
                 StrokeThickness = 2,
                 MarkerSize = 0,
                 LineStyle = LineStyle.Solid,
-                MarkerType = MarkerType.None
+                MarkerType = MarkerType.None,
+                Color = SelectPlotColor(data.character),
+                Title = SelectPlotCharacter(data.character)
             };
-            foreach (DataPoint point in points)
+            foreach (DataPoint point in data.values)
             {
                 series.Points.Add(point);
             }
             return series;
         }
-        public static string SelectPlotAxisName(PlotName name)
+        private static OxyColor SelectPlotColor(PlotCharacter character)
+        {
+            if (character == PlotCharacter.Ideal || character == PlotCharacter.Estimate)
+                return OxyColors.Blue;
+            else if (character == PlotCharacter.Real || character == PlotCharacter.Error)
+                return OxyColors.Red;
+            else if (character == PlotCharacter.CorrectError || character == PlotCharacter.CorrectTrajectory)
+                return OxyColors.Green;
+            else
+                return OxyColors.Black;
+
+        } 
+        public static string SelectPlotCharacter(PlotCharacter character)
+        {
+            switch (character)
+            {
+                case PlotCharacter.Ideal:
+                    return "Ideal";
+                case PlotCharacter.Real:
+                    return "Real";
+                case PlotCharacter.CorrectError:
+                    return "Correct";
+                case PlotCharacter.CorrectTrajectory:
+                    return "Correct";
+                case PlotCharacter.Error:
+                    return "Error";
+                case PlotCharacter.Estimate:
+                    return "Estimate";
+                case PlotCharacter.P:
+                    return "P";
+                default:
+                    return "";
+            }
+        }
+        public static string SelectPlotName(PlotName name)
         {
             switch (name)
             {

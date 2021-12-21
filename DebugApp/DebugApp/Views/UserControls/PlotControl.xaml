@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:DebugApp.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border BorderBrush="Gray" BorderThickness="2">
+    <Border Margin="5"  BorderBrush="Gray" BorderThickness="2">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
@@ -26,11 +26,11 @@
             </local:Plot>
             
             <RadioButton Content="Trajectory"  Grid.Column="0"
-                        Command="{Binding Cmd_Trajectory}" CommandParameter="{Binding MyPlotModel}"></RadioButton>
+                        Command="{Binding Cmd_Trajectory}"></RadioButton>
             <RadioButton Content="Error" Grid.Column="1"
-                        Command="{Binding Cmd_Error}" CommandParameter="{Binding MyPlotModel}"></RadioButton>
+                        Command="{Binding Cmd_Error}"></RadioButton>
             <RadioButton Content="P" Grid.Column="2" 
-                        Command="{Binding Cmd_Covar}" CommandParameter="{Binding MyPlotModel}"></RadioButton>
+                        Command="{Binding Cmd_Covar}"></RadioButton>
             <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="6">
                 <Image Source="pack://application:,,,/Resources/dog-house.png" Stretch="Fill" ></Image>
             </Button>

@@ -11,7 +11,7 @@
         <c:LegendButtonConverter x:Key="legendBtnConverter"></c:LegendButtonConverter>
     </UserControl.Resources>
     <Grid Visibility="{Binding VisPropertyName}">
-        <ToggleButton x:Name="btn" Style="{StaticResource tglbtn_Style}" Opacity="0.7" Command="{Binding Cmd_Pressed}" IsChecked="True">
+        <ToggleButton x:Name="btn" Style="{StaticResource tglbtn_Style}" Opacity="0.7" Command="{Binding Cmd_Pressed}" IsChecked="{Binding IsCheckedPropertyName}">
             <ToggleButton.CommandParameter>
                 <MultiBinding Converter="{StaticResource legendBtnConverter}">
                     <Binding ElementName="btn" Path="IsChecked"></Binding>

@@ -29,8 +29,7 @@ namespace CommonLib.Params
         }
         public void GetProjectionSSK(Matrix C)
         {
-            Vector acceleration_ENH = new Vector(E, N, H);
-            Vector acceleration_XYZ = !C * acceleration_ENH;
+            Vector acceleration_XYZ = !C * new Vector(E, N, H);
             X = acceleration_XYZ[1];
             Y = acceleration_XYZ[2];
             Z = acceleration_XYZ[3];
