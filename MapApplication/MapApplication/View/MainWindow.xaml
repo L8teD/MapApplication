@@ -1,0 +1,33 @@
+﻿<Window x:Class="MapApplication.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:local="clr-namespace:MapApplication.View"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="8*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Button Click="btn_FlightPlan_Click" Grid.Column="0" Margin = "10">
+            <Image Source="pack://application:,,,/AnotherFiles/Images/AirPlaneIcon.png" Stretch="Fill" ></Image>
+        </Button>
+        <Button Click="btn_FlightData_Click" Grid.Column="1" Margin = "10">Flight Data</Button>
+
+        <Frame NavigationUIVisibility="Hidden" x:Name="MainFrame" Grid.Row="1" Grid.ColumnSpan="8"></Frame>
+    </Grid>
+</Window>
