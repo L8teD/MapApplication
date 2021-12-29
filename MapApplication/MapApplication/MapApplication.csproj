@@ -75,6 +75,13 @@
     <Compile Include="Model\Helper\Logger.cs" />
     <Compile Include="Model\Helper\PlotWorker.cs" />
     <Compile Include="Model\Helper\Saver.cs" />
+    <Compile Include="ViewModel\DataRowVM.cs" />
+    <Compile Include="ViewModel\DataRowWithChangesVM.cs" />
+    <Compile Include="ViewModel\DataTableVM.cs" />
+    <Compile Include="ViewModel\DataTableWithChangesVM.cs" />
+    <Compile Include="View\Pages\DebugMode.xaml.cs">
+      <DependentUpon>DebugMode.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Pages\FlightData.xaml.cs">
       <DependentUpon>FlightData.xaml</DependentUpon>
     </Compile>
@@ -83,6 +90,18 @@
     </Compile>
     <Compile Include="View\PlotWindow.xaml.cs">
       <DependentUpon>PlotWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\DataRow.xaml.cs">
+      <DependentUpon>DataRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\DataRowWithChange.xaml.cs">
+      <DependentUpon>DataRowWithChange.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\DataTable.xaml.cs">
+      <DependentUpon>DataTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControls\DataTableWithChanges.xaml.cs">
+      <DependentUpon>DataTableWithChanges.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\UserControls\Legend.xaml.cs">
       <DependentUpon>Legend.xaml</DependentUpon>
@@ -125,6 +144,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\Pages\DebugMode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\Pages\FlightData.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -141,6 +164,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\Styles\BorderDict.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Styles\ButtonDict.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -152,6 +179,22 @@
     <Page Include="View\Styles\ListViewDict.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\UserControls\DataRow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControls\DataRowWithChange.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControls\DataTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\UserControls\DataTableWithChanges.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\UserControls\Legend.xaml">
       <SubType>Designer</SubType>
@@ -217,15 +260,26 @@
       <Version>2.0.20525</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="AnotherFiles\Images\full_display.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="AnotherFiles\Images\AirPlaneIcon.png" />
-    <Resource Include="AnotherFiles\Images\dog-house.png" />
+    <Resource Include="AnotherFiles\Images\house.png" />
     <Resource Include="AnotherFiles\Images\graph.png" />
     <Resource Include="AnotherFiles\Images\MAI_logo.png" />
     <Resource Include="AnotherFiles\Images\Pause.png" />
     <Resource Include="AnotherFiles\Images\Start.png" />
     <Resource Include="AnotherFiles\Images\Stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AnotherFiles\Images\pen_with_notebook.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MAI_logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AnotherFiles\Images\MAI_logo.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

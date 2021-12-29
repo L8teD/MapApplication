@@ -17,6 +17,14 @@ namespace CommonLib
         {
             value += increment;
         }
+        public static void IncrementValue(ref double value)
+        {
+            value += 1;
+        } 
+        public static void IncrementValue(ref int value)
+        {
+            value += 1;
+        }
         public static double IncrementValue(double value, double increment)
         {
             return value + increment;

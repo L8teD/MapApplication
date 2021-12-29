@@ -1,4 +1,21 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+    <Style x:Key="MainStyle">
+        <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="ItemsControl.FontSize" Value="20"></Setter>
+        <Setter Property="ItemsControl.FontFamily" Value="David"></Setter>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="Tblock_Style" BasedOn="{StaticResource MainStyle}">
+        
+
+    </Style>
+    <Style TargetType="{x:Type Label}" x:Key="Lb_Style" BasedOn="{StaticResource MainStyle}">
+        
+    </Style>
+    <Style TargetType="{x:Type GroupBox}" x:Key="Gp_Style">
+        <Setter Property="BorderThickness" Value="0"></Setter>
+        <Setter Property="ItemsControl.Margin" Value="2"></Setter>
+        <Setter Property="ItemsControl.FontSize" Value="25"></Setter>
+        <Setter Property="ItemsControl.FontFamily" Value="David"></Setter>
+    </Style>
 </ResourceDictionary>

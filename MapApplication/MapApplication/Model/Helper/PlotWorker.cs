@@ -328,17 +328,17 @@ namespace MapApplication.Model
         public static string SelectPlotDimension(PlotName name, PlotCharacter character)
         {
             if (name == PlotName.VelocityEast || name == PlotName.VelocityH || name == PlotName.VelocityNorth)
-                return "m/sec";
+                return "[m/sec]";
             else
             {
                 if (name == PlotName.Heading || name == PlotName.Pitch || name == PlotName.Roll)
-                    return "deg";
+                    return "[deg]";
                 else
                 {
                     if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory)
-                        return "deg";
+                        return "[deg]";
                     else
-                        return "m";
+                        return "[m]";
                 }
             }
 

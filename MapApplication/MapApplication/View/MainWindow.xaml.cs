@@ -23,18 +23,23 @@ namespace MapApplication.View
     {
         FlightPlan flightPlan;
         FlightData flightData;
+        DebugMode debugMode;
         public MainWindow()
         {
             InitializeComponent();
 
             flightPlan = new FlightPlan();
             flightData = new FlightData();
+            debugMode = new DebugMode();
 
             MainViewModel mainViewModel = new MainViewModel(flightPlan.Map);
 
             flightPlan.DataContext = mainViewModel;
             flightData.DataContext = mainViewModel;
+            debugMode.DataContext = mainViewModel;
 
+            Uri iconUri = new Uri("pack://application:,,,/AnotherFiles/Images/MAI_logo.ico", UriKind.RelativeOrAbsolute);
+            this.Icon = BitmapFrame.Create(iconUri);
             this.Loaded += MainWindow_Loaded;
 
         }
@@ -52,6 +57,10 @@ namespace MapApplication.View
         private void btn_FlightData_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.NavigationService.Navigate(flightData);
+        }
+        private void btn_DebugMode_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.NavigationService.Navigate(debugMode);
         }
     }
 }

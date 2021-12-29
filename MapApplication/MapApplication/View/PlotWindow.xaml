@@ -25,14 +25,14 @@
                 <ContentControl Content="{Binding plotWindowControlVM.plotVM}"></ContentControl>
             </v:Plot>
 
-            <RadioButton Content="Trajectory"  Grid.Column="0"
+            <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}"
                         Command="{Binding plotWindowControlVM.Cmd_Trajectory}"></RadioButton>
-            <RadioButton Content="Error" Grid.Column="1"
+            <RadioButton Content="Error" Grid.Column="1" Style="{StaticResource rb_Style}"
                         Command="{Binding plotWindowControlVM.Cmd_Error}"></RadioButton>
-            <RadioButton Content="P" Grid.Column="2" 
+            <RadioButton Content="P" Grid.Column="2" Style="{StaticResource rb_Style}"
                         Command="{Binding plotWindowControlVM.Cmd_Covar}"></RadioButton>
             <Button Command="{Binding plotWindowControlVM.Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="6">
-                <Image Source="pack://application:,,,/Resources/dog-house.png" Stretch="Fill" ></Image>
+                <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>
             </Button>
             <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Right">
                 <v:Legend Margin="10">
@@ -41,7 +41,7 @@
             </Grid>
 
             <Button Grid.Row="2" Grid.Column="6" Command="{Binding plotWindowControlVM.Cmd_Full}" Style="{StaticResource btn_Style}">
-                <Image Source="pack://application:,,,/Resources/full_display.png" Stretch="Fill" ></Image>
+                <Image Source="pack://application:,,,/../AnotherFiles/Images/full_display.png" Stretch="Fill" ></Image>
             </Button>
         </Grid>
     </Grid>

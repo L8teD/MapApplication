@@ -1,17 +1,22 @@
-﻿using MapApplication.Model.Helper;
+﻿using CommonLib;
+using MapApplication.Model.Helper;
 using MapApplication.ViewModel;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using static CommonLib.Types;
 using static MapApplication.Model.Helper.Logger;
 using static MapApplication.Model.Types;
+using Point = CommonLib.Params.Point;
 
 namespace MapApplication.Model
 {
@@ -30,9 +35,40 @@ namespace MapApplication.Model
         public event Action<string, string, List<LineSeries>> RefreshHeadingPlot;
         public event Action<string, string, List<LineSeries>> RefreshPitchPlot;
         public event Action<string, string, List<LineSeries>> RefreshRollPlot;
+
+        public event Action<OutputData, int> UpdateTableData;
+
+        public event Action<Point, Point, Windows.UI.Color> DrawTrajectoryAction;
+
+        Timer timerTrajectory;
+        int second = 1;
         public MainModel()
         {
+            timerTrajectory = new Timer(1000);
+            timerTrajectory.Elapsed += TimerTrajectory_Elapsed;
         }
+        private void TimerTrajectory_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (second < outputData.points.Count)
+            {
+                DrawTrajectoryAction?.Invoke(outputData.points[second - 1].CorrectTrajectory.Degrees,
+                    outputData.points[second].CorrectTrajectory.Degrees, Windows.UI.Colors.Blue);
+                MathTransformation.IncrementValue(ref second);
+
+                //dt_Ideal.UpdateDisplayedData(outputData.FullDisplayedData.DisplayedDatasIdeal[second - 1]);
+                //dt_Error.UpdateDisplayedData(outputData.FullDisplayedData.DisplayedDatasError[second - 1]);
+
+                System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
+
+                UpdateTableData?.Invoke(outputData, second);
+
+                //CurrentTimeMessage.Invoke(Operations.AccelerateTime(startedTime, second));
+                //FlightTimeMessage.Invoke(second.ToString() + "sec");
+            }
+            else
+                timerTrajectory.Enabled = false;
+        }
+
         public void AddRTP(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
         {
             ListViewWorker.UpdateData(rtpList, RTP);
@@ -41,6 +77,22 @@ namespace MapApplication.Model
         {
             int id = (int)button.Tag;
             ListViewWorker.RemoveElement(rtpList, id - 1);
+        }
+        public void Start()
+        {
+            timerTrajectory.Start();
+        }
+        public void Pause()
+        {
+            timerTrajectory.Enabled = false;
+        }
+        public void Stop()
+        {
+            timerTrajectory.Stop();
+        }
+        public void SetDrawingSpeed(int timerInterval)
+        {
+            timerTrajectory.Interval = timerInterval;
         }
         public void Compute(InitData initData)
         {

@@ -8,6 +8,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/DataTemplate.xaml"></ResourceDictionary>
                 <ResourceDictionary Source="Styles/ButtonDict.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/BorderDict.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/LabelDict.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/ListViewDict.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

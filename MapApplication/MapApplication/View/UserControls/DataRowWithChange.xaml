@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="MapApplication.View.DataRowWithChange"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MapApplication.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <local:DataRow>
+                <ContentControl Content="{Binding dataRowVM}"></ContentControl>
+        </local:DataRow>
+        <Button Grid.Column="1" Margin="2,2" Command="{Binding Cmd_ChangeParam}" Style="{DynamicResource btn_Style3}">
+            <Image Source="pack://application:,,,/AnotherFiles/Images/pen_with_notebook.png" Stretch="Uniform"></Image>
+        </Button>
+
+    </Grid>
+</UserControl>
