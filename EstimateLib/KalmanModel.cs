@@ -62,8 +62,6 @@ namespace EstimateLib
                 velocityAccuracy.east += X_dot[4];
                 velocityAccuracy.north += X_dot[5];
                 velocityAccuracy.H += X_dot[6];
-
-              
             }
             X[1] = coordAccuracy.longitude;
             X[2] = coordAccuracy.latitude;

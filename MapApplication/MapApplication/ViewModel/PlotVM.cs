@@ -37,7 +37,7 @@ namespace MapApplication.ViewModel
         }
         public void Plot(string xAxisName, string yAxisName, List<LineSeries> lineSeriesData)
         {
-            lastXAxesName = xAxisName;
+            lastXAxesName = "time, [sec]";
             lastYAxesName = yAxisName;
             Plot(lineSeriesData);
         }

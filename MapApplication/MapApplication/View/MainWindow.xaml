@@ -30,6 +30,7 @@
                 </RadioButton>
                 <RadioButton Click="btn_FlightData_Click" Grid.Column="1" Margin = "10"  Style="{StaticResource rb_MainStyle}">Flight Data</RadioButton>
                 <RadioButton Click="btn_DebugMode_Click" Grid.Column="2" Margin = "10"  Style="{StaticResource rb_MainStyle}">Debug Mode</RadioButton>
+                <RadioButton Click="btn_EquipmentPage_Click" Grid.Column="3" Margin = "10"  Style="{StaticResource rb_MainStyle}">Equipment</RadioButton>
             </Grid>
             
 

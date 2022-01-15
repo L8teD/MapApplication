@@ -210,6 +210,34 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        private RelayCommand cmd_Channel2;
+        public RelayCommand Cmd_Channel2
+        {
+            get
+            {
+                return cmd_Channel2 ??
+                (cmd_Channel2 = new RelayCommand(obj =>
+                {
+                    m_Model.SwitchIndicatedData(DataSource.twoChannel);
+                    m_Model.SwitchPlotData(DataSource.twoChannel);
+
+                }));
+            }
+        }
+        private RelayCommand cmd_Channel3;
+        public RelayCommand Cmd_Channel3
+        {
+            get
+            {
+                return cmd_Channel3 ??
+                (cmd_Channel3 = new RelayCommand(obj =>
+                {
+                    m_Model.SwitchIndicatedData(DataSource.threeChannel);
+                    m_Model.SwitchPlotData(DataSource.threeChannel);
+
+                }));
+            }
+        }
         #endregion
         public MainViewModel(Microsoft.Toolkit.Wpf.UI.Controls.MapControl map)
         {

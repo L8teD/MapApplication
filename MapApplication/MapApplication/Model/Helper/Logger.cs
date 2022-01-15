@@ -76,7 +76,7 @@ namespace MapApplication.Model.Helper
             command.ExecuteNonQuery();
             //WRITE DB
             command.CommandText = "INSERT INTO " + tableName + " ('Date', 'Message', 'Count', 'Latitude', 'Longitude', 'Altitude', 'Velocity', 'Fixed') " +
-                "values ('" + /*Converter.DateTimeToUnix(DateTime.Now)*/ "','" + info.Message + "','" + info.CountOfPoints + "','" + info.input.latitude + "','"
+                "values ('" + Converter.DateTimeToUnix(DateTime.Now) +"','" + info.Message + "','" + info.CountOfPoints + "','" + info.input.latitude + "','"
                 + info.input.longitude + "','" + info.input.altitude + "','" + info.input.velocity + "','" + info.Fixed + "')";
             command.ExecuteNonQuery();
             command.Dispose();

@@ -21,16 +21,15 @@ namespace ModellingTrajectoryLib
         ModellingFunctions functions = new ModellingFunctions();
         ErrorsModel errorsModel = new ErrorsModel();
         KalmanModel kalmanModel = new KalmanModel();
+        KalmanModel2 kalmanModel2 = new KalmanModel2();
         private List<Parameters> localParams = new List<Parameters>();
 
 
-        public List<PointSet> pointsList = new List<PointSet>();
-        public List<VelocitySet> velocityList = new List<VelocitySet>();
-        public List<AnglesSet> anglesList = new List<AnglesSet>();
         public OutputData outputData = new OutputData();
+        public OutputData outputData2 = new OutputData();
         
-        public List<P_out> p_Outs = new List<P_out>();
         public List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
+        public List<P_out> P_Outs = new List<P_out>();
         public List<MatlabData> matlabData = new List<MatlabData>();
         double timeTrajectory = 0;
         double timeErrors = 0;
@@ -43,6 +42,11 @@ namespace ModellingTrajectoryLib
             outputData.velocities = new List<VelocitySet>();
             outputData.angles = new List<AnglesSet>();
             outputData.p_OutList = new List<P_out>();
+
+            outputData2.points = new List<PointSet>();
+            outputData2.velocities = new List<VelocitySet>();
+            outputData2.angles = new List<AnglesSet>();
+            outputData2.p_OutList = new List<P_out>();
 
             int inputPointsCount = latArray.Length;
 
@@ -64,15 +68,7 @@ namespace ModellingTrajectoryLib
                 {
                     Parameters parameters = new Parameters();
 
-                    if (Init)
-                    {
-                        parameters.point = new Point(latArray[0], lonArray[0], altArray[0], Dimension.InRadians);
-                        Init = false;
-                    }
-                    else
-                    {
-                        parameters.point = localParams[localParams.Count - 1].point;
-                    }
+                    CheckOfInitalizationStartedPoint(ref parameters, ref Init, latArray, lonArray, altArray);
                     //functions.RecountWind(parameters, k);
 
                     ComputeParametersData(ref parameters, initErrors, k, dt);
@@ -91,7 +87,8 @@ namespace ModellingTrajectoryLib
                 if (functions.TurnIsAvailable(k, inputPointsCount - 2))
                 {
                     Parameters parameters = new Parameters();
-                    parameters.point = localParams[localParams.Count - 1].point;
+
+                    CheckOfInitalizationStartedPoint(ref parameters, ref Init, latArray, lonArray, altArray);
 
                     functions.InitTurnVariables(k, dt);
 
@@ -104,11 +101,6 @@ namespace ModellingTrajectoryLib
                 }
 
             }  
-            Trace.WriteLine("   '''Trajectory'''    " + timeTrajectory.ToString());
-            Trace.WriteLine("   '''Errors'''    " + timeErrors.ToString());
-            Trace.WriteLine("   '''Kalman'''    " + timeKalman.ToString());
-            Trace.WriteLine("   '''Saver'''    " + timeSave.ToString());
-
 
         }
         private void ComputeParametersData(ref Parameters parameters, InitErrors initErrors, int k, double dt)
@@ -130,14 +122,11 @@ namespace ModellingTrajectoryLib
             parameters.omegaGyro = new OmegaGyro(parameters, C);
             parameters.point = Point.GetCoords(parameters, dt, Dimension.InRadians);
 
-            timeTrajectory += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
-            timeTemp = Converter.DateTimeToUnix(DateTime.Now);
             errorsModel.ModellingErrors(initErrors, parameters);
-            timeErrors += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
 
             timeTemp = Converter.DateTimeToUnix(DateTime.Now);
             kalmanModel.Model(initErrors, parameters, C);
-            timeKalman += Converter.DateTimeToUnix(DateTime.Now) - timeTemp;
+            kalmanModel2.Model(initErrors, parameters, C);
 
             outputData.points.Add(new PointSet(
                 parameters.point, kalmanModel.X, kalmanModel.X_estimate, parameters.earthModel));
@@ -146,6 +135,13 @@ namespace ModellingTrajectoryLib
 
             outputData.angles.Add(new AnglesSet(parameters.angles, kalmanModel.X));
 
+            outputData2.points.Add(new PointSet(
+                parameters.point, kalmanModel2.X, kalmanModel2.X_estimate, parameters.earthModel, false));
+
+            outputData2.velocities.Add(new VelocitySet(parameters.velocity, kalmanModel2.X, kalmanModel2.X_estimate, false));
+
+            outputData2.angles.Add(new AnglesSet(parameters.angles, kalmanModel2.X, false));
+
             P_out p_Out = new P_out();
             p_Out.lon = kalmanModel.P[1,1];
             p_Out.lat = kalmanModel.P[2,2];
@@ -153,9 +149,17 @@ namespace ModellingTrajectoryLib
             p_Out.ve = kalmanModel.P[4,4];
             p_Out.vn = kalmanModel.P[5,5];
             p_Out.vh = kalmanModel.P[6,6];
-            p_Outs.Add(p_Out);
-
             outputData.p_OutList.Add(p_Out);
+
+
+            p_Out = new P_out();
+            p_Out.lon = kalmanModel2.P[1, 1];
+            p_Out.lat = kalmanModel2.P[2, 2];
+            p_Out.alt = 0;         
+            p_Out.ve = kalmanModel2.P[3, 3];
+            p_Out.vn = kalmanModel2.P[4, 3];
+            p_Out.vh = 0;
+            outputData2.p_OutList.Add(p_Out);
 
             X_dot_out x_Dot_Out = new X_dot_out();
             x_Dot_Out.lon = kalmanModel.X_dot[1];
@@ -196,6 +200,18 @@ namespace ModellingTrajectoryLib
 
             localParams.Add(parameters);
 
+        }
+        private void CheckOfInitalizationStartedPoint(ref Parameters parameters, ref bool Init, double[] latArray, double[] lonArray, double[] altArray)
+        {
+            if (Init)
+            {
+                parameters.point = new Point(latArray[0], lonArray[0], altArray[0], Dimension.InRadians);
+                Init = false;
+            }
+            else
+            {
+                parameters.point = localParams[localParams.Count - 1].point;
+            }
         }
     }
 }

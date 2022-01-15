@@ -18,13 +18,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"></ColumnDefinition>
             <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="1.2*"></ColumnDefinition>
-            <ColumnDefinition Width="1.2*"></ColumnDefinition>
+            <ColumnDefinition Width="0*"></ColumnDefinition>
+            <ColumnDefinition Width="0*"></ColumnDefinition>
             <ColumnDefinition Width="3*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="2.5*"></RowDefinition>
         </Grid.RowDefinitions>
         <ListView x:Name="lv_Routes" ItemsSource="{Binding Path=initData.rtpList}" Grid.Column="0" Margin="0,0,0.2,0.4">
             <ListView.View>
@@ -63,7 +63,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path= DataContext.Cmd_RemoveRTP}"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveRTP}"
                                         CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{DynamicResource btn_Style}"></Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -96,66 +96,7 @@
             <Button Grid.ColumnSpan="2" Grid.Row="4" Margin="30,10" Content="Add PPM" Command="{Binding Cmd_AddRTP}" 
                     CommandParameter="{Binding initData.rtpList}"></Button>
         </StackPanel>
-        <ListView ItemsSource="{Binding Path=initData.insErrors}" Grid.Column="2" HorizontalAlignment="Stretch"  >
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="50">
-                        <TextBlock Text="Name"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="12"></TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="75">
-                        <TextBlock Text="Value"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding Path=Value}" Width="60" HorizontalAlignment="Center" FontSize="12"></TextBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="60">
-                        <TextBlock Text="Dimension"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="12"></TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <ListView ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="3" HorizontalAlignment="Stretch"  >
-            <ListView.View>
-                <GridView> 
-                    <GridViewColumn Width="50">
-                        <TextBlock Text="Name"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="12"></TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="75">
-                        <TextBlock Text="Value"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding Path=Value}" Width="60" HorizontalAlignment="Center" FontSize="12"></TextBox>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="60">
-                        <TextBlock Text="Dimension"></TextBlock>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="12"></TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+       
         <Button Grid.Column="1" Content="Compute" Command="{Binding Cmd_Compute}" Margin="0,130,0,0"></Button>
         <Grid Grid.Row="1" Grid.ColumnSpan="5" Margin="5">
             <Grid.ColumnDefinitions>

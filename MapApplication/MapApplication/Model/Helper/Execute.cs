@@ -12,7 +12,7 @@ namespace MapApplication.Model.Helper
 {
     class Execute
     {
-        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref List<P_out> p_Outs,
+        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref OutputData outputData2, ref List<P_out> p_Outs,
             ref List<X_dot_out> x_Dot_Outs, ref List<MatlabData> matlabData)
         {
             p_Outs = new List<P_out>();
@@ -33,7 +33,7 @@ namespace MapApplication.Model.Helper
 
             Modelling model = new Modelling(inputData, initErrors);
             outputData = model.outputData;
-
+            outputData2 = model.outputData2;
             p_Outs = model.p_Outs;
             x_Dot_Outs = model.x_Dot_Outs;
             matlabData = model.matlabData;

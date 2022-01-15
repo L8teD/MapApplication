@@ -17,6 +17,11 @@ namespace MapApplication.Model
             public ObservableCollection<InputError> insErrors { get; set; }
             public ObservableCollection<InputError> sensorErrors { get; set; }
         }
+        public enum DataSource
+        {
+            twoChannel,
+            threeChannel
+        }
         public class PlotData
         {
             public PlotName name;

@@ -43,14 +43,14 @@ namespace MapApplication.ViewModel
                 (cmd_Trajectory = new RelayCommand(obj =>
                 {
                     IndicatedSeries.Clear();
-                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Ideal, m_Model.plotDataList);
+                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Ideal, m_Model.indicatedListOfPlotData);
                     IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
 
-                    plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Real, m_Model.plotDataList);
+                    plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Real, m_Model.indicatedListOfPlotData);
                     IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
                     if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
                     {
-                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectTrajectory, m_Model.plotDataList);
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectTrajectory, m_Model.indicatedListOfPlotData);
                         IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
                     }
                     Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
@@ -69,15 +69,15 @@ namespace MapApplication.ViewModel
                     IndicatedSeries.Clear();
 
 
-                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Error, m_Model.plotDataList);
+                    PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Error, m_Model.indicatedListOfPlotData);
                     IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
 
                     if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
                     {
-                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Estimate, m_Model.plotDataList);
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.Estimate, m_Model.indicatedListOfPlotData);
                         IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
 
-                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectError, m_Model.plotDataList);
+                        plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.CorrectError, m_Model.indicatedListOfPlotData);
                         IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
                     }
                     Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
@@ -95,9 +95,9 @@ namespace MapApplication.ViewModel
                     IndicatedSeries.Clear();
                     if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
                     {
-                        PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.P, m_Model.plotDataList);
+                        PlotData plotData = PlotWorker.SelectData(currentTitle, PlotCharacter.P, m_Model.indicatedListOfPlotData);
                         IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
-
+                        
                         Plot(plotData.xAxisName, plotData.yAxisName, IndicatedSeries);
                     }
 
@@ -121,6 +121,8 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+
+
         public PlotControlVM(PlotName plotName, MainModel model)
         {
             m_Model = model;

@@ -336,7 +336,13 @@ namespace MapApplication.Model
                 else
                 {
                     if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory)
-                        return "[deg]";
+                    {
+                        if (name == PlotName.Altitude)
+                            return "[m]";
+                        else
+                            return "[deg]";
+                    }
+                       
                     else
                         return "[m]";
                 }

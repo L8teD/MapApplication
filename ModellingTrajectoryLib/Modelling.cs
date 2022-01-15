@@ -13,6 +13,7 @@ namespace ModellingTrajectoryLib
     {
         TrajectoryModel Model = new TrajectoryModel();
         public OutputData outputData;
+        public OutputData outputData2;
         public List<P_out> p_Outs { get; set; }
         public List<X_dot_out> x_Dot_Outs{ get; set; }
         public List<MatlabData> matlabData { get; set; }
@@ -25,8 +26,8 @@ namespace ModellingTrajectoryLib
             Model.Model(inputLatArray, inputLonArray, inputAltArray, velocity, initErrors);
 
             outputData = Model.outputData;
-
-            p_Outs = Model.p_Outs;
+            outputData2 = Model.outputData2;
+            p_Outs = new List<P_out>();
             x_Dot_Outs = Model.x_Dot_Outs;
             matlabData = Model.matlabData;
         }

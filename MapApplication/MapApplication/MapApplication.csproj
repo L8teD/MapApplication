@@ -37,6 +37,26 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonLib">
       <HintPath>..\..\CommonLib\bin\Debug\CommonLib.dll</HintPath>
@@ -81,6 +101,9 @@
     <Compile Include="ViewModel\DataTableWithChangesVM.cs" />
     <Compile Include="View\Pages\DebugMode.xaml.cs">
       <DependentUpon>DebugMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\EquipmentPage.xaml.cs">
+      <DependentUpon>EquipmentPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Pages\FlightData.xaml.cs">
       <DependentUpon>FlightData.xaml</DependentUpon>
@@ -145,6 +168,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\Pages\DebugMode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Pages\EquipmentPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -274,9 +301,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AnotherFiles\Images\pen_with_notebook.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MAI_logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AnotherFiles\Images\MAI_logo.ico" />

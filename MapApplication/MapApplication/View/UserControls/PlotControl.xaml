@@ -14,23 +14,31 @@
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
-                <ColumnDefinition Width="2*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="7*"></ColumnDefinition>
-                <ColumnDefinition Width="0.9*"></ColumnDefinition>
+                <ColumnDefinition Width="0.5*"></ColumnDefinition>
+
             </Grid.ColumnDefinitions>
             <local:Plot Grid.ColumnSpan="6" Grid.RowSpan="3">
                 <ContentControl Content="{Binding plotVM}"></ContentControl>
             </local:Plot>
-
-            <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}"
+            <Border Style="{StaticResource Border_Style}" Grid.Column="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}"
                         Command="{Binding Cmd_Trajectory}"></RadioButton>
-            <RadioButton Content="Error" Grid.Column="1" Style="{StaticResource rb_Style}"
+                    <RadioButton Content="Error" Grid.Column="1" Style="{StaticResource rb_Style}"
                         Command="{Binding Cmd_Error}"></RadioButton>
-            <RadioButton Content="P" Grid.Column="2" Style="{StaticResource rb_Style}"
+                    <RadioButton Content="P" Grid.Column="2" Style="{StaticResource rb_Style}"
                         Command="{Binding Cmd_Covar}"></RadioButton>
+                </Grid>
+            </Border>
+            
             <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="6">
                 <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>
             </Button>
@@ -40,7 +48,7 @@
                 </local:Legend>
             </Grid>
 
-            <Button Grid.Row="2" Grid.Column="6" Command="{Binding Cmd_Full}" Style="{StaticResource btn_Style}">
+            <Button Grid.Row="2" Grid.Column="7" Command="{Binding Cmd_Full}" Style="{StaticResource btn_Style}">
                 <Image Source="pack://application:,,,/../AnotherFiles/Images/full_display.png" Stretch="Fill" ></Image>
             </Button>
         </Grid>

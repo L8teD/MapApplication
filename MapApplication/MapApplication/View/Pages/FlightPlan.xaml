@@ -113,8 +113,8 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}, Path= DataContext.Cmd_RemoveRTP}"
-                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}"></Button>
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveRTP}"
+                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{StaticResource btn_Style}"></Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -1,6 +1,7 @@
 ﻿using CommonLib;
 using MapApplication.Model.Helper;
 using MapApplication.ViewModel;
+using OxyPlot;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
@@ -22,10 +23,15 @@ namespace MapApplication.Model
 {
     public class MainModel
     {
-        OutputData outputData;
+        OutputData threeChannelOutput;
+        OutputData twoChannelOutput;
+        OutputData indicatedData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
-        public List<PlotData> plotDataList;
+        public List<PlotData> indicatedListOfPlotData;
+        private List<PlotData> twoChannelPlotData;
+        private List<PlotData> threeChannelPlotData;
+
         public event Action<string, string, List<LineSeries>> RefreshLongitudePlot;
         public event Action<string, string, List<LineSeries>> RefreshLatitudePlot;
         public event Action<string, string, List<LineSeries>> RefreshAltitudePlot;
@@ -47,23 +53,29 @@ namespace MapApplication.Model
             timerTrajectory = new Timer(1000);
             timerTrajectory.Elapsed += TimerTrajectory_Elapsed;
         }
+        public void SwitchIndicatedData(DataSource source)
+        {
+            switch (source)
+            {
+                case DataSource.threeChannel:
+                    indicatedData = DublicatOutputData(threeChannelOutput);
+                    break;
+                case DataSource.twoChannel:
+                    indicatedData = DublicatOutputData(twoChannelOutput);
+                    break;
+            }
+        }
         private void TimerTrajectory_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (second < outputData.points.Count)
+            if (second < indicatedData.points.Count)
             {
-                DrawTrajectoryAction?.Invoke(outputData.points[second - 1].CorrectTrajectory.Degrees,
-                    outputData.points[second].CorrectTrajectory.Degrees, Windows.UI.Colors.Blue);
+                DrawTrajectoryAction?.Invoke(indicatedData.points[second - 1].CorrectTrajectory.Degrees,
+                    indicatedData.points[second].CorrectTrajectory.Degrees, Windows.UI.Colors.Blue);
                 MathTransformation.IncrementValue(ref second);
-
-                //dt_Ideal.UpdateDisplayedData(outputData.FullDisplayedData.DisplayedDatasIdeal[second - 1]);
-                //dt_Error.UpdateDisplayedData(outputData.FullDisplayedData.DisplayedDatasError[second - 1]);
 
                 System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
 
-                UpdateTableData?.Invoke(outputData, second);
-
-                //CurrentTimeMessage.Invoke(Operations.AccelerateTime(startedTime, second));
-                //FlightTimeMessage.Invoke(second.ToString() + "sec");
+                UpdateTableData?.Invoke(indicatedData, second - 1);
             }
             else
                 timerTrajectory.Enabled = false;
@@ -76,7 +88,7 @@ namespace MapApplication.Model
         public void RemoveRTP(ObservableCollection<RouteTurningPoint> rtpList, Button button)
         {
             int id = (int)button.Tag;
-            ListViewWorker.RemoveElement(rtpList, id - 1);
+            ListViewWorker.RemoveElement(rtpList, id);
         }
         public void Start()
         {
@@ -96,21 +108,25 @@ namespace MapApplication.Model
         }
         public void Compute(InitData initData)
         {
-            outputData = new OutputData();
+            
+            threeChannelOutput = new OutputData();
+            twoChannelOutput = new OutputData();
             try
             {
                 List<P_out> p_Outs = new List<P_out>();
                 List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
                 List<MatlabData> matlabData = new List<MatlabData>();
-                //MessageBox.Show(p_Outs[32].ToString());
-                Execute.CreateTrajectory(initData, ref outputData, ref p_Outs, ref x_Dot_Outs, ref matlabData);
+                //throw new Exception("CS2043: Вызываемый поток недоступен");
+
+                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput, ref p_Outs, ref x_Dot_Outs, ref matlabData);
+                indicatedData = DublicatOutputData(twoChannelOutput);
                 CreatePlotData();
                 RefreshPlots();
 
 
-                Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
-                Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
-                Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
+                //Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
+                //Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
+                //Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
 
             }
             catch (Exception ex)
@@ -136,16 +152,16 @@ namespace MapApplication.Model
         {
             PlotData plotData;
             List<LineSeries> lineSeriesList = new List<LineSeries>();
-            plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, plotDataList);
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, indicatedListOfPlotData);
 
             lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
 
-            plotData = PlotWorker.SelectData(name, PlotCharacter.Real, plotDataList);
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Real, indicatedListOfPlotData);
             lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
 
             if (name != PlotName.Pitch && name != PlotName.Heading && name != PlotName.Roll)
             {
-                plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, plotDataList);
+                plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, indicatedListOfPlotData);
                 lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
             }
 
@@ -153,9 +169,59 @@ namespace MapApplication.Model
         }
         private void CreatePlotData()
         {
-            plotDataList = PlotWorker.CreatePlotData(outputData);
+            indicatedListOfPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
+            twoChannelPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
+            threeChannelPlotData = PlotWorker.CreatePlotData(threeChannelOutput);
         }
+        public void SwitchPlotData(DataSource source)
+        {
+            switch (source)
+            {
+                case DataSource.threeChannel:
+                    indicatedListOfPlotData = DublicatePlotData(threeChannelPlotData);
+                    break;
+                case DataSource.twoChannel:
+                    indicatedListOfPlotData = DublicatePlotData(twoChannelPlotData);
+                    break;
+            }
+            RefreshPlots();
+        }
+        private List<PlotData> DublicatePlotData(List<PlotData> original)
+        {
+            List<PlotData> copy = new List<PlotData>();
 
+            for (int i = 0; i < original.Count; i++)
+            {
+                List<double> doubleList = new List<double>();
+                foreach (DataPoint point in original[i].values)
+                    doubleList.Add(point.Y);
+                PlotData data = new PlotData(original[i].name, original[i].character, doubleList);
+                copy.Add(data);
+            }
+            return copy;
+        }
+        private OutputData DublicatOutputData(OutputData original)
+        {
+            OutputData copy = new OutputData();
+
+            if (original.points != null)
+            {
+                copy.points = new List<PointSet>();
+                copy.velocities = new List<VelocitySet>();
+                copy.angles = new List<AnglesSet>();
+                copy.p_OutList = new List<P_out>();
+
+                for (int i = 0; i < original.points.Count(); i++)
+                {
+                    copy.points.Add(original.points[i]);
+                    copy.velocities.Add(original.velocities[i]);
+                    copy.angles.Add(original.angles[i]);
+                    copy.p_OutList.Add(original.p_OutList[i]);
+                }
+            }
+            
+            return copy;
+        }
         public void SetDataFromLogger(LogInfo info, ObservableCollection<RouteTurningPoint> rtpList)
         {
             string[] infoString = info.Element.Split('|');
