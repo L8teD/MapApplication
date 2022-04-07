@@ -10,17 +10,22 @@
         <local:LegendButtonConverter x:Key="legendBtnConverter"></local:LegendButtonConverter>
     </UserControl.Resources>
     <Grid Visibility="{Binding VisPropertyName}">
-        <ToggleButton x:Name="btn" Style="{StaticResource tglbtn_Style}" Opacity="0.7" Command="{Binding Cmd_Pressed}" IsChecked="{Binding IsCheckedPropertyName}">
+        <ToggleButton x:Name="btn" Style="{StaticResource legendBtn_Style}" Opacity="0.7" Command="{Binding Cmd_Pressed}" IsChecked="{Binding IsCheckedPropertyName}">
             <ToggleButton.CommandParameter>
                 <MultiBinding Converter="{StaticResource legendBtnConverter}">
                     <Binding ElementName="btn" Path="IsChecked"></Binding>
                     <Binding ElementName="tblock" Path="Text"></Binding>
                 </MultiBinding>
             </ToggleButton.CommandParameter>
-            <StackPanel Orientation="Horizontal">
-                <Ellipse Fill="{Binding ColorPropertyName}" Width="25" Height="10"></Ellipse>
-                <TextBlock x:Name="tblock" Text="{Binding TextPropertyName}"></TextBlock>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"></ColumnDefinition>
+                    <ColumnDefinition Width="45"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Ellipse Grid.Column="0" Fill="{Binding ColorPropertyName}" Width="15" Height="10"></Ellipse>
+                <TextBlock x:Name="tblock" Grid.Column="1" Text="{Binding TextPropertyName}" FontSize="13" FontWeight="DemiBold"
+                           HorizontalAlignment="Center"></TextBlock>
+            </Grid>
         </ToggleButton>
 
     </Grid>

@@ -20,62 +20,62 @@ namespace MapApplication.ViewModel
     {
         private Microsoft.Toolkit.Wpf.UI.Controls.MapControl Map;
         public InitData initData { get; set; }
+        public PlotTableVM PlotTable { get; set; }
 
+        private MapElementsLayer airportsLayer;
         private MainModel m_Model;
 
-        private RouteTurningPoint rtp;
-
-        public PlotControlVM LongitudePlotControlVM { get; set; }
-        public PlotControlVM LatitudePlotControlVM { get; set; }
-        public PlotControlVM AltitudePlotControlVM { get; set; }
-        public PlotControlVM V_EastPlotControlVM { get; set; }
-        public PlotControlVM V_NorthPlotControlVM { get; set; }
-        public PlotControlVM V_VerticalPlotControlVM { get; set; }
-        public PlotControlVM HeadingPlotControlVM { get; set; }
-        public PlotControlVM PitchPlotControlVM { get; set; }
-        public PlotControlVM RollPlotControlVM { get; set; }
+        private WayPoint waypoint;
+        MapPolyline trajectoryLine;
+        List<BasicGeoposition> trajectoryPoints = new List<BasicGeoposition>();
 
         public DataTableWithChangesVM IdealDataTable { get; set; }
         public DataTableVM ErrorDataTable { get; set; }
         public DataTableVM EstimateDataTable { get; set; }
 
-        public RouteTurningPoint RTP
+        public WayPoint Waypoint
         {
-            get { return rtp; }
+            get { return waypoint; }
             set
             {
-                rtp = value;
-                OnPropertyChanged("RTP");
+                waypoint = value;
+                OnPropertyChanged("Waypoint");
             }
         }
         public ObservableCollection<LogInfo> loggerInfoList { get; set; }
 
         #region Commands
         
-        private RelayCommand cmd_AddRTP;
-        public RelayCommand Cmd_AddRTP
+        private RelayCommand cmd_AddWayPoint;
+        public RelayCommand Cmd_AddWayPoint
         {
             get
             {
-                return cmd_AddRTP ??
-                (cmd_AddRTP = new RelayCommand(obj =>
+                return cmd_AddWayPoint ??
+                (cmd_AddWayPoint = new RelayCommand(obj =>
                 {
                     //if (obj is ObservableCollection<RouteTurningPoint>)
-                    m_Model.AddRTP(initData.rtpList, RTP);
+                    m_Model.AddWayPoint(initData.wayPointList, Waypoint);
                 }));
             }
         }
-        private RelayCommand cmd_RemoveRTP;
-        public RelayCommand Cmd_RemoveRTP
+        private RelayCommand cmd_RemoveWayPoint;
+        public RelayCommand Cmd_RemoveWayPoint
         {
             get
             {
-                return cmd_RemoveRTP ??
-                (cmd_RemoveRTP = new RelayCommand(obj =>
+                return cmd_RemoveWayPoint ??
+                (cmd_RemoveWayPoint = new RelayCommand(obj =>
                 {
                     Button button = obj as Button;
-                    m_Model.RemoveRTP(initData.rtpList, button);
+                    
+                    MapElement removedElement = airportsLayer.MapElements.Where(item => (item as MapIcon).Title ==
+                                        initData.wayPointList.Where(X => X.ID == (int)button.Tag).FirstOrDefault().AirportName).FirstOrDefault();
 
+                    if(removedElement != null)
+                        UpdateMapElementOnClick(removedElement);
+                    else
+                        m_Model.RemoveWayPoint(initData.wayPointList, (int)button.Tag);
                 }));
             }
         }
@@ -88,7 +88,7 @@ namespace MapApplication.ViewModel
                 (cmd_SelectionChanged = new RelayCommand(obj =>
                 {
 
-                    m_Model.SetDataFromLogger((LogInfo)obj, initData.rtpList);
+                    m_Model.SetDataFromLogger((LogInfo)obj, initData.wayPointList);
 
                 }));
             }
@@ -238,6 +238,20 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        private RelayCommand cmd_drawFull;
+        public RelayCommand Cmd_drawFull
+        {
+            get
+            {
+                return cmd_drawFull ??
+                (cmd_drawFull = new RelayCommand(obj =>
+                {
+                    m_Model.Stop();
+                    m_Model.DrawFullTrajctory();
+
+                }));
+            }
+        }
         #endregion
         public MainViewModel(Microsoft.Toolkit.Wpf.UI.Controls.MapControl map)
         {
@@ -245,33 +259,13 @@ namespace MapApplication.ViewModel
             m_Model = new MainModel();
 
             initData = new InitData();
-
-            initData.rtpList = new ObservableCollection<RouteTurningPoint>();
+            PlotTable = new PlotTableVM(m_Model);
+            initData.wayPointList = new ObservableCollection<WayPoint>();
 
 
             SetMapView(Map);
 
-            RTP = m_Model.SetRTP();
-
-            LongitudePlotControlVM = new PlotControlVM(PlotName.Longitude, m_Model);
-            LatitudePlotControlVM = new PlotControlVM(PlotName.Latitude, m_Model);
-            AltitudePlotControlVM = new PlotControlVM(PlotName.Altitude, m_Model);
-            V_EastPlotControlVM = new PlotControlVM(PlotName.VelocityEast, m_Model);
-            V_NorthPlotControlVM = new PlotControlVM(PlotName.VelocityNorth, m_Model);
-            V_VerticalPlotControlVM = new PlotControlVM(PlotName.VelocityH, m_Model);
-            HeadingPlotControlVM = new PlotControlVM(PlotName.Heading, m_Model);
-            RollPlotControlVM = new PlotControlVM(PlotName.Roll, m_Model);
-            PitchPlotControlVM = new PlotControlVM(PlotName.Pitch, m_Model);
-
-            m_Model.RefreshLongitudePlot += M_Model_RefreshLongitudePlot;
-            m_Model.RefreshLatitudePlot += M_Model_RefreshLatitudePlot;
-            m_Model.RefreshAltitudePlot += M_Model_RefreshAltitudePlot;
-            m_Model.RefreshV_EastPlot += M_Model_RefreshV_EastPlot;
-            m_Model.RefreshV_NorthPlot += M_Model_RefreshV_NorthPlot;
-            m_Model.RefreshV_VerticalPlot += M_Model_RefreshV_VerticalPlot;
-            m_Model.RefreshHeadingPlot += M_Model_RefreshHeadingPlot;
-            m_Model.RefreshPitchPlot += M_Model_RefreshPitchPlot;
-            m_Model.RefreshRollPlot += M_Model_RefreshRollPlot;
+            Waypoint = m_Model.SetWayPoint();
 
             m_Model.DrawTrajectoryAction += DrawLine;
 
@@ -285,7 +279,7 @@ namespace MapApplication.ViewModel
             EstimateDataTable = new DataTableVM(PlotCharacter.Estimate);
 
             MapElementWorker.AddAirportsOnMAp();
-            MapElementsLayer airportsLayer = new MapElementsLayer() { MapElements = MapElementWorker.airportsMapElements };
+            airportsLayer = new MapElementsLayer() { MapElements = MapElementWorker.airportsMapElements };
             airportsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
             airportsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;
             airportsLayer.MapElementClick += AirportsLayer_MapElementClick;
@@ -329,8 +323,6 @@ namespace MapApplication.ViewModel
         {
             Geopoint maiLocation = new Geopoint(new BasicGeoposition() { Latitude = 55.811685, Longitude = 37.502471 });
             await Map.TrySetViewAsync(maiLocation, 6);
-
-            
         }
         #region MapElement Events
         private void AirportsLayer_MapElementClick(MapElementsLayer sender, MapElementsLayerClickEventArgs args)
@@ -346,29 +338,6 @@ namespace MapApplication.ViewModel
         private void AirportsLayer_MapElementPointerEntered(MapElementsLayer sender, MapElementsLayerPointerEnteredEventArgs args)
         {
             UpdateMapElementOnPointerEntered(args.MapElement);
-        }
-        #endregion
-        private async void DrawLine(Point startPoint, Point endPoint, Windows.UI.Color color)
-        {
-            try
-            {
-                await Dispatcher.InvokeAsync(new Action(delegate ()
-                {
-                    MapPolyline mapPolyline = new MapPolyline();
-                    mapPolyline.Path = new Geopath(new List<BasicGeoposition>() {
-                    new BasicGeoposition() { Latitude = startPoint.lat, Longitude = startPoint.lon},
-                    new BasicGeoposition() {Latitude = endPoint.lat, Longitude = endPoint.lon },
-                });
-                    //mapPolyline.StrokeDashed = strokeDashed;
-                    mapPolyline.StrokeColor = color;
-                    mapPolyline.StrokeThickness = 3;
-                    Map.MapElements.Add(mapPolyline);
-                }));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
         }
         public void UpdateMapElementOnPointerEntered(MapElement mapElement)
         {
@@ -394,68 +363,51 @@ namespace MapApplication.ViewModel
                 mapElement.MapStyleSheetEntryState = "";
                 mapElement.MapStyleSheetEntry = MapStyleSheetEntries.Forest;
 
-                int id = initData.rtpList.Where(item => item.AirportName == myclickedIcon.Title).FirstOrDefault().ID;
+                int id = initData.wayPointList.Where(item => item.AirportName == myclickedIcon.Title).FirstOrDefault().ID;
 
-                ListViewWorker.RemoveElement(initData.rtpList, id);
+                ListViewWorker.RemoveElement(initData.wayPointList, id);
 
             }
             else if (mapElement.MapStyleSheetEntryState == MapStyleSheetEntryStates.Hover)
             {
                 mapElement.MapStyleSheetEntryState = MapStyleSheetEntryStates.Selected;
 
-                RouteTurningPoint RTP = new RouteTurningPoint();
+                WayPoint RTP = new WayPoint();
                 RTP.AirportName = myclickedIcon.Title;
                 RTP.Longitude = myclickedIcon.Location.Position.Longitude;
                 RTP.Latitude = myclickedIcon.Location.Position.Latitude;
                 RTP.Velocity = 850;
                 RTP.Altitude = 1500;
 
-                ListViewWorker.UpdateData(initData.rtpList, RTP);
+                ListViewWorker.UpdateData(initData.wayPointList, RTP);
             }
         }
-        private void M_Model_RefreshRollPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            RollPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
 
-        private void M_Model_RefreshPitchPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            PitchPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
+        #endregion
 
-        private void M_Model_RefreshHeadingPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
+        private async void DrawLine(List<BasicGeoposition> trajectoryPoints)
         {
-            HeadingPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshV_VerticalPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            V_VerticalPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshV_NorthPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            V_NorthPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshV_EastPlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            V_EastPlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshAltitudePlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            AltitudePlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshLatitudePlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            LatitudePlotControlVM.Plot(xAxisName, yAxisName, seriesList);
-        }
-
-        private void M_Model_RefreshLongitudePlot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
-        {
-            LongitudePlotControlVM.Plot(xAxisName, yAxisName, seriesList);
+            try
+            {
+                await Dispatcher.InvokeAsync(new Action(delegate ()
+                {
+                    Map.MapElements.Clear();
+                    if (trajectoryLine == null)
+                    {
+                        trajectoryLine = new MapPolyline();
+                        trajectoryLine.StrokeColor = Windows.UI.Colors.Red;
+                        trajectoryLine.StrokeThickness = 2;
+                    }
+                    
+                    trajectoryLine.Path = new Geopath(trajectoryPoints);
+                    Map.MapElements.Add(trajectoryLine);
+                    
+                }));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

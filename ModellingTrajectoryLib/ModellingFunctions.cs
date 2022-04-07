@@ -1,6 +1,5 @@
 ﻿using CommonLib;
 using CommonLib.Params;
-using ModellingErrorsLib;
 using ModellingTrajectoryLib.Helper;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static CommonLib.Types;
-using static ModellingErrorsLib.Types;
 using static ModellingTrajectoryLib.Types;
 using MyMatrix;
 
@@ -40,7 +38,6 @@ namespace ModellingTrajectoryLib
         double dVelocityOnFullTurn;
         double dVelocityOnEveryIteration;
 
-
         int CountOfWindCall = 0;
         Point[] startedPoints;
 
@@ -64,26 +61,25 @@ namespace ModellingTrajectoryLib
             velAbs = new double[velocity.Length - 1];
             for (int i = 1; i < velocity.Length; i++)
             {
-                if (velocity[i] >= 1224)
-                    velAbs[i - 1] = 1224 / 3.6;
-                else if (velocity[i] <= 500)
-                    velAbs[i - 1] = 500 / 3.6;
-                else
-                    velAbs[i - 1] = velocity[i] / 3.6;
+                if (velocity[i - 1] >= 1224)
+                    velocity[i - 1] = 1224;
+                else if (velocity[i] <= 350)
+                    velocity[i - 1] = 350;
+                velAbs[i - 1] = Converter.KmPerHourToMeterPerSec(velocity[i - 1]);
             }
         }
         private double[] MakeArray(int length)
         {
             return new double[length - 1];
         }
-        internal double ComputeOrtDistAngle(Parameters parameters, int k)
+        internal double ComputeOrtDistAngle(Parameters parameters, int wpNumber)
         {
-            return ComputeOrtDistAngle(parameters.point, startedPoints[k + 1]);
+            return ComputeOrtDistAngle(parameters.point, startedPoints[wpNumber + 1]);
         }
-        private double ComputeOrtDistAngle(Point lastPoint, Point nextPoint)
+        private double ComputeOrtDistAngle(Point currPoint, Point nextPoint)
         {
-            return Math.Acos(Math.Sin(lastPoint.lat) * Math.Sin(nextPoint.lat) +
-                Math.Cos(lastPoint.lat) * Math.Cos(nextPoint.lat) * Math.Cos(nextPoint.lon - lastPoint.lon));
+            return Math.Acos(Math.Sin(currPoint.lat) * Math.Sin(nextPoint.lat) +
+                Math.Cos(currPoint.lat) * Math.Cos(nextPoint.lat) * Math.Cos(nextPoint.lon - currPoint.lon));
         }
         private double ComputeHeading(Point lastPoint, Point nextPoint, double dLon)
         {
@@ -118,22 +114,22 @@ namespace ModellingTrajectoryLib
                 turnHappened = false;
             }
         }
-        private void ComputeParamsBetweenPPM(int k)
+        private void ComputeParamsBetweenPPM(int wpNumber)
         {
-            dLon[k] = startedPoints[k + 1].lon - startedPoints[k].lon;
-            ortDistAngle[k] = ComputeOrtDistAngle(startedPoints[k], startedPoints[k + 1]);
-            ortDist[k] = Rz * ortDistAngle[k];
-            distance[k] = Math.Sqrt(Math.Pow(ortDist[k], 2)) + dH[k];
-            pitch[k] = Math.Atan2(dH[k], ortDist[k]);
-            roll[k] = 0;
-            heading[k] = ComputeHeading(startedPoints[k], startedPoints[k + 1], dLon[k]);
-            heading[k] += heading[k] <= 0 ? 2 * Math.PI : 0;
-            heading[k] -= heading[k] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
+            dLon[wpNumber] = startedPoints[wpNumber + 1].lon - startedPoints[wpNumber].lon;
+            ortDistAngle[wpNumber] = ComputeOrtDistAngle(startedPoints[wpNumber], startedPoints[wpNumber + 1]);
+            ortDist[wpNumber] = Rz * ortDistAngle[wpNumber];
+            distance[wpNumber] = Math.Sqrt(Math.Pow(ortDist[wpNumber], 2)) + dH[wpNumber];
+            pitch[wpNumber] = Math.Atan2(dH[wpNumber], ortDist[wpNumber]);
+            roll[wpNumber] = 0;
+            heading[wpNumber] = ComputeHeading(startedPoints[wpNumber], startedPoints[wpNumber + 1], dLon[wpNumber]);
+            heading[wpNumber] += heading[wpNumber] <= 0 ? 2 * Math.PI : 0;
+            heading[wpNumber] -= heading[wpNumber] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
         }
-        internal double GetLUR(int k, int limit)
+        internal double GetLUR(int wpNumber, int limit)
         {
-            if (k != limit)
-                ComputeLUR(k);
+            if (wpNumber != limit)
+                ComputeLUR(wpNumber);
             else
                 LUR_Distance = -1;
             return LUR_Distance;
@@ -189,6 +185,7 @@ namespace ModellingTrajectoryLib
             angles.heading = heading[k];
             angles.pitch = pitch[k];
             angles.roll = roll[k];
+            angles.dimension = Dimension.InRadians;
             parameters.angles = angles;
         }
         internal void SetVelocity(ref Parameters parameters, int k)
@@ -205,8 +202,9 @@ namespace ModellingTrajectoryLib
             numberOfIterations = (int)(timeTurnInt / dt);
             dHeading = UR / numberOfIterations;
 
-
             turnHappened = true;
+
+            //dRollOnTurn = (rollTarget / numberOfIterations) * 2;
 
             dVelocityOnFullTurn = velAbs[k + 1] - velAbs[k];
             dVelocityOnEveryIteration = dVelocityOnFullTurn != 0 ? dVelocityOnFullTurn / numberOfIterations : 0;

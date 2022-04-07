@@ -10,24 +10,24 @@ namespace MapApplication.Model
 {
     public class ListViewWorker
     {
-        public static void UpdateData(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
+        public static void UpdateData(ObservableCollection<WayPoint> wayPointList, WayPoint RTP)
         {
-            RouteTurningPoint tempRTP = new RouteTurningPoint();
-            tempRTP.AirportName = RTP.AirportName;
-            tempRTP.Latitude = RTP.Latitude;
-            tempRTP.Longitude = RTP.Longitude;
-            tempRTP.Altitude = RTP.Altitude;
-            tempRTP.Velocity = RTP.Velocity;
-            tempRTP.ID = rtpList.Count() + 1;
-            rtpList.Add(tempRTP);
+            WayPoint temp = new WayPoint();
+            temp.AirportName = RTP.AirportName;
+            temp.Latitude = RTP.Latitude;
+            temp.Longitude = RTP.Longitude;
+            temp.Altitude = RTP.Altitude;
+            temp.Velocity = RTP.Velocity;
+            temp.ID = wayPointList.Count() + 1;
+            wayPointList.Add(temp);
             
         }
-        public static void RemoveElement(ObservableCollection<RouteTurningPoint> rtpList, int id)
+        public static void RemoveElement(ObservableCollection<WayPoint> wayPointList, int id)
         {
-            rtpList.RemoveAt(id - 1);
-            for (int i = 0; i < rtpList.Count; i++)
+            wayPointList.RemoveAt(id - 1);
+            for (int i = 0; i < wayPointList.Count; i++)
             {
-                rtpList[i].ID = i + 1;
+                wayPointList[i].ID = i + 1;
             }
         }
     }

@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,22 +50,20 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonLib">
+    <Reference Include="CommonLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CommonLib\bin\Debug\CommonLib.dll</HintPath>
     </Reference>
-    <Reference Include="EstimateLib" />
-    <Reference Include="EstimateLib">
+    <Reference Include="EstimateLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\EstimateLib\bin\Debug\EstimateLib.dll</HintPath>
     </Reference>
-    <Reference Include="ModellingErrorsLib">
-      <HintPath>..\ModellingErrorsLib\bin\Debug\ModellingErrorsLib.dll</HintPath>
-    </Reference>
-    <Reference Include="ModellingErrorsLib3" />
-    <Reference Include="ModellingErrorsLib3">
+    <Reference Include="ModellingErrorsLib3, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\ModellingErrorsLib3\bin\Debug\ModellingErrorsLib3.dll</HintPath>
     </Reference>
-    <Reference Include="MyMatrix" />
-    <Reference Include="MyMatrix">
+    <Reference Include="MyMatrix, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Projects\MyMatrix\MyMatrix\bin\Debug\MyMatrix.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -90,4 +89,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetDir)$(TargetFileName)" "$(ProjectDir)..\Lib\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

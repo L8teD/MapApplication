@@ -12,14 +12,14 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="6*"></RowDefinition>
-                <RowDefinition Height="20"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60"></ColumnDefinition>
-                <ColumnDefinition Width="60"></ColumnDefinition>
-                <ColumnDefinition Width="60"></ColumnDefinition>
+                <ColumnDefinition Width="80"></ColumnDefinition>
+                <ColumnDefinition Width="80"></ColumnDefinition>
+                <ColumnDefinition Width="80"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="30"></ColumnDefinition>
+                <ColumnDefinition Width="35"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <v:Plot Grid.ColumnSpan="6" Grid.Row="1">
                 <ContentControl Content="{Binding plotWindowControlVM.plotVM}"></ContentControl>
@@ -35,7 +35,7 @@
                 <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>
             </Button>
             <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-                <v:Legend Margin="10">
+                <v:Legend Margin="2,10">
                     <ContentControl Content="{Binding plotWindowControlVM.legendControlVM}"></ContentControl>
                 </v:Legend>
             </Grid>

@@ -135,6 +135,10 @@ namespace CommonLib
             public PointValue CorrectTrajectory;
             public PointSet(Point idP, Vector error, Vector estimate, EarthModel earth, bool ISChannel3 = true)
             {
+                if (error == null)
+                    error = Vector.Zero(3);
+                if (estimate == null)
+                    estimate = Vector.Zero(3);
                 if (ISChannel3)
                 {
                     Ideal = new PointValue(idP, earth, idP.lat);
@@ -200,6 +204,10 @@ namespace CommonLib
             public VelocityValue CorrectTrajectory;
             public VelocitySet(Velocity velocity, Vector error, Vector estimate, bool ISChannel3 = true)
             {
+                if (error == null)
+                    error = Vector.Zero(6);
+                if (estimate == null)
+                    estimate = Vector.Zero(6);
                 if (ISChannel3)
                 {
                     Ideal = new VelocityValue(velocity.E, velocity.N, velocity.H);
@@ -259,6 +267,8 @@ namespace CommonLib
             public AngleValue Real;
             public AnglesSet(Angles angles, Vector error, bool IsChannel3 = true)
             {
+                if (error == null)
+                    error = Vector.Zero(9);
                 if (IsChannel3)
                 {
                     Ideal = new AngleValue(angles);

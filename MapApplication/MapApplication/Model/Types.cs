@@ -13,7 +13,7 @@ namespace MapApplication.Model
     {
         public class InitData
         {
-            public ObservableCollection<RouteTurningPoint> rtpList { get; set; }
+            public ObservableCollection<WayPoint> wayPointList { get; set; }
             public ObservableCollection<InputError> insErrors { get; set; }
             public ObservableCollection<InputError> sensorErrors { get; set; }
         }
@@ -64,6 +64,12 @@ namespace MapApplication.Model
             Heading,
             Roll,
             Pitch
+        }
+        public enum ActivePlotState
+        {
+            Trajectory,
+            Error,
+            P
         }
     }
 }

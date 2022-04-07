@@ -6,31 +6,31 @@
              xmlns:local="clr-namespace:MapApplication.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border Margin="5"  BorderBrush="Gray" BorderThickness="2">
+    <Border Margin="2"  BorderBrush="Gray" BorderThickness="2">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="1.2*"></RowDefinition>
                 <RowDefinition Height="6*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="2.8*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
                 <ColumnDefinition Width="2*"></ColumnDefinition>
                 <ColumnDefinition Width="0.5*"></ColumnDefinition>
-
+                <ColumnDefinition Width="0.6*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <local:Plot Grid.ColumnSpan="6" Grid.RowSpan="3">
+            <local:Plot Grid.ColumnSpan="5" Grid.RowSpan="3">
                 <ContentControl Content="{Binding plotVM}"></ContentControl>
             </local:Plot>
-            <Border Style="{StaticResource Border_Style}" Grid.Column="0">
+            <Border Grid.Column="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="1.5*"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}"
+                    <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}" 
                         Command="{Binding Cmd_Trajectory}"></RadioButton>
                     <RadioButton Content="Error" Grid.Column="1" Style="{StaticResource rb_Style}"
                         Command="{Binding Cmd_Error}"></RadioButton>
@@ -39,10 +39,10 @@
                 </Grid>
             </Border>
             
-            <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="6">
+            <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="4">
                 <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>
             </Button>
-            <Grid Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+            <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Right">
                 <local:Legend>
                     <ContentControl Content="{Binding legendControlVM}"></ContentControl>
                 </local:Legend>

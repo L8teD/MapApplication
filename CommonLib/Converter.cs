@@ -62,7 +62,6 @@ namespace CommonLib
                 pointInDegrees.alt,
                 Types.Dimension.InDegrees
             );
-
         }
        
         public static (double[], double[], double[]) ListInPointsToDoubleCoords(List<Point> points)
@@ -114,6 +113,14 @@ namespace CommonLib
                 inputPointInRadians.alt,
                 Types.Dimension.InMeters);
             return outPoint;
+        }
+        public static double KmPerHourToMeterPerSec(double kmPerHour)
+        {
+            return kmPerHour / 3.6;
+        }
+        public static double MeterPerSecToKmPerHour(double meterPerSec)
+        {
+            return meterPerSec * 3.6;
         }
         public static double DateTimeToUnix(DateTime dateTime)
         {

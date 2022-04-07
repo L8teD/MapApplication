@@ -27,18 +27,18 @@ namespace MapApplication.Model.Helper
             info.Date = DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString();
             info.Message = message;
             info.Fixed = 0;
-            info.CountOfPoints = initData.rtpList.Count();
+            info.CountOfPoints = initData.wayPointList.Count();
             info.input = new DebugInput();
             info.input.latitude = "";
             info.input.longitude = "";
             info.input.altitude = "";
             info.input.velocity = "";
-            foreach (RouteTurningPoint RTP in initData.rtpList)
+            foreach (WayPoint wayPoint in initData.wayPointList)
             {
-                info.input.latitude += RTP.Latitude.ToString() + " ";
-                info.input.longitude += RTP.Longitude.ToString() + " ";
-                info.input.altitude += RTP.Altitude.ToString() + " ";
-                info.input.velocity += RTP.Velocity.ToString() + " ";
+                info.input.latitude += wayPoint.Latitude.ToString() + " ";
+                info.input.longitude += wayPoint.Longitude.ToString() + " ";
+                info.input.altitude += wayPoint.Altitude.ToString() + " ";
+                info.input.velocity += wayPoint.Velocity.ToString() + " ";
             }
             PrintInfoTXT(info);
             PrintInfoDB(info);

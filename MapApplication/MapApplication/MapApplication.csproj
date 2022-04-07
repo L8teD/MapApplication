@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -58,16 +59,16 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonLib">
+    <Reference Include="CommonLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\CommonLib\bin\Debug\CommonLib.dll</HintPath>
     </Reference>
-    <Reference Include="EstimateLib">
-      <HintPath>..\..\EstimateLib\bin\Debug\EstimateLib.dll</HintPath>
-    </Reference>
-    <Reference Include="ModellingErrorsLib3">
+    <Reference Include="ModellingErrorsLib3, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ModellingErrorsLib3\bin\Debug\ModellingErrorsLib3.dll</HintPath>
     </Reference>
-    <Reference Include="ModellingTrajectoryLib">
+    <Reference Include="ModellingTrajectoryLib, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ModellingTrajectoryLib\bin\Debug\ModellingTrajectoryLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -95,10 +96,11 @@
     <Compile Include="Model\Helper\Logger.cs" />
     <Compile Include="Model\Helper\PlotWorker.cs" />
     <Compile Include="Model\Helper\Saver.cs" />
-    <Compile Include="ViewModel\DataRowVM.cs" />
-    <Compile Include="ViewModel\DataRowWithChangesVM.cs" />
-    <Compile Include="ViewModel\DataTableVM.cs" />
-    <Compile Include="ViewModel\DataTableWithChangesVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\DataRowVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\DataRowWithChangesVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\DataTableVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\DataTableWithChangesVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\PlotTableVM.cs" />
     <Compile Include="View\Pages\DebugMode.xaml.cs">
       <DependentUpon>DebugMode.xaml</DependentUpon>
     </Compile>
@@ -138,6 +140,9 @@
     <Compile Include="View\UserControls\PlotControl.xaml.cs">
       <DependentUpon>PlotControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UserControls\PlotTable.xaml.cs">
+      <DependentUpon>PlotTable.xaml</DependentUpon>
+    </Compile>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -148,16 +153,16 @@
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\Types.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
-    <Compile Include="ViewModel\InpuError.cs" />
-    <Compile Include="ViewModel\LegendButtonVM.cs" />
-    <Compile Include="ViewModel\LegendVM.cs" />
-    <Compile Include="ViewModel\LogInfo.cs" />
+    <Compile Include="ViewModel\DataClasses\InputError.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\LegendButtonVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\LegendVM.cs" />
+    <Compile Include="ViewModel\DataClasses\LogInfo.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\PlotControlVM.cs" />
-    <Compile Include="ViewModel\PlotVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\PlotControlVM.cs" />
+    <Compile Include="ViewModel\UserControlsViewModels\PlotVM.cs" />
     <Compile Include="ViewModel\PlotWindowVM.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
-    <Compile Include="ViewModel\RouteTurningPoint.cs" />
+    <Compile Include="ViewModel\DataClasses\WayPoint.cs" />
     <Compile Include="View\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -239,6 +244,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\UserControls\PlotTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -261,6 +270,7 @@
     <Resource Include="AnotherFiles\ports_info.csv" />
     <None Include="app.manifest">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -305,5 +315,6 @@
   <ItemGroup>
     <Resource Include="AnotherFiles\Images\MAI_logo.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using CommonLib;
+using CommonLib.Params;
 using MapApplication.Model.Helper;
 using MapApplication.ViewModel;
 using OxyPlot;
@@ -9,15 +10,17 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
+
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Windows.Devices.Geolocation;
 using static CommonLib.Types;
 using static MapApplication.Model.Helper.Logger;
 using static MapApplication.Model.Types;
-using Point = CommonLib.Params.Point;
+
 
 namespace MapApplication.Model
 {
@@ -32,6 +35,8 @@ namespace MapApplication.Model
         private List<PlotData> twoChannelPlotData;
         private List<PlotData> threeChannelPlotData;
 
+        private List<BasicGeoposition> trajectoryPoints;
+
         public event Action<string, string, List<LineSeries>> RefreshLongitudePlot;
         public event Action<string, string, List<LineSeries>> RefreshLatitudePlot;
         public event Action<string, string, List<LineSeries>> RefreshAltitudePlot;
@@ -44,36 +49,70 @@ namespace MapApplication.Model
 
         public event Action<OutputData, int> UpdateTableData;
 
-        public event Action<Point, Point, Windows.UI.Color> DrawTrajectoryAction;
+        public event Action<List<BasicGeoposition>> DrawTrajectoryAction;
 
-        Timer timerTrajectory;
+        System.Timers.Timer timerTrajectory;
         int second = 1;
         public MainModel()
         {
-            timerTrajectory = new Timer(1000);
+            timerTrajectory = new System.Timers.Timer(1000);
             timerTrajectory.Elapsed += TimerTrajectory_Elapsed;
         }
         public void SwitchIndicatedData(DataSource source)
         {
+            if (indicatedData.points == null) return;
             switch (source)
             {
                 case DataSource.threeChannel:
-                    indicatedData = DublicatOutputData(threeChannelOutput);
+                    indicatedData = DublicateOutputData(threeChannelOutput);
                     break;
                 case DataSource.twoChannel:
-                    indicatedData = DublicatOutputData(twoChannelOutput);
+                    indicatedData = DublicateOutputData(twoChannelOutput);
                     break;
             }
+        }
+        public void DrawFullTrajctory()
+        {
+            
+            while(second < indicatedData.points.Count)
+            {
+                trajectoryPoints.Add(new BasicGeoposition()
+                {
+                    Latitude = indicatedData.points[second].CorrectTrajectory.Degrees.lat,
+                    Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon,
+                    Altitude = indicatedData.points[second].CorrectTrajectory.Degrees.alt
+                });
+                MathTransformation.IncrementValue(ref second);
+            }
+
+            DrawTrajectoryAction?.Invoke(trajectoryPoints);
+        }
+        private void RefreshDrawingTrajectoryParams()
+        {
+            second = 1;
+            if (trajectoryPoints == null)
+                trajectoryPoints = new List<BasicGeoposition>();
+            trajectoryPoints.Clear();
         }
         private void TimerTrajectory_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (second < indicatedData.points.Count)
             {
-                DrawTrajectoryAction?.Invoke(indicatedData.points[second - 1].CorrectTrajectory.Degrees,
-                    indicatedData.points[second].CorrectTrajectory.Degrees, Windows.UI.Colors.Blue);
+                trajectoryPoints.Add(new BasicGeoposition()
+                {
+                    Latitude = indicatedData.points[second - 1].CorrectTrajectory.Degrees.lat,
+                    Longitude = indicatedData.points[second - 1].CorrectTrajectory.Degrees.lon
+                });
+                trajectoryPoints.Add(new BasicGeoposition()
+                {
+                    Latitude = indicatedData.points[second].CorrectTrajectory.Degrees.lat,
+                    Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon
+                });
+
+                DrawTrajectoryAction?.Invoke(trajectoryPoints);
                 MathTransformation.IncrementValue(ref second);
 
-                System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
+                Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
 
                 UpdateTableData?.Invoke(indicatedData, second - 1);
             }
@@ -81,14 +120,13 @@ namespace MapApplication.Model
                 timerTrajectory.Enabled = false;
         }
 
-        public void AddRTP(ObservableCollection<RouteTurningPoint> rtpList, RouteTurningPoint RTP)
+        public void AddWayPoint(ObservableCollection<WayPoint> wayPointList, WayPoint wayPoint)
         {
-            ListViewWorker.UpdateData(rtpList, RTP);
+            ListViewWorker.UpdateData(wayPointList, wayPoint);
         }
-        public void RemoveRTP(ObservableCollection<RouteTurningPoint> rtpList, Button button)
+        public void RemoveWayPoint(ObservableCollection<WayPoint> wayPointList, int id)
         {
-            int id = (int)button.Tag;
-            ListViewWorker.RemoveElement(rtpList, id);
+            ListViewWorker.RemoveElement(wayPointList, id);
         }
         public void Start()
         {
@@ -108,30 +146,19 @@ namespace MapApplication.Model
         }
         public void Compute(InitData initData)
         {
-            
+            RefreshDrawingTrajectoryParams();
             threeChannelOutput = new OutputData();
             twoChannelOutput = new OutputData();
             try
             {
-                List<P_out> p_Outs = new List<P_out>();
-                List<X_dot_out> x_Dot_Outs = new List<X_dot_out>();
-                List<MatlabData> matlabData = new List<MatlabData>();
-                //throw new Exception("CS2043: Вызываемый поток недоступен");
-
-                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput, ref p_Outs, ref x_Dot_Outs, ref matlabData);
-                indicatedData = DublicatOutputData(twoChannelOutput);
+                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput);
+                indicatedData = DublicateOutputData(twoChannelOutput);
                 CreatePlotData();
                 RefreshPlots();
-
-
-                //Saver.WriteCSV<P_out>(p_Outs, "../../../../matlab_scripts/test_csv/covar.csv");
-                //Saver.WriteCSV<X_dot_out>(x_Dot_Outs, "../../../../matlab_scripts/test_csv/x_dot.csv");
-                //Saver.WriteCSV<MatlabData>(matlabData, "../../../../matlab_scripts/kalman/matlabData.csv");
-
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message);
                 Logger.PrintErrorInfo(ex.Message, initData);
             }
         }
@@ -175,6 +202,7 @@ namespace MapApplication.Model
         }
         public void SwitchPlotData(DataSource source)
         {
+            if (indicatedListOfPlotData == null) return;
             switch (source)
             {
                 case DataSource.threeChannel:
@@ -188,6 +216,7 @@ namespace MapApplication.Model
         }
         private List<PlotData> DublicatePlotData(List<PlotData> original)
         {
+            if (original == null) return new List<PlotData>();
             List<PlotData> copy = new List<PlotData>();
 
             for (int i = 0; i < original.Count; i++)
@@ -200,7 +229,7 @@ namespace MapApplication.Model
             }
             return copy;
         }
-        private OutputData DublicatOutputData(OutputData original)
+        private OutputData DublicateOutputData(OutputData original)
         {
             OutputData copy = new OutputData();
 
@@ -210,20 +239,18 @@ namespace MapApplication.Model
                 copy.velocities = new List<VelocitySet>();
                 copy.angles = new List<AnglesSet>();
                 copy.p_OutList = new List<P_out>();
-
-                for (int i = 0; i < original.points.Count(); i++)
-                {
-                    copy.points.Add(original.points[i]);
-                    copy.velocities.Add(original.velocities[i]);
-                    copy.angles.Add(original.angles[i]);
-                    copy.p_OutList.Add(original.p_OutList[i]);
-                }
+                copy.points.AddRange(original.points);
+                copy.velocities.AddRange(original.velocities);
+                copy.angles.AddRange(original.angles);
+                copy.p_OutList.AddRange(original.p_OutList);
             }
             
             return copy;
         }
-        public void SetDataFromLogger(LogInfo info, ObservableCollection<RouteTurningPoint> rtpList)
+        public void SetDataFromLogger(LogInfo info, ObservableCollection<WayPoint> wayPointList)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
             string[] infoString = info.Element.Split('|');
             int ID = Convert.ToInt32(infoString[7].Split(' ')[1]);
             selectedInfo = infoList.Find(item => item.id == ID);
@@ -231,15 +258,15 @@ namespace MapApplication.Model
             string[] longitude = selectedInfo.input.longitude.Split(' ');
             string[] altitude = selectedInfo.input.altitude.Split(' ');
             string[] velocity = selectedInfo.input.velocity.Split(' ');
-            rtpList.Clear();
+            wayPointList.Clear();
             for (int i = 0; i < selectedInfo.CountOfPoints; i++)
             {
-                RouteTurningPoint RTP = new RouteTurningPoint();
-                RTP.Latitude = Convert.ToDouble(latitude[i]);
-                RTP.Longitude = Convert.ToDouble(longitude[i]);
-                RTP.Altitude = Convert.ToDouble(altitude[i]);
-                RTP.Velocity = Convert.ToDouble(velocity[i]);
-                AddRTP(rtpList, RTP);
+                WayPoint wayPoint = new WayPoint();
+                wayPoint.Latitude = Convert.ToDouble(latitude[i]);
+                wayPoint.Longitude = Convert.ToDouble(longitude[i]);
+                wayPoint.Altitude = Convert.ToDouble(altitude[i]);
+                wayPoint.Velocity = Convert.ToDouble(velocity[i]);
+                AddWayPoint(wayPointList, wayPoint);
             }
         }
         public void RemoveDataFromLogger()
@@ -262,9 +289,9 @@ namespace MapApplication.Model
             }
             return logInfo;
         }
-        public RouteTurningPoint SetRTP()
+        public WayPoint SetWayPoint()
         {
-            return new RouteTurningPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 1224 };
+            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 1224 };
         }
         public (ObservableCollection<InputError>, ObservableCollection<InputError>) SetInputErrors()
         {

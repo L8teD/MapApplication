@@ -12,31 +12,25 @@ namespace MapApplication.Model.Helper
 {
     class Execute
     {
-        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref OutputData outputData2, ref List<P_out> p_Outs,
-            ref List<X_dot_out> x_Dot_Outs, ref List<MatlabData> matlabData)
+        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref OutputData outputData2)
         {
-            p_Outs = new List<P_out>();
-
             InputData inputData = new InputData();
-            inputData.latitude = new double[initData.rtpList.Count];
-            inputData.longitude = new double[initData.rtpList.Count];
-            inputData.altitude = new double[initData.rtpList.Count];
-            inputData.velocity = new double[initData.rtpList.Count];
-            for (int i = 0; i < initData.rtpList.Count; i++)
+            inputData.latitude = new double[initData.wayPointList.Count];
+            inputData.longitude = new double[initData.wayPointList.Count];
+            inputData.altitude = new double[initData.wayPointList.Count];
+            inputData.velocity = new double[initData.wayPointList.Count];
+            for (int i = 0; i < initData.wayPointList.Count; i++)
             {
-                inputData.latitude[i] = initData.rtpList[i].Latitude;
-                inputData.longitude[i] = initData.rtpList[i].Longitude;
-                inputData.altitude[i] = initData.rtpList[i].Altitude;
-                inputData.velocity[i] = initData.rtpList[i].Velocity;
+                inputData.latitude[i] = initData.wayPointList[i].Latitude;
+                inputData.longitude[i] = initData.wayPointList[i].Longitude;
+                inputData.altitude[i] = initData.wayPointList[i].Altitude;
+                inputData.velocity[i] = initData.wayPointList[i].Velocity;
             }
             InitErrors initErrors = SetInitErrors(initData);
 
             Modelling model = new Modelling(inputData, initErrors);
             outputData = model.outputData;
             outputData2 = model.outputData2;
-            p_Outs = model.p_Outs;
-            x_Dot_Outs = model.x_Dot_Outs;
-            matlabData = model.matlabData;
         }
         private static InitErrors SetInitErrors(InitData initData)
         {

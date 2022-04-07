@@ -243,10 +243,13 @@ namespace MapApplication.Model
         }
         public static PlotData SelectData(PlotName name, PlotCharacter character, List<PlotData> plotDataList)
         {
+            if (plotDataList == null) return null;
             return plotDataList.Find(item => item.name == name && item.character == character);
         }
         public static LineSeries CreateLineSeries(PlotData data)
         {
+            if (data == null) return null;
+
             LineSeries series = new LineSeries()
             {
                 //ItemsSource = data,

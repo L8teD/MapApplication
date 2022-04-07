@@ -18,19 +18,17 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"></ColumnDefinition>
             <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="0*"></ColumnDefinition>
-            <ColumnDefinition Width="0*"></ColumnDefinition>
-            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="2.5*"></RowDefinition>
+            <RowDefinition Height="3.5*"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListView x:Name="lv_Routes" ItemsSource="{Binding Path=initData.rtpList}" Grid.Column="0" Margin="0,0,0.2,0.4">
+        <ListView x:Name="lv_Routes" ItemsSource="{Binding Path=initData.wayPointList}" Grid.Column="0" Margin="2">
             <ListView.View>
                 <GridView ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
                     <GridViewColumn DisplayMemberBinding="{Binding Path=ID}" Width="25">ID</GridViewColumn>
-                    <GridViewColumn Width="80">Latitude [deg]
+                    <GridViewColumn Width="100">Latitude [deg]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBox Text="{Binding Path=Latitude}" HorizontalAlignment="Center" Margin="20,0,0,0"></TextBox>
@@ -38,21 +36,21 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Width="80">Longitude [deg]
+                    <GridViewColumn Width="100">Longitude [deg]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center" Margin="20,0,0,0"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="80">Altitude [m]
+                    <GridViewColumn Width="75">Altitude [m]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center" Margin="20,0,0,0"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="80">Velocity [km/h]
+                    <GridViewColumn Width="85">Velocity [km/h]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center" Margin="20,0,0,0"></TextBox>
@@ -62,80 +60,55 @@
                     <GridViewColumn  Width="35">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveRTP}"
-                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{DynamicResource btn_Style}"></Button>
+                                <Button x:Name="btn_RemoveWP" Content="X" Tag="{Binding Path=ID}" Width="20" 
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveWayPoint}"
+                                        CommandParameter="{Binding ElementName=btn_RemoveWP}" Style="{DynamicResource btn_Style}"></Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
-        <StackPanel Grid.Column="1">
-            <Grid DataContext="{Binding RTP}">
+        <Border Grid.Column="1" BorderThickness="1" BorderBrush="DarkSlateGray" CornerRadius="6">
+            <Grid Grid.Column="1" DataContext="{Binding Waypoint}" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.5*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="1.5*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="textblock111" Text="Latitude"></TextBlock>
-                <TextBox Text="{Binding Path=Latitude}" Grid.Column="1"></TextBox>
-                <TextBlock Text="Longtitude" Grid.Row="1"></TextBlock>
-                <TextBox Text="{Binding Path=Longitude}" Grid.Column="1" Grid.Row="1"></TextBox>
-                <TextBlock Text="Altitude" Grid.Row="2"></TextBlock>
-                <TextBox Text="{Binding Path=Altitude}" Grid.Column="1" Grid.Row="2"></TextBox>
-                <TextBlock Text="Velocity" Grid.Row="3"></TextBlock>
-                <TextBox Text="{Binding Path=Velocity}" Grid.Column="1" Grid.Row="3"></TextBox>
+                <TextBlock Text="Latitude" VerticalAlignment="Center"></TextBlock>
+                <TextBox Text="{Binding Path=Latitude}" Grid.Column="1" VerticalAlignment="Center"></TextBox>
+                <TextBlock Text="Longtitude" Grid.Row="1" VerticalAlignment="Center"></TextBlock>
+                <TextBox Text="{Binding Path=Longitude}" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"></TextBox>
+                <TextBlock Text="Altitude" Grid.Row="2" VerticalAlignment="Center"></TextBlock>
+                <TextBox Text="{Binding Path=Altitude}" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"></TextBox>
+                <TextBlock Text="Velocity" Grid.Row="3" VerticalAlignment="Center"></TextBlock>
+                <TextBox Text="{Binding Path=Velocity}" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"></TextBox>
+                <Button Grid.Column="2" Grid.RowSpan="5" Content="Compute"  Margin="10,50" Style="{StaticResource btn_Style2}"
+                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}},Path=DataContext.Cmd_Compute}" ></Button>
+                <Button Grid.ColumnSpan="2" Grid.Row="4" Content="Add WayPoint" Style="{StaticResource btn_Style2}" Margin="10,5" 
+                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path=DataContext.Cmd_AddWayPoint}" 
+                    CommandParameter="{Binding initData.wayPointList}"></Button>
             </Grid>
-            <Button Grid.ColumnSpan="2" Grid.Row="4" Margin="30,10" Content="Add PPM" Command="{Binding Cmd_AddRTP}" 
-                    CommandParameter="{Binding initData.rtpList}"></Button>
+        </Border>
+        
+        
+        <StackPanel Grid.Column="1">
+           
         </StackPanel>
+
        
-        <Button Grid.Column="1" Content="Compute" Command="{Binding Cmd_Compute}" Margin="0,130,0,0"></Button>
-        <Grid Grid.Row="1" Grid.ColumnSpan="5" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <v:PlotControl>
-                <ContentControl Content="{Binding LongitudePlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Column="1" >
-                <ContentControl Content="{Binding LatitudePlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Column="2" >
-                <ContentControl Content="{Binding AltitudePlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="1" >
-                <ContentControl Content="{Binding V_EastPlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="1" Grid.Column="1" >
-                <ContentControl Content="{Binding V_NorthPlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="1" Grid.Column="2" >
-                <ContentControl Content="{Binding V_VerticalPlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="2" >
-                <ContentControl Content="{Binding HeadingPlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="2" Grid.Column="1" >
-                <ContentControl Content="{Binding RollPlotControlVM}"></ContentControl>
-            </v:PlotControl>
-            <v:PlotControl Grid.Row="2" Grid.Column="2">
-                <ContentControl Content="{Binding PitchPlotControlVM}"></ContentControl>
-            </v:PlotControl>
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="5">
+            <v:PlotTable>
+                <ContentControl Content="{Binding PlotTable}"></ContentControl>
+            </v:PlotTable>
         </Grid>
         <GroupBox Header="LogInfo" Grid.Column="4">
             <ListBox x:Name="lb_LoggerInfo" ItemsSource="{Binding loggerInfoList, Mode=TwoWay}" >

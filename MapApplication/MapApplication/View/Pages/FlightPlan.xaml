@@ -12,7 +12,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"></RowDefinition>
+            <RowDefinition Height="3.5*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -33,6 +33,7 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
+
                 <Border Margin="2" BorderBrush="Black" BorderThickness="2" CornerRadius="4">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -67,9 +68,14 @@
                     </Grid>
                 </Border>
             </Grid>
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <Border Margin="2,5" BorderBrush="Black" BorderThickness="2" CornerRadius="4" MinHeight="50" MaxHeight="100">
+                    <Button Content="Draw Full Trajectory" Style="{StaticResource btn_Style}" Command="{Binding Cmd_drawFull}"></Button>
+                </Border>
+            </StackPanel>
         </Grid>
-        <ListView ItemsSource="{Binding Path=initData.rtpList}" Grid.Row="1" Grid.Column="1"
-                  Background="#FFBFFFF3" BorderThickness="2" BorderBrush="Black">
+        <ListView ItemsSource="{Binding Path=initData.wayPointList}" Grid.Row="1" Grid.Column="1"
+                  Background="#FFBFFFF3" BorderThickness="1" BorderBrush="Gray">
             <ListView.View>
                 <GridView ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
                     <GridViewColumn DisplayMemberBinding="{Binding Path=ID}" Width="25">ID</GridViewColumn>
@@ -112,9 +118,9 @@
                     <GridViewColumn  Width="35">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button x:Name="btn_RemoveRTP" Content="X" Tag="{Binding Path=ID}" Width="20" 
-                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveRTP}"
-                                        CommandParameter="{Binding ElementName=btn_RemoveRTP}" Style="{StaticResource btn_Style}"></Button>
+                                <Button x:Name="btn_RemoveWP" Content="X" Tag="{Binding Path=ID}" Width="20" 
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Page}}, Path= DataContext.Cmd_RemoveWayPoint}"
+                                        CommandParameter="{Binding ElementName=btn_RemoveWP}" Style="{StaticResource btn_Style}"></Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -131,6 +137,6 @@
                 <Button Margin="10, 5" Command="{Binding Cmd_Simulation}" Content="Simulation" Grid.Row="1" Style="{StaticResource btn_Style2}"></Button>
             </Grid>
         </Border>
-        
+
     </Grid>
 </Page>

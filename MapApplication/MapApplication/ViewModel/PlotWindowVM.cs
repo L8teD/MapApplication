@@ -12,10 +12,10 @@ namespace MapApplication.ViewModel
     public class PlotWindowVM : BaseViewModel
     {
         public PlotControlVM plotWindowControlVM { get; set; }
-        public PlotWindowVM(PlotName name, PlotControlVM plotControlVM, MainModel model)
+        public PlotWindowVM(PlotName name, ActivePlotState plotState, PlotControlVM plotControlVM, MainModel model)
         {
-            plotWindowControlVM = new PlotControlVM(name, model);
-            plotWindowControlVM.Plot("x", "y", plotControlVM.IndicatedSeries);
+            plotWindowControlVM = new PlotControlVM(name, model, true);
+            plotWindowControlVM.RefreshPlot(plotState);
         }
     }
 }

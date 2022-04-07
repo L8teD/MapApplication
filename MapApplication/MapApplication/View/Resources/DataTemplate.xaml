@@ -8,6 +8,9 @@
     <DataTemplate DataType="{x:Type vm:PlotControlVM}">
         <v:PlotControl></v:PlotControl>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:PlotTableVM}">
+        <v:PlotTable></v:PlotTable>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:LegendButtonVM}">
         <v:LegendElement></v:LegendElement>
     </DataTemplate>
