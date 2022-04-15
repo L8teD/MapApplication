@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using static MapApplication.Model.Types;
 
 namespace MapApplication.Model.Helper
 {

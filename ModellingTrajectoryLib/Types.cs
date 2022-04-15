@@ -9,14 +9,25 @@ using System.Threading.Tasks;
 
 namespace ModellingTrajectoryLib
 {
-    public class Types
+    public struct Wind
     {
-        public struct Wind
-        {
-            public double angle { get; set; }
-            public double speed { get; set; }
-            public double gust { get; set; }
-        }
-
+        public double angle { get; set; }
+        public double speed { get; set; }
+        public double gust { get; set; }
+    }
+    public struct Altitude
+    {
+        public double geometric;
+        public double geopotential;
+    }
+    public struct Temperature
+    {
+        public double kelvin;
+        public double celcius;
+    }
+    public struct Pressure
+    {
+        public double pascal;
+        public double mmOfMercure;
     }
 }

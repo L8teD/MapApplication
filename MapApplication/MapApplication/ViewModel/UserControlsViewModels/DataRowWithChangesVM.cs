@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MapApplication.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static MapApplication.Model.Types;
 
 namespace MapApplication.ViewModel
 {

@@ -10,9 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Windows.Devices.Geolocation;
 using Windows.UI.Xaml.Controls.Maps;
-using static CommonLib.Types;
-using static MapApplication.Model.Types;
-using Point = CommonLib.Params.Point;
+using CommonLib;
 
 namespace MapApplication.ViewModel
 {

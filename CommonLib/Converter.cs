@@ -49,7 +49,7 @@ namespace CommonLib
                 DegToRad(pointInDegrees.lat),
                 DegToRad(pointInDegrees.lon),
                 pointInDegrees.alt,
-                Types.Dimension.InRadians
+                Dimension.InRadians
             );
 
         }
@@ -60,7 +60,7 @@ namespace CommonLib
                 RadToDeg(pointInDegrees.lat),
                 RadToDeg(pointInDegrees.lon),
                 pointInDegrees.alt,
-                Types.Dimension.InDegrees
+                Dimension.InDegrees
             );
         }
        
@@ -97,7 +97,7 @@ namespace CommonLib
                 inputPoint.lat / (earthModel.R2 * Math.Cos(latitude)),
                 inputPoint.lon / earthModel.R1,
                 inputPoint.alt,
-                Types.Dimension.InRadians);
+                Dimension.InRadians);
             return outPoint;
         }
         public static Point DegreesToMeters(Point inputPointInDegrees, EarthModel earthModel)
@@ -111,7 +111,7 @@ namespace CommonLib
                 inputPointInRadians.lat * (earthModel.R2 * Math.Cos(inputPointInRadians.lat)),
                 inputPointInRadians.lon * earthModel.R1,
                 inputPointInRadians.alt,
-                Types.Dimension.InMeters);
+                Dimension.InMeters);
             return outPoint;
         }
         public static double KmPerHourToMeterPerSec(double kmPerHour)

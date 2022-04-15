@@ -17,9 +17,7 @@ using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Windows.Devices.Geolocation;
-using static CommonLib.Types;
 using static MapApplication.Model.Helper.Logger;
-using static MapApplication.Model.Types;
 
 
 namespace MapApplication.Model

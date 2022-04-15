@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EstimateLib;
-using static CommonLib.Types;
-using static ModellingErrorsLib3.Types;
-using static ModellingTrajectoryLib.Types;
+using CommonLib;
+using ModellingErrorsLib3;
+using ModellingTrajectoryLib;
 using MyMatrix;
 
 namespace ModellingTrajectoryLib

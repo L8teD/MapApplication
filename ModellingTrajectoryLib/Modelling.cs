@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static CommonLib.Types;
-using static ModellingErrorsLib3.Types;
+using ModellingErrorsLib3;
 
 namespace ModellingTrajectoryLib
 {
