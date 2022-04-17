@@ -23,14 +23,22 @@ namespace CommonLib.Params
         {
             return new double[] { absOmega.E, absOmega.N / Math.Cos(point.lat), velocity.H };
         }
-        public static Point GetCoords(Parameters parameters, double dt, Dimension dim)
+        public static Point GetCoords(Parameters parameters, double dt)
         {
             double[] increments = GetCoordsIncrement(parameters.point, parameters.absOmega, parameters.velocity);
-            double lat = parameters.point.lat + increments[0] * dt;
-            double lon = parameters.point.lon + increments[1] * dt;
-            double alt = parameters.point.alt + increments[2] * dt;
-            return new Point(lat, lon, alt, dim);
+            return IncrementCoords(parameters.point, increments, dt);
         }
-
+        public static Point GetCoords(Point point, AbsoluteOmega absOmega, Velocity velocity, double dt)
+        {
+            double[] increments = GetCoordsIncrement(point, absOmega, velocity);
+            return IncrementCoords(point, increments, dt);
+        }
+        private static Point IncrementCoords(Point point, double[] increments, double dt)
+        {
+            double lat = point.lat + increments[0] * dt;
+            double lon = point.lon + increments[1] * dt;
+            double alt = point.alt + increments[2] * dt;
+            return new Point(lat, lon, alt, point.dimension);
+        }
     }
 }

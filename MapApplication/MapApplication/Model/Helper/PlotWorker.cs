@@ -235,6 +235,36 @@ namespace MapApplication.Model
             plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.P, Vn_P));
             plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.P, Vh_P));
 
+            #endregion
+
+            #region Course Air Lists
+            List<double> long_Air = new List<double>();
+            List<double> lat_Air = new List<double>();
+            List<double> alt_Air = new List<double>();
+
+            List<double> Ve_Air = new List<double>();
+            List<double> Vn_Air = new List<double>();
+            List<double> Vh_Air = new List<double>();
+
+
+            foreach (AirData airData in outputData.airData)
+            {
+                long_Air.Add(airData.point.lon);
+                lat_Air.Add(airData.point.lat);
+                alt_Air.Add(airData.point.alt);
+
+                Ve_Air.Add(airData.groundSpeed.E);
+                Vn_Air.Add(airData.groundSpeed.N);
+                Vh_Air.Add(airData.groundSpeed.H);
+            }
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CourseAir, lat_Air));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CourseAir, long_Air));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CourseAir, alt_Air));
+
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CourseAir, Ve_Air));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CourseAir, Vn_Air));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CourseAir, Vh_Air));
+
 
 
             #endregion
@@ -297,6 +327,8 @@ namespace MapApplication.Model
                     return "Estimate";
                 case PlotCharacter.P:
                     return "P";
+                case PlotCharacter.CourseAir:
+                    return "CourseAir";
                 default:
                     return "";
             }

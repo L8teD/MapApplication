@@ -10,30 +10,18 @@ namespace CommonLib
 {
     public struct MatlabData
     {
-        public double lat { get; set; }
-        public double lon { get; set; }
-        public double heading { get; set; }
-        public double roll { get; set; }
-        public double Ve { get; set; }
-        public double Vn { get; set; }
-        public double R1 { get; set; }
-        public double R2 { get; set; }
-        public double aw_e { get; set; }
-        public double aw_n { get; set; }
-        public double aw_h { get; set; }
-        public double alfa { get; set; }
-        public double betta { get; set; }
-        public double gamma { get; set; }
-        public double accE { get; set; }
-        public double accN { get; set; }
-        public double accH { get; set; }
-        public double w_x { get; set; }
-        public double w_y { get; set; }
-        public double w_z { get; set; }
-        public double n_x { get; set; }
-        public double n_y { get; set; }
-        public double n_z { get; set; }
-        public double dot_omega_h { get; set; }
+        public double lat;
+        public double lon;
+        public double alt; 
+        public double Ve;
+        public double Vn;
+        public double Vh;
+        public double lat1;
+        public double lon1;
+        public double alt1;
+        public double Ve1;
+        public double Vn1;
+        public double Vh1;
     }
     public struct P_out
     {
@@ -79,12 +67,22 @@ namespace CommonLib
             dimension = dim;
         }
     }
+    public struct AirData
+    {
+        public Point point;
+        public Velocity airSpeed;
+        public Velocity windSpeed;
+        public Velocity groundSpeed;
+        public Angles angles;
+        public double windAngle;
+    }
     public struct OutputData
     {
         public List<PointSet> points;
         public List<VelocitySet> velocities;
         public List<AnglesSet> angles;
         public List<P_out> p_OutList;
+        public List<AirData> airData;
     }
     public struct PointValue
     {

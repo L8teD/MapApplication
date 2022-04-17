@@ -71,7 +71,6 @@ namespace MapApplication.Model
         }
         public void DrawFullTrajctory()
         {
-            
             while(second < indicatedData.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
@@ -171,7 +170,6 @@ namespace MapApplication.Model
             Plot(RefreshHeadingPlot, PlotName.Heading);
             Plot(RefreshPitchPlot, PlotName.Pitch);
             Plot(RefreshRollPlot, PlotName.Roll);
-
         }
         private void Plot(Action<string, string, List<LineSeries>> action, PlotName name)
         {
@@ -187,6 +185,9 @@ namespace MapApplication.Model
             if (name != PlotName.Pitch && name != PlotName.Heading && name != PlotName.Roll)
             {
                 plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, indicatedListOfPlotData);
+                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+
+                plotData = PlotWorker.SelectData(name, PlotCharacter.CourseAir, indicatedListOfPlotData);
                 lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
             }
 
@@ -237,10 +238,12 @@ namespace MapApplication.Model
                 copy.velocities = new List<VelocitySet>();
                 copy.angles = new List<AnglesSet>();
                 copy.p_OutList = new List<P_out>();
+                copy.airData = new List<AirData>();
                 copy.points.AddRange(original.points);
                 copy.velocities.AddRange(original.velocities);
                 copy.angles.AddRange(original.angles);
                 copy.p_OutList.AddRange(original.p_OutList);
+                copy.airData.AddRange(original.airData);
             }
             
             return copy;
@@ -322,30 +325,6 @@ namespace MapApplication.Model
             //SaveInitDataHandler += ListViewWorker.SaveInitDataHandler;
 
             return (insErrors, sensorErrors);
-        }
-        public List<LineSeries> DublicateLineSeriesList(List<LineSeries> seriesList)
-        {
-            List<LineSeries> copyList = new List<LineSeries>();
-            foreach (LineSeries series in seriesList)
-                copyList.Add(DublicateLineSeries(series));
-            return copyList;
-        }
-        public LineSeries DublicateLineSeries(LineSeries series)
-        {
-            LineSeries lineSeries = new LineSeries()
-            {
-                DataFieldX = "x",
-                DataFieldY = "Y",
-                StrokeThickness = 2,
-                MarkerSize = 0,
-                LineStyle = series.LineStyle,
-                Color = series.Color,
-                MarkerType = series.MarkerType,
-                Title = series.Title
-            };
-            foreach (var point in series.Points)
-                lineSeries.Points.Add(point);
-            return lineSeries;
         }
     }
 }

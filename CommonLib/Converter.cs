@@ -9,6 +9,8 @@ namespace CommonLib
 {
     public class Converter
     {
+        private const double pascalToKgMConst = 0.1019716212978;
+
         public static double DegToRad(double valueDeg)
         {
             return valueDeg * Math.PI / 180.0;
@@ -53,13 +55,13 @@ namespace CommonLib
             );
 
         }
-        public static Point RadToDeg(Point pointInDegrees)
+        public static Point RadToDeg(Point pointInRadians)
         {
             return new Point(
 
-                RadToDeg(pointInDegrees.lat),
-                RadToDeg(pointInDegrees.lon),
-                pointInDegrees.alt,
+                RadToDeg(pointInRadians.lat),
+                RadToDeg(pointInRadians.lon),
+                pointInRadians.alt,
                 Dimension.InDegrees
             );
         }
@@ -131,6 +133,20 @@ namespace CommonLib
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(unixSeconds);
             return new DateTime(1970, 1, 1, 0, 0, 0).Add(timeSpan);
+        }
+        public static double SimilarityTheory(double value, double altitde)
+        {
+            double similarityConst = 0.143;
+            double zeroAltitude = 10.0;
+            return value * Math.Pow(altitde / zeroAltitude, similarityConst);
+        }
+        public static double PascalToKgM(double pascal)
+        {
+            return pascal * pascalToKgMConst;
+        }
+        public static double KgMToPascal(double kgM)
+        {
+            return kgM / pascalToKgMConst;
         }
     }
 }

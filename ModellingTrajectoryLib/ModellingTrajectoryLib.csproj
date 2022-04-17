@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CourseAirReckoning.cs" />
     <Compile Include="Helper\Atmosphere.cs" />
     <Compile Include="Helper\Weather.cs" />
     <Compile Include="Modelling.cs" />

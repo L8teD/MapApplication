@@ -1,7 +1,6 @@
 ﻿using CommonLib;
 using CommonLib.Params;
 using ModellingErrorsLib3;
-using ModellingTrajectoryLib.Helper;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -9,19 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EstimateLib;
-using CommonLib;
-using ModellingErrorsLib3;
-using ModellingTrajectoryLib;
 using MyMatrix;
 
 namespace ModellingTrajectoryLib
 {
-    class TrajectoryModel
+    partial class TrajectoryModel
     {
         ModellingFunctions functions = new ModellingFunctions();
         ErrorsModel errorsModel = new ErrorsModel();
         KalmanModel kalmanModel = new KalmanModel();
         KalmanModel2 kalmanModel2 = new KalmanModel2();
+
+
         private List<Parameters> localParams = new List<Parameters>();
 
 
@@ -34,11 +32,14 @@ namespace ModellingTrajectoryLib
             outputData.velocities = new List<VelocitySet>();
             outputData.angles = new List<AnglesSet>();
             outputData.p_OutList = new List<P_out>();
+            outputData.airData = new List<AirData>();
 
             outputData2.points = new List<PointSet>();
             outputData2.velocities = new List<VelocitySet>();
             outputData2.angles = new List<AnglesSet>();
             outputData2.p_OutList = new List<P_out>();
+            outputData2.airData = new List<AirData>();
+
 
             int inputPointsCount = latArray.Length;
 
@@ -98,13 +99,12 @@ namespace ModellingTrajectoryLib
         }
         private void ComputeParametersData(ref Parameters parameters, InitErrors initErrors, int wpNumber, double dt)
         {
-            //Trace.WriteLine(k.ToString() + "   '''Compute trajectory'''    " + DateTime.Now.ToShortTimeString());
             functions.SetAngles(ref parameters, wpNumber);
 
             Matrix C = functions.CreateMatrixC(parameters);
 
             parameters.earthModel = new EarthModel(parameters.point);
-            parameters.gravAcceleration = new GravitationalAcceleration(new Point(10,10,10,Dimension.InDegrees));
+            parameters.gravAcceleration = new GravitationalAcceleration(parameters.point);
             parameters.omegaEarth = new OmegaEarth(parameters.point);
 
             functions.SetVelocity(ref parameters, wpNumber);
@@ -112,22 +112,26 @@ namespace ModellingTrajectoryLib
             parameters.absOmega = new AbsoluteOmega(parameters);
             parameters.acceleration = new Acceleration(parameters, C);
             parameters.omegaGyro = new OmegaGyro(parameters, C);
-            parameters.point = Point.GetCoords(parameters, dt, Dimension.InRadians);
+
+            AirData airData = new AirData();
+            CourseAirReckoning(parameters, ref airData);
+            parameters.point = Point.GetCoords(parameters, dt);
+
 
             //errorsModel.ModellingErrors(initErrors, parameters);
 
-            kalmanModel.Model(initErrors, parameters, C);
+            //kalmanModel.Model(initErrors, parameters, C);
             kalmanModel2.Model(initErrors, parameters, C);
 
-            outputData.points.Add(new PointSet(
-                parameters.point, errorsModel.X, kalmanModel.X_estimate, parameters.earthModel));
             //outputData.points.Add(new PointSet(
-                //parameters.point, errorsModel.X, kalmanModel.X_estimate, parameters.earthModel));
+            //    parameters.point, errorsModel.X, kalmanModel.X_estimate, parameters.earthModel));
+            ////outputData.points.Add(new PointSet(
+            //    //parameters.point, errorsModel.X, kalmanModel.X_estimate, parameters.earthModel));
 
-            outputData.velocities.Add(new VelocitySet(parameters.velocity, kalmanModel.X, kalmanModel.X_estimate));
-            //outputData.velocities.Add(new VelocitySet(parameters.velocity, errorsModel.X, kalmanModel.X_estimate));
+            //outputData.velocities.Add(new VelocitySet(parameters.velocity, kalmanModel.X, kalmanModel.X_estimate));
+            ////outputData.velocities.Add(new VelocitySet(parameters.velocity, errorsModel.X, kalmanModel.X_estimate));
 
-            outputData.angles.Add(new AnglesSet(parameters.angles, kalmanModel.X));
+            //outputData.angles.Add(new AnglesSet(parameters.angles, kalmanModel.X));
 
             outputData2.points.Add(new PointSet(
                 parameters.point, kalmanModel2.X, kalmanModel2.X_estimate, parameters.earthModel, false));
@@ -138,16 +142,17 @@ namespace ModellingTrajectoryLib
             //outputData2.velocities.Add(new VelocitySet(parameters.velocity, errorsModel.X, kalmanModel2.X_estimate, false));
 
             outputData2.angles.Add(new AnglesSet(parameters.angles, kalmanModel2.X, false));
-
+            if (airData.airSpeed != null)
+                outputData2.airData.Add(airData);
 
             P_out p_Out = new P_out();
-            p_Out.lon = kalmanModel.P[1, 1];
-            p_Out.lat = kalmanModel.P[2, 2];
-            p_Out.alt = kalmanModel.P[3, 3];
-            p_Out.ve = kalmanModel.P[4, 4];
-            p_Out.vn = kalmanModel.P[5, 5];
-            p_Out.vh = kalmanModel.P[6, 6];
-            outputData.p_OutList.Add(p_Out);
+            //p_Out.lon = kalmanModel.P[1, 1];
+            //p_Out.lat = kalmanModel.P[2, 2];
+            //p_Out.alt = kalmanModel.P[3, 3];
+            //p_Out.ve = kalmanModel.P[4, 4];
+            //p_Out.vn = kalmanModel.P[5, 5];
+            //p_Out.vh = kalmanModel.P[6, 6];
+            //outputData.p_OutList.Add(p_Out);
 
 
             p_Out = new P_out();
@@ -168,6 +173,7 @@ namespace ModellingTrajectoryLib
             if (Init)
             {
                 parameters.point = new Point(latArray[k], lonArray[k], altArray[k], Dimension.InRadians);
+                InitAirReckoningData(parameters.point);
                 Init = false;
             }
             else

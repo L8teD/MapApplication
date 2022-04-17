@@ -49,6 +49,7 @@ namespace MapApplication.Model
         CorrectError,
         CorrectTrajectory,
         P,
+        CourseAir,
         None
     }
     public enum PlotName

@@ -25,6 +25,18 @@ namespace CommonLib.Params
             value = _value;
             GetProjectionsNZSK(parameters.angles.heading, parameters.angles.pitch);
         }
+        public Velocity(double _value, Angles angles)
+        {
+            value = _value;
+            GetProjectionsNZSK(angles.heading, angles.pitch);
+        }
+        public Velocity(double vel_E, double vel_N, double vel_H)
+        {
+            E = vel_E;
+            N = vel_N;
+            H = vel_H;
+            value = Math.Sqrt(Math.Pow(E,2) + Math.Pow(N,2) + Math.Pow(H,2));
+        }
 
         public void GetProjectionsNZSK(double directAngle, double pitch)
         {

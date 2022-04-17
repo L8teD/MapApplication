@@ -7,12 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModellingTrajectoryLib.Helper
+namespace ModellingTrajectoryLib
 {
     class Weather
     {
+        private static Wind lastAnswer = default(Wind);
+        private static int count = -1;
+        private static double prevAltitude= 0;
+
         public static Wind Query(Point point)
         {
+            count++;
+            return lastAnswer;
+            if (Math.Abs(point.alt - prevAltitude) > 500.0)
+                lastAnswer.speed = Converter.SimilarityTheory(lastAnswer.speed, point.alt);
+            if (count % 500 != 0)
+                return lastAnswer;
+
             Wind wind = new Wind();
             string apiKey = "69199cd1ac4f09270d7954f270d947d3";
             string part = "current";
@@ -26,8 +37,11 @@ namespace ModellingTrajectoryLib.Helper
 
             double speed = Convert.ToDouble(windAnswer.SelectToken("speed").ToString());
 
-            wind.speed = speed * Math.Pow(point.alt / 10, 0.143);
+            wind.speed = Converter.SimilarityTheory(speed, point.alt);
+            prevAltitude = point.alt;
+            lastAnswer = wind;
             return wind;
         }
+
     }
 }

@@ -17,7 +17,7 @@ namespace ModellingTrajectoryLib
         public double density;
         public double gravitationalAcceleration;
 
-        public static void Read()
+        public static List<Atmosphere> Read()
         {
             List<Atmosphere> atmosphereList = new List<Atmosphere>();
             try
@@ -66,6 +66,7 @@ namespace ModellingTrajectoryLib
             catch (Exception ex)
             {
             }
+            return atmosphereList;
         }
     }
     

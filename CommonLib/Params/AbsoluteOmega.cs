@@ -18,6 +18,10 @@ namespace CommonLib.Params
         {
             GetProjectionsNZSK(parameters.velocity, parameters.earthModel, parameters.point);
         }
+        public AbsoluteOmega(Velocity velocity, EarthModel earthModel, Point point)
+        {
+            GetProjectionsNZSK(velocity, earthModel, point);
+        }
         public void GetProjectionsNZSK(Velocity velocity, EarthModel earthModel, Point point)
         {
             E = velocity.N / (earthModel.R1 + point.alt);

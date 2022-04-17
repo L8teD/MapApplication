@@ -108,7 +108,7 @@ namespace MapApplication.ViewModel
             switch (plotState)
             {
                 case ActivePlotState.Trajectory:
-                    RefreshPlot(PlotCharacter.Ideal, PlotCharacter.Real, PlotCharacter.CorrectTrajectory);
+                    RefreshPlot(PlotCharacter.Ideal, PlotCharacter.Real, PlotCharacter.CorrectTrajectory, PlotCharacter.CourseAir);
                     break;
                 case ActivePlotState.Error:
                     RefreshPlot(PlotCharacter.Error, PlotCharacter.Estimate, PlotCharacter.CorrectError);
@@ -121,7 +121,7 @@ namespace MapApplication.ViewModel
         private void RefreshPlot(params PlotCharacter[] characters)
         {
             IndicatedSeries.Clear();
-            PlotData plotData = null;
+            PlotData plotData;
             string xAxisName = "";
             string yAxisName = "";
             foreach (PlotCharacter character in characters)
@@ -136,14 +136,6 @@ namespace MapApplication.ViewModel
                 }
             }
            
-
-            //plotData = PlotWorker.SelectData(currentTitle, characters[1], m_Model.indicatedListOfPlotData);
-            //IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
-            //if (currentTitle != PlotName.Pitch && currentTitle != PlotName.Heading && currentTitle != PlotName.Roll)
-            //{
-            //    plotData = PlotWorker.SelectData(currentTitle, characters[2], m_Model.indicatedListOfPlotData);
-            //    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
-            //}
             Plot(xAxisName, yAxisName, IndicatedSeries);
         }
         public void Plot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
@@ -158,8 +150,7 @@ namespace MapApplication.ViewModel
                 {
                     
                     LineSeries series = seriesList[i];
-                    OxyColor lineColor = series.Color;
-                    SolidColorBrush legendElColor = new SolidColorBrush(Color.FromArgb(lineColor.A, lineColor.R, lineColor.G, lineColor.B));
+                    SolidColorBrush legendElColor = new SolidColorBrush(Color.FromArgb(series.Color.A, series.Color.R, series.Color.G, series.Color.B));
                     string legendElText = series.Title;
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i], legendElColor, legendElText);
                     
