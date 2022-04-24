@@ -335,8 +335,6 @@ namespace EstimateLib
             InitG(C);
             InitW(initErrors);
 
-
-
             //X_dot = MatrixOperations.Sum(MatrixOperations.Product(F, X), MatrixOperations.Product(G, W));
 
             X_dot = F * X + G * W; // шумы повторяются

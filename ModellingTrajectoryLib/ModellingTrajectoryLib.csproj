@@ -79,8 +79,10 @@
     <Compile Include="CourseAirReckoning.cs" />
     <Compile Include="Helper\Atmosphere.cs" />
     <Compile Include="Helper\Weather.cs" />
+    <Compile Include="ITrajectory.cs" />
     <Compile Include="Modelling.cs" />
     <Compile Include="ModellingFunctions.cs" />
+    <Compile Include="IdealTrajectory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrajectoryModel.cs" />
     <Compile Include="Types.cs" />

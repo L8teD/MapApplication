@@ -253,9 +253,9 @@ namespace MapApplication.Model
                 lat_Air.Add(airData.point.lat);
                 alt_Air.Add(airData.point.alt);
 
-                Ve_Air.Add(airData.groundSpeed.E);
-                Vn_Air.Add(airData.groundSpeed.N);
-                Vh_Air.Add(airData.groundSpeed.H);
+                Ve_Air.Add(airData.airSpeed.E);
+                Vn_Air.Add(airData.airSpeed.N);
+                Vh_Air.Add(airData.airSpeed.H);
             }
             plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CourseAir, lat_Air));
             plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CourseAir, long_Air));
@@ -369,7 +369,7 @@ namespace MapApplication.Model
                     return "[deg]";
                 else
                 {
-                    if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory)
+                    if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory || character == PlotCharacter.CourseAir)
                     {
                         if (name == PlotName.Altitude)
                             return "[m]";

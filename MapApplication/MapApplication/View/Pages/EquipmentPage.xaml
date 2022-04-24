@@ -10,12 +10,13 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="EquipmentPage">
 
-    <Grid>
+    <Grid Background="#FFBFCBF3">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
@@ -23,24 +24,28 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="3*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Count of channels" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-                <Grid Grid.Column="1">
+                
+                <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="2" BorderBrush="Black" Margin="100,15" CornerRadius="10">
+                    <TextBlock Text="STRAPDOWN INERTIAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="22"></TextBlock>
+                </Border>
+                <Grid Grid.Column="1" Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <RadioButton Margin="3" Content="2 Channel"  Grid.Column="0" Style="{StaticResource rb_Style}"
-                        Command="{Binding Cmd_Channel2}"></RadioButton>
-                <RadioButton Margin="3" Content="3 channel" Grid.Column="1" Style="{StaticResource rb_Style}"
-                        Command="{Binding Cmd_Channel3}"></RadioButton>
-            </Grid>
-            <ListView Margin="5" ItemsSource="{Binding Path=initData.insErrors}" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch"  >
+                    <RadioButton Margin="15" Content="2 Channel"  Grid.Column="0"  Style="{StaticResource rb_Style}"
+                            Command="{Binding Cmd_Channel2}"></RadioButton>
+                    <RadioButton Margin="15" Content="3 channel" Grid.Column="1" Style="{StaticResource rb_Style}"
+                            Command="{Binding Cmd_Channel3}"></RadioButton>
+                </Grid>
+            <ListView Margin="5" ItemsSource="{Binding Path=initData.insErrors}" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch"  >
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="50">
@@ -70,7 +75,7 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ListView Margin="5" ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch"  >
+            <ListView Margin="5" ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch"  >
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="50">
@@ -103,6 +108,58 @@
             </Grid>
            
            
+        </Border>
+        <Border Style="{StaticResource Border_Style_outside}" Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="3*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="2" BorderBrush="Black" Margin="60,15" CornerRadius="10">
+                    <TextBlock Text="AIR SIGNAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"></TextBlock>
+                </Border>
+            </Grid>
+        </Border>
+        <Border Style="{StaticResource Border_Style_outside}" Grid.Column="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="3*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="2" BorderBrush="Black" Margin="60,15" CornerRadius="10">
+                    <TextBlock Text="GLOBAL POSITION SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"></TextBlock>
+                </Border>
+            </Grid>
+        </Border>
+        <Border Style="{StaticResource Border_Style_outside}" Grid.ColumnSpan="3" Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+               
+                <Border  BorderThickness="2" BorderBrush="Black" CornerRadius="10" Margin="20,40">
+                    <TextBlock  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20">
+                        <Run Text="WEATHER"/><LineBreak/><Run Text="SETTING"/><LineBreak/><Run Text="CONTROL"/>
+                    </TextBlock>
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </Page>

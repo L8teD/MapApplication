@@ -47,7 +47,7 @@ namespace MapApplication.Model
 
         public event Action<OutputData, int> UpdateTableData;
 
-        public event Action<List<BasicGeoposition>> DrawTrajectoryAction;
+        public event Action<List<BasicGeoposition>, int> DrawTrajectoryAction;
 
         System.Timers.Timer timerTrajectory;
         int second = 1;
@@ -56,6 +56,9 @@ namespace MapApplication.Model
             timerTrajectory = new System.Timers.Timer(1000);
             timerTrajectory.Elapsed += TimerTrajectory_Elapsed;
         }
+
+
+
         public void SwitchIndicatedData(DataSource source)
         {
             if (indicatedData.points == null) return;
@@ -71,7 +74,7 @@ namespace MapApplication.Model
         }
         public void DrawFullTrajctory()
         {
-            while(second < indicatedData.points.Count)
+            while (second < indicatedData.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
                 {
@@ -79,10 +82,11 @@ namespace MapApplication.Model
                     Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon,
                     Altitude = indicatedData.points[second].CorrectTrajectory.Degrees.alt
                 });
+                
                 MathTransformation.IncrementValue(ref second);
             }
 
-            DrawTrajectoryAction?.Invoke(trajectoryPoints);
+            DrawTrajectoryAction?.Invoke(trajectoryPoints, 1);
         }
         private void RefreshDrawingTrajectoryParams()
         {
@@ -106,7 +110,7 @@ namespace MapApplication.Model
                     Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon
                 });
 
-                DrawTrajectoryAction?.Invoke(trajectoryPoints);
+                DrawTrajectoryAction?.Invoke(trajectoryPoints, 1);
                 MathTransformation.IncrementValue(ref second);
 
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
@@ -125,9 +129,13 @@ namespace MapApplication.Model
         {
             ListViewWorker.RemoveElement(wayPointList, id);
         }
-        public void Start()
+        public void Simulate()
         {
             timerTrajectory.Start();
+        }
+        public void Start()
+        {
+            
         }
         public void Pause()
         {

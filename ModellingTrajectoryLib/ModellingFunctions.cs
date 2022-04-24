@@ -10,7 +10,7 @@ using MyMatrix;
 
 namespace ModellingTrajectoryLib
 {
-    class ModellingFunctions
+    public class ModellingFunctions
     {
         double Rz = 6371000;
         double g = 9.81;
@@ -51,7 +51,11 @@ namespace ModellingTrajectoryLib
             startedPoints = new Point[latArray.Length];
             for (int i = 0; i < latArray.Length; i++)
             {
-                startedPoints[i] = new Point(latArray[i], lonArray[i], altArray[i], Dimension.InRadians);
+                startedPoints[i] = new Point(
+                    latArray[i],
+                    lonArray[i],
+                    altArray[i],
+                    Dimension.InRadians);
             }
         }
         private void InitStartedVelocitites(double[] velocity)
@@ -70,9 +74,9 @@ namespace ModellingTrajectoryLib
         {
             return new double[length - 1];
         }
-        internal double ComputeOrtDistAngle(Parameters parameters, int wpNumber)
+        internal double ComputeOrtDistAngle(Point point, int wpNumber)
         {
-            return ComputeOrtDistAngle(parameters.point, startedPoints[wpNumber + 1]);
+            return ComputeOrtDistAngle(point, startedPoints[wpNumber + 1]);
         }
         private double ComputeOrtDistAngle(Point currPoint, Point nextPoint)
         {
@@ -144,17 +148,7 @@ namespace ModellingTrajectoryLib
             timeTurn = radiusTurn * UR / velAbs[k];
             LUR_Distance = radiusTurn * Math.Tan(0.5 * UR);
         }
-        private double RecountHeading(double velocityRoute, double velocityAbs, Wind wind, double heading)
-        {
-            double a1 = Math.Pow(velocityRoute, 2) + Math.Pow(velocityAbs, 2) - Math.Pow(wind.speed, 2);
-            double a2 = (2.0 * velocityAbs * velocityRoute);
-            double a = Math.Acos(a1 / a2);
-            return a + heading;
-        }
-        private double RecountVelocity(double velocityAbs, Wind wind, double heading)
-        {
-            return Math.Sqrt(Math.Pow(velocityAbs, 2) + Math.Pow(wind.speed, 2) - 2.0 * velocityAbs * wind.speed * Math.Cos(180 - heading - wind.angle));
-        }
+
         internal double GetPPM(int k)
         {
             return Rz * ortDistAngle[k];
@@ -163,16 +157,7 @@ namespace ModellingTrajectoryLib
         {
             return Rz * ortDistAngle;
         }
-        internal void RecountWind(Parameters parameters, int k)
-        {
-            if (CountOfWindCall % 100 == 0)
-            {
-                Wind wind = Weather.Query(parameters.point);
-                velAbs[k] = RecountVelocity(velAbs[k], wind, heading[k]);
-                //heading[k] = RecountHeading(velAbs[k], velAbs[k], wind, heading[k]);
-            }
-            CountOfWindCall++;
-        }
+        
         internal Matrix CreateMatrixC(Parameters parameters)
         {
             return Create.MatrixC(parameters.angles);
@@ -188,7 +173,7 @@ namespace ModellingTrajectoryLib
         }
         internal void SetVelocity(ref Parameters parameters, int k)
         {
-            parameters.velocity = new Velocity(velAbs[k], parameters);
+            parameters.velocity = new Velocity(velAbs[k], parameters.angles);
         }
         internal bool TurnIsAvailable(int k, int length)
         {

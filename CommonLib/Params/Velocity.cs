@@ -20,11 +20,7 @@ namespace CommonLib.Params
         public double H_dot { get; private set; }
 
         public double value { get; private set; }
-        public Velocity(double _value, Parameters parameters)
-        {
-            value = _value;
-            GetProjectionsNZSK(parameters.angles.heading, parameters.angles.pitch);
-        }
+
         public Velocity(double _value, Angles angles)
         {
             value = _value;

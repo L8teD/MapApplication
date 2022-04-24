@@ -72,6 +72,16 @@
                 <Border Margin="2,5" BorderBrush="Black" BorderThickness="2" CornerRadius="4" MinHeight="50" MaxHeight="100">
                     <Button Content="Draw Full Trajectory" Style="{StaticResource btn_Style}" Command="{Binding Cmd_drawFull}"></Button>
                 </Border>
+                <Border Margin="2,10" BorderBrush="Black" BorderThickness="1" CornerRadius="4" MinHeight="250" MaxHeight="100">
+                    <Grid>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Weather Control" Margin="5"  HorizontalAlignment="Center" FontSize="14" FontWeight="DemiBold"></TextBlock>
+                            <Button Content="Turbulence" Style="{StaticResource btn_Style}" Command="{Binding Cmd_None}" MinHeight="50" Margin="10,5,150,50"></Button>
+                        </StackPanel>
+                        
+                    </Grid>
+                    
+                </Border>
             </StackPanel>
         </Grid>
         <ListView ItemsSource="{Binding Path=initData.wayPointList}" Grid.Row="1" Grid.Column="1"

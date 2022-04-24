@@ -16,9 +16,10 @@
     </Page.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
+            <ColumnDefinition Width="1.8*"></ColumnDefinition>
             <ColumnDefinition Width="1*"></ColumnDefinition>
-            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="1.5*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -69,7 +70,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Border Grid.Column="1" BorderThickness="1" BorderBrush="DarkSlateGray" CornerRadius="6">
+        <Border Grid.Column="1" BorderThickness="1" BorderBrush="DarkSlateGray" CornerRadius="6" Margin="3,3,0,0">
             <Grid Grid.Column="1" DataContext="{Binding Waypoint}" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -98,14 +99,13 @@
                     CommandParameter="{Binding initData.wayPointList}"></Button>
             </Grid>
         </Border>
-        
-        
-        <StackPanel Grid.Column="1">
-           
-        </StackPanel>
+
+        <Border Grid.Column="2" BorderThickness="1" BorderBrush="DarkSlateGray" CornerRadius="6" Margin="5,3,0,0">
+            <TextBlock Text="Weather setting" HorizontalAlignment="Center"></TextBlock>
+        </Border>
 
        
-        <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="5">
+        <Grid Grid.Row="1" Grid.ColumnSpan="4" Margin="5">
             <v:PlotTable>
                 <ContentControl Content="{Binding PlotTable}"></ContentControl>
             </v:PlotTable>

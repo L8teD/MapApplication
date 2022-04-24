@@ -9,7 +9,7 @@
     <Style TargetType="{x:Type Border}" x:Key="Border_Style_outside">
         <Setter Property="BorderBrush" Value="Black"></Setter>
         <Setter Property="BorderThickness" Value="3"></Setter>
-        <Setter Property="Margin" Value="15"></Setter>
+        <Setter Property="Margin" Value="10"></Setter>
         <Setter Property="Background" Value="#FF72BEFF"></Setter>
     </Style>
     <Style TargetType="{x:Type Border}" x:Key="Border_Style_inside">

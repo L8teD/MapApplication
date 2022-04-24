@@ -13,14 +13,12 @@ namespace ModellingTrajectoryLib
         double adiabaticKoef = 1.4; //k
         double gaseConst = 29.27; //R
 
-        private double prevWe, prevWn;
         private double prevBaroAlt;
         Point airPoint;
         List<Atmosphere> atmosphereData;
 
         private void InitAirReckoningData(Point _point)
         {
-            atmosphereData = new List<Atmosphere>();
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
         }
@@ -29,43 +27,42 @@ namespace ModellingTrajectoryLib
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));
             Wind wind = Weather.Query(parameters.point);
             Velocity windSpeed = new Velocity(wind.speed, wind.angle, default(double));
-            Velocity modellingAirSpeed = new Velocity(parameters.velocity.E - windSpeed.E, parameters.velocity.N - windSpeed.N, 0.0);
+            Velocity modellingAirSpeed = new Velocity(
+                parameters.velocity.E - windSpeed.E,
+                parameters.velocity.N - windSpeed.N,
+                parameters.velocity.H);
 
             double Pd = GetDynamicPressure(atmosphere, modellingAirSpeed);
             double M = GetM(Pd, atmosphere);
             double _airSpeed = GetAirSpeed(atmosphere, M);
+
+            
+            Velocity airSpeed = new Velocity(modellingAirSpeed.value, parameters.angles);
+
             double baroAltitude = GetBaroAltitude(parameters.point.alt, atmosphere, M);
 
-            
+          
+            double verticalSpeed;
+            if (prevBaroAlt == default(double))
+                verticalSpeed = 0.0;
+            else
+                verticalSpeed = baroAltitude - prevBaroAlt;
 
-            Velocity airSpeed = new Velocity(_airSpeed, parameters.angles.heading, default(double));
-            
-
-            Velocity groundSpeed = new Velocity(airSpeed.E + windSpeed.E, airSpeed.N + windSpeed.N, baroAltitude - prevBaroAlt);
 
 
-            double verticalSpeed = baroAltitude - prevBaroAlt;
-            double dWn = groundSpeed.N - prevWn;
-            double dWe = groundSpeed.E - prevWe;
+            AbsoluteOmega absOmega = new AbsoluteOmega(airSpeed, parameters.earthModel, airPoint);
 
-            Point airPoint_meters = Converter.RadiansToMeters(airPoint, parameters.earthModel);
-
-            AbsoluteOmega absOmega = new AbsoluteOmega(groundSpeed, parameters.earthModel, airPoint);
-
-            airPoint = Point.GetCoords(airPoint, absOmega, groundSpeed, 1.0);
+            airPoint = Point.GetCoords(airPoint, absOmega, airSpeed, 1.0);
 
 
             airData.point = Converter.RadToDeg(airPoint);
             airData.airSpeed = airSpeed;
             airData.windSpeed = windSpeed;
-            airData.groundSpeed = groundSpeed;
             airData.angles = parameters.angles;
                 
             
 
-            prevBaroAlt = baroAltitude;
-            prevWe = groundSpeed.E;
-            prevWn = groundSpeed.N;            
+            prevBaroAlt = baroAltitude;        
         }
         private double GetDynamicPressure(Atmosphere atm, Velocity vel)
         {

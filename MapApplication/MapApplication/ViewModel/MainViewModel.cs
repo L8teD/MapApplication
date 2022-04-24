@@ -125,7 +125,7 @@ namespace MapApplication.ViewModel
                 return cmd_Simulation ??
                 (cmd_Simulation = new RelayCommand(obj =>
                 {
-                    m_Model.Start();
+                    m_Model.Simulate();
 
                 }));
             }
@@ -383,7 +383,7 @@ namespace MapApplication.ViewModel
 
         #endregion
 
-        private async void DrawLine(List<BasicGeoposition> trajectoryPoints)
+        private async void DrawLine(List<BasicGeoposition> trajectoryPoints, int trChar)
         {
             try
             {
@@ -396,7 +396,10 @@ namespace MapApplication.ViewModel
                         trajectoryLine.StrokeColor = Windows.UI.Colors.Red;
                         trajectoryLine.StrokeThickness = 2;
                     }
-                    
+                    if (trChar == 1)
+                        trajectoryLine.StrokeColor = Windows.UI.Colors.Red;
+                    else
+                        trajectoryLine.StrokeColor = Windows.UI.Colors.Black;
                     trajectoryLine.Path = new Geopath(trajectoryPoints);
                     Map.MapElements.Add(trajectoryLine);
                     

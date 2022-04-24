@@ -72,7 +72,6 @@ namespace CommonLib
         public Point point;
         public Velocity airSpeed;
         public Velocity windSpeed;
-        public Velocity groundSpeed;
         public Angles angles;
         public double windAngle;
     }

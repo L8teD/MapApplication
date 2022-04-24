@@ -11,9 +11,29 @@ namespace MapApplication.Model.Helper
 {
     class Execute
     {
-        public static void CreateTrajectory(InitData initData, ref OutputData outputData, ref OutputData outputData2)
+        static Modelling trajectoryModelling;
+        private static void Init(InitData initData)
         {
-            InputData inputData = new InputData();
+            if (trajectoryModelling == null)
+                trajectoryModelling = new Modelling();
+
+            InputData input;
+            InitErrors initErrors = new InitErrors(); //delete struct creation
+            SetInputs(initData,ref input, ref initErrors);
+            trajectoryModelling.Init(input, initErrors);
+        }
+        private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput)
+        {
+            trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput);
+        }
+        public static void CreateTrajectory(InitData initData, ref OutputData threeChannelOutput, ref OutputData twoChannelOutput)
+        {
+            Init(initData);
+            GetOutputs(ref threeChannelOutput, ref twoChannelOutput);
+        }
+        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors)
+        {
+            inputData = new InputData();
             inputData.latitude = new double[initData.wayPointList.Count];
             inputData.longitude = new double[initData.wayPointList.Count];
             inputData.altitude = new double[initData.wayPointList.Count];
@@ -25,11 +45,7 @@ namespace MapApplication.Model.Helper
                 inputData.altitude[i] = initData.wayPointList[i].Altitude;
                 inputData.velocity[i] = initData.wayPointList[i].Velocity;
             }
-            InitErrors initErrors = SetInitErrors(initData);
-
-            Modelling model = new Modelling(inputData, initErrors);
-            outputData = model.outputData;
-            outputData2 = model.outputData2;
+            initErrors = SetInitErrors(initData);
         }
         private static InitErrors SetInitErrors(InitData initData)
         {

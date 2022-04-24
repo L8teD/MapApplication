@@ -18,11 +18,15 @@ namespace ModellingTrajectoryLib
         public static Wind Query(Point point)
         {
             count++;
-            return lastAnswer;
-            if (Math.Abs(point.alt - prevAltitude) > 500.0)
-                lastAnswer.speed = Converter.SimilarityTheory(lastAnswer.speed, point.alt);
-            if (count % 500 != 0)
+            //return lastAnswer;
+
+            if (count % 200 != 0)
+            {
+                if (point.alt != prevAltitude)
+                    lastAnswer.speed = Converter.SimilarityTheory(lastAnswer.speed, point.alt);
                 return lastAnswer;
+            }
+           
 
             Wind wind = new Wind();
             string apiKey = "69199cd1ac4f09270d7954f270d947d3";

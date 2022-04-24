@@ -63,12 +63,12 @@ namespace ModellingTrajectoryLib
 
                     CheckOfInitalizationStartedPoint(ref parameters, ref Init, latArray, lonArray, altArray, wpNumber);
                     //functions.RecountWind(parameters, k);
-
-                    ComputeParametersData(ref parameters, initErrors, wpNumber, dt);
-
+                    AirData airData = new AirData();
+                    ComputeParametersData(ref parameters, ref airData, initErrors, wpNumber, dt);
+                    AddParams(parameters, airData);
 
                     PPM_DisctancePrev = PPM_Distance;
-                    double ortDistAngleCurrent = functions.ComputeOrtDistAngle(parameters, wpNumber);
+                    double ortDistAngleCurrent = functions.ComputeOrtDistAngle(parameters.point, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
 
                     if (PPM_DisctancePrev < PPM_Distance)
@@ -89,7 +89,9 @@ namespace ModellingTrajectoryLib
                     {
                         //functions.RecountWind(parameters, k);
                         functions.SetTurnAngles(wpNumber, dt);
-                        ComputeParametersData(ref parameters, initErrors, wpNumber, dt);
+                        AirData airData = new AirData();
+                        ComputeParametersData(ref parameters, ref airData, initErrors, wpNumber, dt);
+                        AddParams(parameters,airData);
                     }
                     //Init = true;
                 }
@@ -97,7 +99,7 @@ namespace ModellingTrajectoryLib
             }  
 
         }
-        private void ComputeParametersData(ref Parameters parameters, InitErrors initErrors, int wpNumber, double dt)
+        private void ComputeParametersData(ref Parameters parameters, ref AirData airData, InitErrors initErrors, int wpNumber, double dt)
         {
             functions.SetAngles(ref parameters, wpNumber);
 
@@ -113,7 +115,7 @@ namespace ModellingTrajectoryLib
             parameters.acceleration = new Acceleration(parameters, C);
             parameters.omegaGyro = new OmegaGyro(parameters, C);
 
-            AirData airData = new AirData();
+            
             CourseAirReckoning(parameters, ref airData);
             parameters.point = Point.GetCoords(parameters, dt);
 
@@ -122,7 +124,9 @@ namespace ModellingTrajectoryLib
 
             //kalmanModel.Model(initErrors, parameters, C);
             kalmanModel2.Model(initErrors, parameters, C);
-
+        }
+        private void AddParams(Parameters parameters, AirData airData)
+        {
             //outputData.points.Add(new PointSet(
             //    parameters.point, errorsModel.X, kalmanModel.X_estimate, parameters.earthModel));
             ////outputData.points.Add(new PointSet(
@@ -136,7 +140,7 @@ namespace ModellingTrajectoryLib
             outputData2.points.Add(new PointSet(
                 parameters.point, kalmanModel2.X, kalmanModel2.X_estimate, parameters.earthModel, false));
             //outputData2.points.Add(new PointSet(
-                //parameters.point, errorsModel.X, kalmanModel2.X_estimate, parameters.earthModel, false));
+            //parameters.point, errorsModel.X, kalmanModel2.X_estimate, parameters.earthModel, false));
 
             outputData2.velocities.Add(new VelocitySet(parameters.velocity, kalmanModel2.X, kalmanModel2.X_estimate, false));
             //outputData2.velocities.Add(new VelocitySet(parameters.velocity, errorsModel.X, kalmanModel2.X_estimate, false));
@@ -154,7 +158,6 @@ namespace ModellingTrajectoryLib
             //p_Out.vh = kalmanModel.P[6, 6];
             //outputData.p_OutList.Add(p_Out);
 
-
             p_Out = new P_out();
             p_Out.lon = kalmanModel2.P[1, 1];
             p_Out.lat = kalmanModel2.P[2, 2];
@@ -166,7 +169,6 @@ namespace ModellingTrajectoryLib
 
 
             localParams.Add(parameters);
-
         }
         private void CheckOfInitalizationStartedPoint(ref Parameters parameters, ref bool Init, double[] latArray, double[] lonArray, double[] altArray, int k)
         {
