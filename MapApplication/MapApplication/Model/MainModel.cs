@@ -26,12 +26,16 @@ namespace MapApplication.Model
     {
         OutputData threeChannelOutput;
         OutputData twoChannelOutput;
+        OutputData feedbackOutput2;
+        OutputData feedbackOutput3;
         OutputData indicatedData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
         public List<PlotData> indicatedListOfPlotData;
         private List<PlotData> twoChannelPlotData;
         private List<PlotData> threeChannelPlotData;
+        private List<PlotData> feedbackPlotData2;
+        private List<PlotData> feedbackPlotData3;
 
         private List<BasicGeoposition> trajectoryPoints;
 
@@ -70,10 +74,17 @@ namespace MapApplication.Model
                 case DataSource.twoChannel:
                     indicatedData = DublicateOutputData(twoChannelOutput);
                     break;
+                case DataSource.threeChannelFeedback:
+                    indicatedData = DublicateOutputData(feedbackOutput3);
+                    break;
+                case DataSource.twoChannelFeedback:
+                    indicatedData = DublicateOutputData(feedbackOutput2);
+                    break;
             }
         }
         public void DrawFullTrajctory()
         {
+            RefreshDrawingTrajectoryParams();
             while (second < indicatedData.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
@@ -156,7 +167,7 @@ namespace MapApplication.Model
             twoChannelOutput = new OutputData();
             try
             {
-                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput);
+                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
                 indicatedData = DublicateOutputData(twoChannelOutput);
                 CreatePlotData();
                 RefreshPlots();
@@ -206,6 +217,8 @@ namespace MapApplication.Model
             indicatedListOfPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
             twoChannelPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
             threeChannelPlotData = PlotWorker.CreatePlotData(threeChannelOutput);
+            feedbackPlotData2 = PlotWorker.CreatePlotData(feedbackOutput2);
+            feedbackPlotData3 = PlotWorker.CreatePlotData(feedbackOutput3);
         }
         public void SwitchPlotData(DataSource source)
         {
@@ -217,6 +230,12 @@ namespace MapApplication.Model
                     break;
                 case DataSource.twoChannel:
                     indicatedListOfPlotData = DublicatePlotData(twoChannelPlotData);
+                    break;
+                case DataSource.threeChannelFeedback:
+                    indicatedListOfPlotData = DublicatePlotData(feedbackPlotData3);
+                    break;
+                case DataSource.twoChannelFeedback:
+                    indicatedListOfPlotData = DublicatePlotData(feedbackPlotData2);
                     break;
             }
             RefreshPlots();
@@ -326,6 +345,12 @@ namespace MapApplication.Model
             sensorErrors.Add(new InputError() { Name = "ΔΩ1", Value = 0.001, Dimension = "[deg/h]" });
             sensorErrors.Add(new InputError() { Name = "ΔΩ2", Value = 0.001, Dimension = "[deg/h]" });
             sensorErrors.Add(new InputError() { Name = "ΔΩ3", Value = 0.001, Dimension = "[deg/h]" });
+            
+            sensorErrors.Add(new InputError() { Name = "acc noise", Value = 0.001, Dimension = "" });
+            sensorErrors.Add(new InputError() { Name = "gyro noise", Value = 0.001, Dimension = "" });
+
+            sensorErrors.Add(new InputError() { Name = "sns noise", Value = 10, Dimension = "" });
+            sensorErrors.Add(new InputError() { Name = "dt", Value = 1, Dimension = "" });
 
             //items.Add(new InputError() { Name = "ΔXc", Value = 10, Dimension = "[m]" });
             //items.Add(new InputError() { Name = "ΔVc", Value = 0.1, Dimension = "[m/s]" });

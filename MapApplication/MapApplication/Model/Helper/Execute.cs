@@ -22,14 +22,14 @@ namespace MapApplication.Model.Helper
             SetInputs(initData,ref input, ref initErrors);
             trajectoryModelling.Init(input, initErrors);
         }
-        private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput)
+        private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
         {
-            trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput);
+            trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
         }
-        public static void CreateTrajectory(InitData initData, ref OutputData threeChannelOutput, ref OutputData twoChannelOutput)
+        public static void CreateTrajectory(InitData initData, ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
         {
             Init(initData);
-            GetOutputs(ref threeChannelOutput, ref twoChannelOutput);
+            GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
         }
         private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors)
         {
@@ -70,6 +70,12 @@ namespace MapApplication.Model.Helper
             initErrors.gyroError.first = initData.sensorErrors[3].Value;
             initErrors.gyroError.second = initData.sensorErrors[4].Value;
             initErrors.gyroError.third = initData.sensorErrors[5].Value;
+
+            initErrors.accNoise = initData.sensorErrors[6].Value;
+            initErrors.gyroNoise = initData.sensorErrors[7].Value;
+            initErrors.snsNoise = initData.sensorErrors[8].Value;
+
+            initErrors.dt = initData.sensorErrors[9].Value;
 
             return initErrors;
         }

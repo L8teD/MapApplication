@@ -82,9 +82,8 @@
     <Compile Include="ITrajectory.cs" />
     <Compile Include="Modelling.cs" />
     <Compile Include="ModellingFunctions.cs" />
-    <Compile Include="IdealTrajectory.cs" />
+    <Compile Include="DesiredTrack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrajectoryModel.cs" />
     <Compile Include="Types.cs" />
   </ItemGroup>
   <ItemGroup>

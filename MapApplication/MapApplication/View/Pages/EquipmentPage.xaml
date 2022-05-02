@@ -23,9 +23,9 @@
         <Border Style="{StaticResource Border_Style_outside}">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="0.65*"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="2*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -36,14 +36,25 @@
                     <TextBlock Text="STRAPDOWN INERTIAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="22"></TextBlock>
                 </Border>
                 <Grid Grid.Column="1" Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                    <RadioButton Margin="15" Content="2 Channel"  Grid.Column="0"  Style="{StaticResource rb_Style}"
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.5*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="2 Channel" Margin="40,0,15,5" FontSize="16" FontWeight="SemiBold"></TextBlock>
+                    <TextBlock Text="3 Channel" Grid.Column="1" Margin="40,0,15,5" FontSize="16" FontWeight="SemiBold"></TextBlock>
+                    <RadioButton Margin="15,0,15,5" Content="Default"  Grid.Column="0" Grid.Row="1" Style="{StaticResource rb_Style}"
                             Command="{Binding Cmd_Channel2}"></RadioButton>
-                    <RadioButton Margin="15" Content="3 channel" Grid.Column="1" Style="{StaticResource rb_Style}"
+                    <RadioButton Margin="15,0,15,5" Content="Default" Grid.Column="1" Grid.Row="1" Style="{StaticResource rb_Style}"
                             Command="{Binding Cmd_Channel3}"></RadioButton>
+                    <RadioButton Margin="15,0,15,5" Content="Feedback"  Grid.Column="0" Grid.Row="2" Style="{StaticResource rb_Style}"
+                            Command="{Binding Cmd_FeedbackChannel2}"></RadioButton>
+                    <RadioButton Margin="15,0,15,5" Content="Feedback" Grid.Column="1" Grid.Row="2" Style="{StaticResource rb_Style}"
+                            Command="{Binding Cmd_FeedbackChannel3}"></RadioButton>
                 </Grid>
             <ListView Margin="5" ItemsSource="{Binding Path=initData.insErrors}" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch"  >
                     <ListView.View>

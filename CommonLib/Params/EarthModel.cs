@@ -19,7 +19,7 @@ namespace CommonLib.Params
 
         public double omegaEarth = 7.29e-5;
 
-        public double shulerFrequency = 1.25e-3;
+        public double shulerFrequency = 1 / 5040;//1.25e-3;
 
         public double R1 { get; set; }
         public double R2 { get; set; }

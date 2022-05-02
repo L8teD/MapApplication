@@ -18,6 +18,10 @@ namespace CommonLib.Params
         public double X_dot { get; private set; }
         public double Y_dot { get; private set; }
         public double Z_dot { get; private set; }
+
+        private double V_Eprev = 0;
+        private double V_Nprev = 0;
+        private double V_Hprev = 0;
         public OmegaGyro(Parameters parameters, Matrix C)
         {
             GetProjectionsNZSK(parameters.absOmega, parameters.omegaEarth);
@@ -40,9 +44,21 @@ namespace CommonLib.Params
         }
         private void GetDot(Point point, Velocity velocity, Acceleration acceleration, EarthModel earth, OmegaEarth omegaEarth)
         {
-            X_dot = -(velocity.N_dot - velocity.H * velocity.N / earth.R1) / earth.R1;
-            Y_dot = (velocity.E_dot - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
-            Z_dot = (omegaEarth.N * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
+            if (V_Eprev == 0 && V_Hprev == 0 && V_Nprev == 0)
+            {
+                V_Eprev = velocity.E;
+                V_Nprev = velocity.N;
+                V_Hprev = velocity.H;
+            }
+
+            //X_dot = -(velocity.N_dot - velocity.H * velocity.N / earth.R1) / earth.R1;
+            //Y_dot = (velocity.E_dot - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
+            //Z_dot = (omegaEarth.N * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
+            //    velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
+
+            X_dot = -(velocity.E - V_Eprev- velocity.H * velocity.N / earth.R1) / earth.R1;
+            Y_dot = (velocity.N - V_Nprev - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
+            Z_dot = (velocity.H - V_Hprev * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
                 velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
         }
     }

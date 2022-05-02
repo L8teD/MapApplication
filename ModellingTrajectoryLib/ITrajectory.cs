@@ -1,5 +1,6 @@
 ﻿using CommonLib;
 using CommonLib.Params;
+using EstimateLib;
 using ModellingErrorsLib3;
 using MyMatrix;
 using System;
@@ -13,7 +14,7 @@ namespace ModellingTrajectoryLib
     public interface ITrajectory
     {
         //void Model();
-        Action FillOutputsData { get; set; }
+        Action<IKalman> FillOutputsData { get; set; }
     }
     public abstract class BaseTrajectory
     {

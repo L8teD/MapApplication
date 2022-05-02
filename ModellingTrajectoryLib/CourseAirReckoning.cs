@@ -22,7 +22,7 @@ namespace ModellingTrajectoryLib
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
         }
-        private void CourseAirReckoning(Parameters parameters, ref AirData airData)
+        private void CourseAirReckoning(Parameters parameters, ref AirData airData, double dt)
         {
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));
             Wind wind = Weather.Query(parameters.point);
@@ -37,7 +37,7 @@ namespace ModellingTrajectoryLib
             double _airSpeed = GetAirSpeed(atmosphere, M);
 
             
-            Velocity airSpeed = new Velocity(modellingAirSpeed.value, parameters.angles);
+            Velocity airSpeed = new Velocity(modellingAirSpeed.value, parameters.angles, dt);
 
             double baroAltitude = GetBaroAltitude(parameters.point.alt, atmosphere, M);
 

@@ -236,6 +236,34 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        private RelayCommand cmd_FeedbackChannel2;
+        public RelayCommand Cmd_FeedbackChannel2
+        {
+            get
+            {
+                return cmd_FeedbackChannel2 ??
+                (cmd_FeedbackChannel2 = new RelayCommand(obj =>
+                {
+                    m_Model.SwitchIndicatedData(DataSource.twoChannelFeedback);
+                    m_Model.SwitchPlotData(DataSource.twoChannelFeedback);
+
+                }));
+            }
+        }
+        private RelayCommand cmd_FeedbackChannel3;
+        public RelayCommand Cmd_FeedbackChannel3
+        {
+            get
+            {
+                return cmd_FeedbackChannel3 ??
+                (cmd_FeedbackChannel3 = new RelayCommand(obj =>
+                {
+                    m_Model.SwitchIndicatedData(DataSource.threeChannelFeedback);
+                    m_Model.SwitchPlotData(DataSource.threeChannelFeedback);
+
+                }));
+            }
+        }
         private RelayCommand cmd_drawFull;
         public RelayCommand Cmd_drawFull
         {

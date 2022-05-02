@@ -50,6 +50,7 @@ namespace ModellingErrorsLib3
             angles_Dot = (MatrixOrientation * orientationAngles) + gyroIncrementArray;
 
             X_Dot = ErrorMatrix * X + AngleMatrix * accelerationArray + accelerationIncrementArray;
+
         }
         public void ModellingErrors(InitErrors initErrors, Parameters parameters)
         {

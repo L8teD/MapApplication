@@ -72,6 +72,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ikalman.cs" />
+    <Compile Include="KalmanFeedbackModel.cs" />
     <Compile Include="KalmanModel.cs" />
     <Compile Include="KalmanModel2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converter.cs" />
+    <Compile Include="Import.cs" />
     <Compile Include="MathTransformation.cs" />
     <Compile Include="Matrix\Create.cs" />
     <Compile Include="Matrix\MatrixOperations.cs" />

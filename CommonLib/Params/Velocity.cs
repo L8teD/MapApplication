@@ -8,10 +8,10 @@ namespace CommonLib.Params
 {
     public class Velocity
     {
-        double X;
-        double Y;
-        double Z;
-
+        double Eprev;
+        double Nprev;
+        double Hprev;
+        
         public double E { get; private set; }
         public double N { get; private set; }
         public double H { get; private set; }
@@ -21,13 +21,26 @@ namespace CommonLib.Params
 
         public double value { get; private set; }
 
-        public Velocity(double _value, Angles angles)
+        public Velocity(double _value, Angles angles, double dt)
         {
+            Eprev = E;
+            Nprev = N;
+            Hprev = H;
             value = _value;
             GetProjectionsNZSK(angles.heading, angles.pitch);
+            SetDerivatives(dt);
+        }
+        private void SetDerivatives(double dt)
+        {
+            E_dot = (E - Eprev) / dt;
+            N_dot = (N - Nprev) / dt;
+            H_dot = (H - Hprev) / dt;
         }
         public Velocity(double vel_E, double vel_N, double vel_H)
         {
+            Eprev = E;
+            Nprev = N;
+            Hprev = H;
             E = vel_E;
             N = vel_N;
             H = vel_H;

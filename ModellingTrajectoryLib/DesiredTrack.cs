@@ -11,18 +11,22 @@ using MyMatrix;
 
 namespace ModellingTrajectoryLib
 {
-    public class IdealTrajectory : BaseTrajectory, ITrajectory
+    public class DesiredTrack : BaseTrajectory, ITrajectory
     {
         int wayPointsCount;
-        public Action FillOutputsData { get; set; }
+        public Action<IKalman> FillOutputsData { get; set; }
         private Parameters parameters;
-        public OutputData outputData = new OutputData();
-        public OutputData outputData2 = new OutputData();
+        List<Parameters> localParams;
+        IKalman kalmanModel;
+
         public PointSet OutPoints
         {
             get
             {
-                return new PointSet(parameters.point, kalmanModel2.X, kalmanModel2.X_estimate, parameters.earthModel, false);
+                if (kalmanModel is KalmanModel2)
+                    return new PointSet(parameters.point, kalmanModel.X, kalmanModel.X_estimate, parameters.earthModel, false);
+
+                return new PointSet(parameters.point, kalmanModel.X, kalmanModel.X_estimate, parameters.earthModel);
             }
             private set
             {
@@ -33,7 +37,9 @@ namespace ModellingTrajectoryLib
         {
             get
             {
-                return new VelocitySet(parameters.velocity, kalmanModel2.X, kalmanModel2.X_estimate, false);
+                if (kalmanModel is KalmanModel2)
+                    return new VelocitySet(parameters.velocity, kalmanModel.X, kalmanModel.X_estimate, false);
+                return new VelocitySet(parameters.velocity, kalmanModel.X, kalmanModel.X_estimate);
             }
             private set
             {
@@ -44,7 +50,9 @@ namespace ModellingTrajectoryLib
         {
             get
             {
-                return new AnglesSet(parameters.angles, kalmanModel2.X, false);
+                if (kalmanModel is KalmanModel2)
+                    return new AnglesSet(parameters.angles, kalmanModel.X, false);
+                return new AnglesSet(parameters.angles, kalmanModel.X);
             }
             private set
             {
@@ -56,7 +64,7 @@ namespace ModellingTrajectoryLib
             get
             {
                 return default(AirData);
-                //return new AnglesSet(parameters.angles, kalmanModel2.X, false);
+                //return new AnglesSet(parameters.angles, kalmanModel.X, false);
             }
             private set
             {
@@ -68,12 +76,23 @@ namespace ModellingTrajectoryLib
             get
             {
                 P_out p_Out = new P_out();
-                p_Out.lon = kalmanModel2.P[1, 1];
-                p_Out.lat = kalmanModel2.P[2, 2];
-                p_Out.alt = 0;
-                p_Out.ve = kalmanModel2.P[3, 3];
-                p_Out.vn = kalmanModel2.P[4, 3];
-                p_Out.vh = 0;
+                if (kalmanModel is KalmanModel2)
+                {
+                    p_Out.lon = Math.Sqrt(kalmanModel.P[1, 1]);
+                    p_Out.lat = Math.Sqrt(kalmanModel.P[2, 2]);
+                    p_Out.ve = Math.Sqrt(kalmanModel.P[3, 3]);
+                    p_Out.vn = Math.Sqrt(kalmanModel.P[4, 4]);
+                }
+                else
+                {
+                    p_Out.lon = Math.Sqrt(kalmanModel.P[1, 1]);
+                    p_Out.lat = Math.Sqrt(kalmanModel.P[2, 2]);
+                    p_Out.alt = Math.Sqrt(kalmanModel.P[3, 3]);
+                    p_Out.ve = Math.Sqrt(kalmanModel.P[4, 4]);
+                    p_Out.vn = Math.Sqrt(kalmanModel.P[5, 5]);
+                    p_Out.vh = Math.Sqrt(kalmanModel.P[6, 6]);
+                }
+                
                 return p_Out;
             }
             private set
@@ -86,27 +105,25 @@ namespace ModellingTrajectoryLib
             get { return wayPointsCount; }
             private set { wayPointsCount = value; }
         }
-        List<Parameters> localParams;
-        KalmanModel2 kalmanModel2;
+
 
         public void Init(InputData input)
         {
-            kalmanModel2 = new KalmanModel2();
             localParams = new List<Parameters>();
             parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.InRadians);
             localParams.Add(parameters);
             //InitStartedPoint(ref parameters, input);
         }
-        public void ActualTrack(InitErrors initErrors, int wpNumber,double dt, ModellingFunctions functions)
+        public void Track(int wpNumber,double dt, ModellingFunctions functions)
         {
             InitNextPoint(ref parameters, localParams);
             AirData airData = new AirData();
-            ComputeParametersData(ref parameters, ref airData, initErrors, wpNumber, dt, functions);
+            ComputeParametersData(ref airData, wpNumber, dt, functions);
             localParams.Add(parameters);
-            FillOutputsData?.Invoke();
+
         }
 
-        protected void ComputeParametersData(ref Parameters parameters, ref AirData airData, InitErrors initErrors, int wpNumber, double dt, ModellingFunctions functions)
+        protected void ComputeParametersData(ref AirData airData, int wpNumber, double dt, ModellingFunctions functions)
         {
             functions.SetAngles(ref parameters, wpNumber);
 
@@ -116,21 +133,25 @@ namespace ModellingTrajectoryLib
             parameters.gravAcceleration = new GravitationalAcceleration(parameters.point);
             parameters.omegaEarth = new OmegaEarth(parameters.point);
 
-            functions.SetVelocity(ref parameters, wpNumber);
+            functions.SetVelocity(ref parameters, wpNumber, dt);
 
             parameters.absOmega = new AbsoluteOmega(parameters);
             parameters.acceleration = new Acceleration(parameters, C);
             parameters.omegaGyro = new OmegaGyro(parameters, C);
 
-
-            //CourseAirReckoning(parameters, ref airData);
             parameters.point = Point.GetCoords(parameters, dt);
 
+        }
+        public void Kalman(IKalman kalman, InitErrors initErrors, ModellingFunctions functions, double dt)
+        {
+            Matrix C = functions.CreateMatrixC(parameters);
+            kalmanModel = kalman;
+            kalmanModel.Model(initErrors, parameters, C, dt);
+            FillOutputsData?.Invoke(kalman);
+        }
+        protected void CourseAirReckoning()
+        {
 
-            //errorsModel.ModellingErrors(initErrors, parameters);
-
-            //kalmanModel.Model(initErrors, parameters, C);
-            kalmanModel2.Model(initErrors, parameters, C);
         }
     }
 }

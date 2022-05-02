@@ -10,9 +10,9 @@ using ModellingErrorsLib3;
 
 namespace EstimateLib
 {
-    public class KalmanModel2
+    public class KalmanModel2 : IKalman
     {
-        public Vector X;
+        public Vector X { get; set; }
         public Vector X_dot;
         public Matrix F;
         public Matrix G;
@@ -20,8 +20,8 @@ namespace EstimateLib
         Vector W_withoutNoise;
         public Matrix H;
         public Vector Z;
-        public Matrix P;
-        public Vector X_estimate;
+        public Matrix P { get; set; }
+        public Vector X_estimate { get; set; }
         Vector X_previous;
         Matrix eyeMatrix;
         Matrix F_discrete;
@@ -60,12 +60,12 @@ namespace EstimateLib
             }
             else
             {
-                coordAccuracy.longitude += X_dot[1];
-                coordAccuracy.latitude += X_dot[2];
+                coordAccuracy.longitude += X_dot[1]* initErrors.dt;
+                coordAccuracy.latitude += X_dot[2]* initErrors.dt;
                 //coordAccuracy.altitude += X_dot[2][0];
 
-                velocityAccuracy.east += X_dot[3];
-                velocityAccuracy.north += X_dot[4];
+                velocityAccuracy.east += X_dot[3]* initErrors.dt;
+                velocityAccuracy.north += X_dot[4]* initErrors.dt;
                 //velocityAccuracy.H += X_dot[5][0];
             }
             X[1] = coordAccuracy.longitude;
@@ -78,9 +78,9 @@ namespace EstimateLib
 
             Vector orientationErrors = !M * anglesErrors; 
 
-            double alfa = orientationErrors[1] + X_dot[5];
-            double betta = orientationErrors[2] + X_dot[6];
-            double gamma = orientationErrors[3] + X_dot[7];
+            double alfa = orientationErrors[1] + X_dot[5] * initErrors.dt;
+            double betta = orientationErrors[2] + X_dot[6] * initErrors.dt;
+            double gamma = orientationErrors[3] + X_dot[7] * initErrors.dt;
 
             orientationAngles[1] = alfa - X[2] / earthModel.R1;
             orientationAngles[2] = betta + X[1] / earthModel.R2;
@@ -174,49 +174,48 @@ namespace EstimateLib
         }
         private void InitG(Matrix C)
         {
-            G = Matrix.Zero(19, 19);
+            G = Matrix.Zero(19, 6);
 
-            G[3, 17] = C[1, 1];
-            G[3, 18] = C[1, 2];
-            G[3, 19] = C[1, 3];
+            G[3, 4] = C[1, 1];
+            G[3, 5] = C[1, 2];
+            G[3, 6] = C[1, 3];
 
-            G[4, 17] = C[2, 1];
-            G[4, 18] = C[2, 2];
-            G[4, 19] = C[2, 3];
+            G[4, 4] = C[2, 1];
+            G[4, 5] = C[2, 2];
+            G[4, 6] = C[2, 3];
 
-            G[5, 14] = C[1, 1];
-            G[5, 15] = C[1, 2];
-            G[5, 16] = C[1, 3];
+            G[5, 1] = C[1, 1];
+            G[5, 2] = C[1, 2];
+            G[5, 3] = C[1, 3];
 
-            G[6, 14] = C[2, 1];
-            G[6, 15] = C[2, 2];
-            G[6, 16] = C[2, 3];
+            G[6, 1] = C[2, 1];
+            G[6, 2] = C[2, 2];
+            G[6, 3] = C[2, 3];
 
-            G[7, 14] = C[3, 1];
-            G[7, 15] = C[3, 2];
-            G[7, 16] = C[3, 3];
+            G[7, 1] = C[3, 1];
+            G[7, 2] = C[3, 2];
+            G[7, 3] = C[3, 3];
         }
         private void InitW(InitErrors initErrors)
         {
-            double gyro_noise = 0.05 * initErrors.gyroError.first; //default = 0.05
-            double acc_noise = 9.78 * 0.05 * initErrors.accelerationError.first;//default = 0.05
-            Random random = new Random();
+            double acc_noise = initErrors.accNoise;
+            double gyro_noise = initErrors.gyroNoise;
 
-            W = Vector.Zero(19);
-            W[14] = gyro_noise * random.NextDouble();
-            W[15] = gyro_noise * random.NextDouble();
-            W[16] = gyro_noise * random.NextDouble();
-            W[17] = acc_noise * random.NextDouble();
-            W[18] = acc_noise * random.NextDouble();
-            W[19] = acc_noise * random.NextDouble();
+            W = Vector.Zero(6);
+            W[1] = gyro_noise * Import.GetRandom();
+            W[2] = gyro_noise * Import.GetRandom();
+            W[3] = gyro_noise * Import.GetRandom();
+            W[4] = acc_noise * Import.GetRandom();
+            W[5] = acc_noise * Import.GetRandom();
+            W[6] = acc_noise * Import.GetRandom();
 
-            W_withoutNoise = Vector.Zero(19);
-            W_withoutNoise[14] = gyro_noise;
-            W_withoutNoise[15] = gyro_noise;
-            W_withoutNoise[16] = gyro_noise;
-            W_withoutNoise[17] = acc_noise;
-            W_withoutNoise[18] = acc_noise;
-            W_withoutNoise[19] = acc_noise;
+            W_withoutNoise = Vector.Zero(6);
+            W_withoutNoise[1] = gyro_noise;
+            W_withoutNoise[2] = gyro_noise;
+            W_withoutNoise[3] = gyro_noise;
+            W_withoutNoise[4] = acc_noise;
+            W_withoutNoise[5] = acc_noise;
+            W_withoutNoise[6] = acc_noise;
         }
         private void InitH(Point point, EarthModel earth, AbsoluteOmega absOmega, Velocity velocity)
         {
@@ -230,7 +229,7 @@ namespace EstimateLib
             H[4,1] = -velocity.H / earth.R1;
             H[4,4] = 1.0;
         }
-        private void InitZ(Point point, Velocity velocity, EarthModel earth)
+        private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
         {
             Random random = new Random();
             Z = Vector.Zero(4);
@@ -251,12 +250,13 @@ namespace EstimateLib
                 0.05
             };
             Vector snsErrors = new Vector(_snsErrors);
+            double noise_sns = initErrors.snsNoise;
             double[] _Z_sns = new double[]
             {
-                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * 10.0 * random.NextDouble(),
-                point.lat + snsErrors[2] / (earth.R1) * 10.0 * random.NextDouble(),
-                velocity.E + snsErrors[3] * 10.0 * random.NextDouble(),
-                velocity.N + snsErrors[4] * 10.0 * random.NextDouble()
+                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * noise_sns * Import.GetRandom(),
+                point.lat + snsErrors[2] / (earth.R1) * noise_sns * Import.GetRandom(),
+                velocity.E + snsErrors[3] * noise_sns * Import.GetRandom(),
+                velocity.N + snsErrors[4] * noise_sns * Import.GetRandom()
             };
             Vector Z_sns = new Vector(_Z_sns);
             Z = Z_ins - Z_sns;
@@ -270,56 +270,45 @@ namespace EstimateLib
             anglesErrors = new Vector(Converter.DegToRad(initErrors.angleAccuracy.heading),
                   Converter.DegToRad(initErrors.angleAccuracy.roll), Converter.DegToRad(initErrors.angleAccuracy.pitch));
         }
-        private void IncrementX()
-        {
-            X[1] = MathTransformation.IncrementValue(X[1], X_dot[1]);
-            X[2] = MathTransformation.IncrementValue(X[2], X_dot[2]);
-            X[3] = MathTransformation.IncrementValue(X[3], X_dot[3]);
-            X[4] = MathTransformation.IncrementValue(X[4], X_dot[4]);
-            X[5] = MathTransformation.IncrementValue(X[5], X_dot[5]);
-            X[6] = MathTransformation.IncrementValue(X[6], X_dot[6]);
-        }
-        private void IncrementAngle()
-        {
-            X[7] = MathTransformation.IncrementValue(X[5], X_dot[5]);
-            X[8] = MathTransformation.IncrementValue(X[6], X_dot[6]);
-            X[9] = MathTransformation.IncrementValue(X[7], X_dot[7]);
-        }
-        private void Kalman()
+        private void Kalman(double dt)
         {
             eyeMatrix = Matrix.Identity(19);
 
-            F_discrete = eyeMatrix + F + (F ^ 2) * 0.5;
+            F_discrete = eyeMatrix + F * dt;// + (F ^ 2) * 0.5;
 
             if (P == null)
             {
                 P = X.Diag() ^ 2;
             }
+            else
+            {
+                P = (eyeMatrix - K * H) * S;
+            }
 
-            G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
+            //G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
+
+            G_discrete = G * dt;
+
             Q = W_withoutNoise.Diag() ^ 2;
+
             S = F_discrete * P * ~F_discrete + G_discrete * Q * ~G_discrete;
+
             K = S * ~H * !(H * S * ~H + R);
-
-            P = (eyeMatrix - K * H) * S;
-
 
             if (X_estimate == null)
             {
                 X_previous = X.Dublicate();
             }
             
-            
             X_estimate = F_discrete * X_previous + K * (Z - H * F_discrete * X_previous);
-            
-
 
             X_previous = X_estimate.Dublicate();
         }
-        public void Model(InitErrors initErrors, Parameters parameters, Matrix C)
+        public void Model(InitErrors initErrors, Parameters parameters, Matrix C, double dt)
         {
             if (X == null)
             {
+                Import.random_sample_initialize();
                 X_dot = Vector.Zero(19);
                 InitAnglesError(initErrors);
                 InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);
@@ -335,16 +324,13 @@ namespace EstimateLib
             InitG(C);
             InitW(initErrors);
 
-            //X_dot = MatrixOperations.Sum(MatrixOperations.Product(F, X), MatrixOperations.Product(G, W));
 
-            X_dot = F * X + G * W; // шумы повторяются
+            X_dot = F * X + G * W; 
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
-            InitZ(parameters.point, parameters.velocity, parameters.earthModel);
+            InitZ(parameters.point, parameters.velocity, parameters.earthModel, initErrors);
 
-            Kalman();
-            //IncrementX();
-            //IncrementAngle();
+            Kalman(dt);
         }
     }
 }

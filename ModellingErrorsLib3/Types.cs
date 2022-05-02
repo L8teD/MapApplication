@@ -10,8 +10,13 @@ namespace ModellingErrorsLib3
         public VelocityAccuracy velocityAccuracy;
         public GyroError gyroError;
         public AccError accelerationError;
+        public double accNoise;
+        public double gyroNoise;
+        public double snsNoise;
         public double sateliteErrorCoord { get; set; }
         public double sateliteErrorVelocity { get; set; }
+
+        public double dt; //вынести отсюда
     }
     public struct AngleAccuracy
     {

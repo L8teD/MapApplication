@@ -171,9 +171,9 @@ namespace ModellingTrajectoryLib
             angles.dimension = Dimension.InRadians;
             parameters.angles = angles;
         }
-        internal void SetVelocity(ref Parameters parameters, int k)
+        internal void SetVelocity(ref Parameters parameters, int k, double dt)
         {
-            parameters.velocity = new Velocity(velAbs[k], parameters.angles);
+            parameters.velocity = new Velocity(velAbs[k], parameters.angles, dt);
         }
         internal bool TurnIsAvailable(int k, int length)
         {

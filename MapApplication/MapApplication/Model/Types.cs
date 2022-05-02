@@ -18,7 +18,9 @@ namespace MapApplication.Model
     public enum DataSource
     {
         twoChannel,
-        threeChannel
+        threeChannel,
+        twoChannelFeedback,
+        threeChannelFeedback
     }
     public class PlotData
     {
