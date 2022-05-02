@@ -63,7 +63,7 @@ namespace ModellingTrajectoryLib
         {
             get
             {
-                return default(AirData);
+                return parameters.airData;
                 //return new AnglesSet(parameters.angles, kalmanModel.X, false);
             }
             private set
@@ -109,21 +109,26 @@ namespace ModellingTrajectoryLib
 
         public void Init(InputData input)
         {
+            Import.Init();
             localParams = new List<Parameters>();
             parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.InRadians);
             localParams.Add(parameters);
-            //InitStartedPoint(ref parameters, input);
+
+            CourseAirReckoning.Init(parameters.point);
         }
         public void Track(int wpNumber,double dt, ModellingFunctions functions)
         {
             InitNextPoint(ref parameters, localParams);
-            AirData airData = new AirData();
-            ComputeParametersData(ref airData, wpNumber, dt, functions);
-            localParams.Add(parameters);
 
+            ComputeParametersData(wpNumber, dt, functions);
+            CourseAirReckoning.Model(ref parameters, dt);
+
+            //functions.CheckParamsBetweenPPM(wpNumber, parameters.point);
+
+            localParams.Add(parameters);
         }
 
-        protected void ComputeParametersData(ref AirData airData, int wpNumber, double dt, ModellingFunctions functions)
+        protected void ComputeParametersData(int wpNumber, double dt, ModellingFunctions functions)
         {
             functions.SetAngles(ref parameters, wpNumber);
 
@@ -148,10 +153,6 @@ namespace ModellingTrajectoryLib
             kalmanModel = kalman;
             kalmanModel.Model(initErrors, parameters, C, dt);
             FillOutputsData?.Invoke(kalman);
-        }
-        protected void CourseAirReckoning()
-        {
-
         }
     }
 }

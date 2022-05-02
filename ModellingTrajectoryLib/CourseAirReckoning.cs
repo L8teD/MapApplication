@@ -8,24 +8,27 @@ using System.Threading.Tasks;
 
 namespace ModellingTrajectoryLib
 {
-    partial class TrajectoryModel
+    public class CourseAirReckoning
     {
-        double adiabaticKoef = 1.4; //k
-        double gaseConst = 29.27; //R
+        static double adiabaticKoef = 1.4; //k
+        static double gaseConst = 29.27; //R
 
-        private double prevBaroAlt;
-        Point airPoint;
-        List<Atmosphere> atmosphereData;
 
-        private void InitAirReckoningData(Point _point)
+        static double prevBaroAlt;
+        static Point airPoint;
+        static List<Atmosphere> atmosphereData;
+
+        public static void Init(Point _point)
         {
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
         }
-        private void CourseAirReckoning(Parameters parameters, ref AirData airData, double dt)
+        public static void Model(ref Parameters parameters, double dt)
         {
-            Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));
-            Wind wind = Weather.Query(parameters.point);
+            Point _point = parameters.point;
+            Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
+
+            Wind wind = default(Wind);//Weather.Query(parameters.point);
             Velocity windSpeed = new Velocity(wind.speed, wind.angle, default(double));
             Velocity modellingAirSpeed = new Velocity(
                 parameters.velocity.E - windSpeed.E,
@@ -37,7 +40,7 @@ namespace ModellingTrajectoryLib
             double _airSpeed = GetAirSpeed(atmosphere, M);
 
             
-            Velocity airSpeed = new Velocity(modellingAirSpeed.value, parameters.angles, dt);
+            Velocity airSpeed = new Velocity(_airSpeed, parameters.angles, dt);
 
             double baroAltitude = GetBaroAltitude(parameters.point.alt, atmosphere, M);
 
@@ -48,23 +51,18 @@ namespace ModellingTrajectoryLib
             else
                 verticalSpeed = baroAltitude - prevBaroAlt;
 
-
-
             AbsoluteOmega absOmega = new AbsoluteOmega(airSpeed, parameters.earthModel, airPoint);
 
-            airPoint = Point.GetCoords(airPoint, absOmega, airSpeed, 1.0);
+            airPoint = Point.GetCoords(airPoint, absOmega, airSpeed, dt);
 
-
-            airData.point = Converter.RadToDeg(airPoint);
-            airData.airSpeed = airSpeed;
-            airData.windSpeed = windSpeed;
-            airData.angles = parameters.angles;
-                
-            
+            parameters.airData.point = Converter.RadToDeg(airPoint);
+            parameters.airData.airSpeed = airSpeed;
+            parameters.airData.windSpeed = windSpeed;
+            parameters.airData.angles = parameters.angles;            
 
             prevBaroAlt = baroAltitude;        
         }
-        private double GetDynamicPressure(Atmosphere atm, Velocity vel)
+        private static double GetDynamicPressure(Atmosphere atm, Velocity vel)
         {
             double Ps_meters = Converter.PascalToKgM(atm.pressure.pascal);
             double massDensity = atm.density / atm.gravitationalAcceleration;
@@ -75,20 +73,20 @@ namespace ModellingTrajectoryLib
 
             return Converter.KgMToPascal(Pd_meters);
         }
-        private double GetM(double Pd, Atmosphere atm)
+        private static double GetM(double Pd, Atmosphere atm)
         {
             double Ps = atm.pressure.pascal;
 
             return Math.Sqrt(2.0 / (adiabaticKoef - 1.0) * (Math.Pow(Pd / Ps + 1, (adiabaticKoef - 1.0) / adiabaticKoef) - 1.0));
         }
-        private double GetAirSpeed(Atmosphere atm, double M)
+        private static double GetAirSpeed(Atmosphere atm, double M)
         {
             double ksi = 1.0;
             double c = Math.Sqrt(adiabaticKoef * atm.gravitationalAcceleration * gaseConst);
             double machFunction = c * M / Math.Sqrt(1 + 0.2 * ksi * Math.Pow(M, 2));
             return machFunction * Math.Sqrt(atm.temperature.kelvin);
         }
-        private double GetBaroAltitude(double m_Altitude, Atmosphere atm, double M)
+        private static double GetBaroAltitude(double m_Altitude, Atmosphere atm, double M)
         {
             double middleTemp;
             double ksi = 1.0;
@@ -100,9 +98,9 @@ namespace ModellingTrajectoryLib
             return gaseConst * middleTemp * Math.Log(atmZero.pressure.pascal / atm.pressure.pascal);
 
         }
-        private bool CompareAltitude(double alt1, double alt2)
+        private static bool CompareAltitude(double alt1, double alt2)
         {
-            /*altitude-step in csv-file = 50*/
+            /*altitude-step in csv-file = 50m*/
             return (Math.Abs(alt1 - alt2) < 25.0);
         }
     }

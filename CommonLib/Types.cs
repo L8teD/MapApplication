@@ -8,20 +8,26 @@ using System.Threading.Tasks;
 
 namespace CommonLib
 {
-    public struct MatlabData
+    public struct InputWindData
     {
-        public double lat;
-        public double lon;
-        public double alt; 
-        public double Ve;
-        public double Vn;
-        public double Vh;
-        public double lat1;
-        public double lon1;
-        public double alt1;
-        public double Ve1;
-        public double Vn1;
-        public double Vh1;
+        public double wind_n;
+        public double wind_e;
+        public double wind_d;
+        public double L_u;
+        public double L_v;
+        public double L_w;
+        public double sigma_u;
+        public double sigma_v;
+        public double sigma_w;
+    }
+    public struct MatlabOutData
+    {
+        public double baro_h;
+        public double baro_Vh;
+        public double air_Ve;
+        public double air_Vn;
+        public double air_lat;
+        public double air_lon;
     }
     public struct P_out
     {
@@ -52,6 +58,7 @@ namespace CommonLib
         public Point point;
         public Velocity velocity;
         public Angles angles;
+        public AirData airData;
     }
     public struct Angles
     {

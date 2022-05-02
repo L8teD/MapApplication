@@ -96,8 +96,8 @@ namespace CommonLib
         public static Point MetersToRadians(Point inputPoint, double latitude, EarthModel earthModel)
         {
             Point outPoint = new Point(
-                inputPoint.lat / (earthModel.R2 * Math.Cos(latitude)),
-                inputPoint.lon / earthModel.R1,
+                inputPoint.lat / earthModel.R2,
+                inputPoint.lon / (earthModel.R1 * Math.Cos(latitude)),
                 inputPoint.alt,
                 Dimension.InRadians);
             return outPoint;
@@ -108,13 +108,11 @@ namespace CommonLib
         }
         public static Point RadiansToMeters(Point inputPointInRadians, EarthModel earthModel)
         {
-
-            Point outPoint = new Point(
-                inputPointInRadians.lat * (earthModel.R2 * Math.Cos(inputPointInRadians.lat)),
-                inputPointInRadians.lon * earthModel.R1,
+            return new Point(
+                inputPointInRadians.lat * earthModel.R2,
+                inputPointInRadians.lon * earthModel.R1 * Math.Cos(inputPointInRadians.lat),
                 inputPointInRadians.alt,
                 Dimension.InMeters);
-            return outPoint;
         }
         public static double KmPerHourToMeterPerSec(double kmPerHour)
         {

@@ -297,7 +297,7 @@ namespace MapApplication.ViewModel
 
             m_Model.UpdateTableData += M_Model_UpdateTableData;
 
-            (initData.insErrors, initData.sensorErrors) = m_Model.SetInputErrors();
+            initData = m_Model.SetInputErrors(initData);
             loggerInfoList = m_Model.GetInfoFromLogger();
 
             IdealDataTable = new DataTableWithChangesVM(PlotCharacter.Ideal);

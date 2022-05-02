@@ -67,9 +67,9 @@ namespace MapApplication.Model.Helper
             initErrors.accelerationError.second = initData.sensorErrors[1].Value;
             initErrors.accelerationError.third = initData.sensorErrors[2].Value;
 
-            initErrors.gyroError.first = initData.sensorErrors[3].Value;
-            initErrors.gyroError.second = initData.sensorErrors[4].Value;
-            initErrors.gyroError.third = initData.sensorErrors[5].Value;
+            initErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value);
+            initErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value);
+            initErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value);
 
             initErrors.accNoise = initData.sensorErrors[6].Value;
             initErrors.gyroNoise = initData.sensorErrors[7].Value;

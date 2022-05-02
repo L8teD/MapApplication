@@ -12,8 +12,9 @@ namespace MapApplication.Model
     public class InitData
     {
         public ObservableCollection<WayPoint> wayPointList { get; set; }
-        public ObservableCollection<InputError> insErrors { get; set; }
-        public ObservableCollection<InputError> sensorErrors { get; set; }
+        public ObservableCollection<EquipmentData> insErrors { get; set; }
+        public ObservableCollection<EquipmentData> sensorErrors { get; set; }
+        public ObservableCollection<EquipmentData> airInfo { get; set; }
     }
     public enum DataSource
     {

@@ -92,6 +92,9 @@ namespace MapApplication.Model
                     Latitude = indicatedData.points[second].CorrectTrajectory.Degrees.lat,
                     Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon,
                     Altitude = indicatedData.points[second].CorrectTrajectory.Degrees.alt
+                    //Latitude = indicatedData.airData[second].point.lat,
+                    //Longitude = indicatedData.airData[second].point.lon,
+                    //Altitude = indicatedData.airData[second].point.alt
                 });
                 
                 MathTransformation.IncrementValue(ref second);
@@ -319,45 +322,48 @@ namespace MapApplication.Model
         }
         public WayPoint SetWayPoint()
         {
-            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 1224 };
+            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 150 };
         }
-        public (ObservableCollection<InputError>, ObservableCollection<InputError>) SetInputErrors()
+        public InitData SetInputErrors(InitData initData)
         {
-            ObservableCollection<InputError> insErrors = new ObservableCollection<InputError>();
-            ObservableCollection<InputError> sensorErrors = new ObservableCollection<InputError>();
+            initData.insErrors = new ObservableCollection<EquipmentData>();
+            initData.sensorErrors = new ObservableCollection<EquipmentData>();
+            initData.airInfo = new ObservableCollection<EquipmentData>();
 
-            insErrors.Add(new InputError() { Name = "α", Value = 0.25, Dimension = "[deg/h]" });
-            insErrors.Add(new InputError() { Name = "β", Value = 0.03, Dimension = "[deg/h]" });
-            insErrors.Add(new InputError() { Name = "γ", Value = 0.03, Dimension = "[deg/h]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "α", Value = 0.25, Dimension = "[deg/h]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "β", Value = 0.03, Dimension = "[deg/h]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "γ", Value = 0.03, Dimension = "[deg/h]" });
 
-            insErrors.Add(new InputError() { Name = "Δλ", Value = 15, Dimension = "[m]" });
-            insErrors.Add(new InputError() { Name = "Δφ", Value = 15, Dimension = "[m]" });
-            insErrors.Add(new InputError() { Name = "ΔH", Value = 15, Dimension = "[m]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "Δλ", Value = 15, Dimension = "[m]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "Δφ", Value = 15, Dimension = "[m]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "ΔH", Value = 15, Dimension = "[m]" });
 
-            insErrors.Add(new InputError() { Name = "ΔVe", Value = 0.5, Dimension = "[m/s]" });
-            insErrors.Add(new InputError() { Name = "ΔVn", Value = 0.5, Dimension = "[m/s]" });
-            insErrors.Add(new InputError() { Name = "ΔVh", Value = 0.5, Dimension = "[m/s]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "ΔVe", Value = 0.5, Dimension = "[m/s]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "ΔVn", Value = 0.5, Dimension = "[m/s]" });
+            initData.insErrors.Add(new EquipmentData() { Name = "ΔVh", Value = 0.5, Dimension = "[m/s]" });
 
-            sensorErrors.Add(new InputError() { Name = "Δn1", Value = 6E-06, Dimension = "[g]" });
-            sensorErrors.Add(new InputError() { Name = "Δn2", Value = 6E-06, Dimension = "[g]" });
-            sensorErrors.Add(new InputError() { Name = "Δn3", Value = 6E-06, Dimension = "[g]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn1", Value = 6E-06, Dimension = "[g]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn2", Value = 6E-06, Dimension = "[g]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn3", Value = 6E-06, Dimension = "[g]" });
 
-            sensorErrors.Add(new InputError() { Name = "ΔΩ1", Value = 0.001, Dimension = "[deg/h]" });
-            sensorErrors.Add(new InputError() { Name = "ΔΩ2", Value = 0.001, Dimension = "[deg/h]" });
-            sensorErrors.Add(new InputError() { Name = "ΔΩ3", Value = 0.001, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ1", Value = 0.001, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ2", Value = 0.001, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ3", Value = 0.001, Dimension = "[deg/h]" });
             
-            sensorErrors.Add(new InputError() { Name = "acc noise", Value = 0.001, Dimension = "" });
-            sensorErrors.Add(new InputError() { Name = "gyro noise", Value = 0.001, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "acc noise", Value = 0.001, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "gyro noise", Value = 0.001, Dimension = "" });
 
-            sensorErrors.Add(new InputError() { Name = "sns noise", Value = 10, Dimension = "" });
-            sensorErrors.Add(new InputError() { Name = "dt", Value = 1, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 10, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
+
+            initData.airInfo.Add(new EquipmentData() { Name = "H0", Value = 0, Dimension = "m" });
 
             //items.Add(new InputError() { Name = "ΔXc", Value = 10, Dimension = "[m]" });
             //items.Add(new InputError() { Name = "ΔVc", Value = 0.1, Dimension = "[m/s]" });
 
             //SaveInitDataHandler += ListViewWorker.SaveInitDataHandler;
 
-            return (insErrors, sensorErrors);
+            return initData;
         }
     }
 }

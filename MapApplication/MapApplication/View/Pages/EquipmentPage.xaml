@@ -124,17 +124,41 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="4*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-
                 <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="2" BorderBrush="Black" Margin="60,15" CornerRadius="10">
                     <TextBlock Text="AIR SIGNAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20"></TextBlock>
                 </Border>
+                <ListView Margin="5" ItemsSource="{Binding Path=initData.airInfo}" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch"  >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="50">
+                                <TextBlock Text="Name"></TextBlock>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="12"></TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="75">
+                                <TextBlock Text="Value"></TextBlock>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" HorizontalAlignment="Center" FontSize="12"></TextBox>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="60">
+                                <TextBlock Text="Dimension"></TextBlock>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="12"></TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </Border>
         <Border Style="{StaticResource Border_Style_outside}" Grid.Column="2">

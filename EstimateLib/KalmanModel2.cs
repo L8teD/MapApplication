@@ -114,7 +114,6 @@ namespace EstimateLib
             F[1, 3] = 1;
             F[2, 4] = 1;
 
-            //F[3, 1] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(omegaGyro.N, 2) + Math.Pow(omegaGyro.H, 2);
             F[3, 1] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(absOmega.N, 2) + Math.Pow(absOmega.H, 2);
             F[3, 2] = omegaGyro.Z_dot - absOmega.E * absOmega.N;
             F[3, 4] = 2 * absOmega.H;
@@ -221,8 +220,8 @@ namespace EstimateLib
         {
             H = Matrix.Zero(4, 19);
 
-            H[1,1] = 1.0 / (earth.R2 * Math.Cos(point.lat));
-            H[2,2] = 1.0 / earth.R1;
+            H[1,1] = 1.0;
+            H[2,2] = 1.0;
             H[3,1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
             H[3,2] = -absOmega.H;
             H[3,3] = 1.0;
@@ -231,37 +230,47 @@ namespace EstimateLib
         }
         private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
         {
-            Random random = new Random();
-            Z = Vector.Zero(4);
 
+            Z = Vector.Zero(4);
+            Point _point = Converter.RadiansToMeters(point, earth);
             double[] _estimatedParams = new double[]
                        {
-                 point.lon,
-                 point.lat,
+                 _point.lon,
+                 _point.lat,
                  velocity.E,
                  velocity.N
                        };
             Vector estimatedParams = new Vector(_estimatedParams);
+
             Vector Z_ins = estimatedParams + H * X;
             double[] _snsErrors = new double[] {
-                5.0 / (earth.R2*Math.Cos(point.lat)),
-                5.0 / earth.R1,
+                5.0,
+                5.0,
                 0.05,
                 0.05
             };
             Vector snsErrors = new Vector(_snsErrors);
+
             double noise_sns = initErrors.snsNoise;
+
+            //double[] _Z_sns = new double[]
+            //{
+            //    point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * noise_sns * Import.GetRandom(),
+            //    point.lat + snsErrors[2] / (earth.R1) * noise_sns * Import.GetRandom(),
+            //    velocity.E + snsErrors[3] * noise_sns * Import.GetRandom(),
+            //    velocity.N + snsErrors[4] * noise_sns * Import.GetRandom()
+            //};
             double[] _Z_sns = new double[]
             {
-                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * noise_sns * Import.GetRandom(),
-                point.lat + snsErrors[2] / (earth.R1) * noise_sns * Import.GetRandom(),
-                velocity.E + snsErrors[3] * noise_sns * Import.GetRandom(),
-                velocity.N + snsErrors[4] * noise_sns * Import.GetRandom()
+                _point.lon + snsErrors[1] + noise_sns * Import.GetRandom(),
+                _point.lat + snsErrors[2] + noise_sns * Import.GetRandom(),
+                velocity.E + snsErrors[3] + noise_sns * Import.GetRandom(),
+                velocity.N + snsErrors[4] + noise_sns * Import.GetRandom()
             };
             Vector Z_sns = new Vector(_Z_sns);
             Z = Z_ins - Z_sns;
 
-            R = snsErrors.Diag() ^ 2;
+            R = (snsErrors.Diag() ^ 2 ) * (1.0 / initErrors.dt);
 
         }
         private void InitAnglesError(InitErrors initErrors)
@@ -285,11 +294,11 @@ namespace EstimateLib
                 P = (eyeMatrix - K * H) * S;
             }
 
-            //G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
+           //G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
 
-            G_discrete = G * dt;
+            G_discrete = F_discrete * G * dt;
 
-            Q = W_withoutNoise.Diag() ^ 2;
+            Q = (W_withoutNoise.Diag() ^ 2) * (1.0/dt);
 
             S = F_discrete * P * ~F_discrete + G_discrete * Q * ~G_discrete;
 
@@ -308,7 +317,6 @@ namespace EstimateLib
         {
             if (X == null)
             {
-                Import.random_sample_initialize();
                 X_dot = Vector.Zero(19);
                 InitAnglesError(initErrors);
                 InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);

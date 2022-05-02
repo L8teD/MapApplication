@@ -1,0 +1,7 @@
+LIBRARY	"Random"
+
+EXPORTS
+	Random_initialize			@1		PRIVATE
+	Random_step					@2		PRIVATE
+	Random_terminate			@3		PRIVATE
+	GetOutput					@4		PRIVATE

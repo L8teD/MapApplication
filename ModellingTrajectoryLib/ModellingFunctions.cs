@@ -91,10 +91,7 @@ namespace ModellingTrajectoryLib
         internal void InitParamsBetweenPPM()
         {
             dH = MakeArray(startedPoints.Length);
-            for (int i = 0; i < dH.Length; i++)
-            {
-                dH[i] = startedPoints[i+1].alt - startedPoints[i].alt;
-            }
+
             dLon = MakeArray(startedPoints.Length);
             ortDist = MakeArray(startedPoints.Length);
             ortDistAngle = MakeArray(startedPoints.Length);
@@ -105,28 +102,33 @@ namespace ModellingTrajectoryLib
             //roll = MakeArray(startedPoints.Length);
             for (int k = 0; k < startedPoints.Length - 1; k++)
             {
-                ComputeParamsBetweenPPM(k);
+                ComputeParamsBetweenPPM(k, startedPoints[k]);
             }
         }
-        internal void CheckParamsBetweenPPM(int k)
+        internal void CheckParamsBetweenPPM(int k, Point lastPoint, double velocityValue)
         {
-            if (turnHappened)
-            {
-                ComputeParamsBetweenPPM(k);
-                turnHappened = false;
-            }
+            ComputeParamsBetweenPPM(k, lastPoint, velocityValue);
+            turnHappened = false;
+            //if (turnHappened)
+            //{
+            //    ComputeParamsBetweenPPM(k);
+            //    turnHappened = false;
+            //}
         }
-        private void ComputeParamsBetweenPPM(int wpNumber)
+        private void ComputeParamsBetweenPPM(int wpNumber, Point lastPoint, double velocityValue = 0)
         {
-            dLon[wpNumber] = startedPoints[wpNumber + 1].lon - startedPoints[wpNumber].lon;
-            ortDistAngle[wpNumber] = ComputeOrtDistAngle(startedPoints[wpNumber], startedPoints[wpNumber + 1]);
+            if (velocityValue != 0)
+                velAbs[wpNumber] = velocityValue;
+            dH[wpNumber] = startedPoints[wpNumber + 1].alt - lastPoint.alt;
+            dLon[wpNumber] = startedPoints[wpNumber + 1].lon - lastPoint.lon;
+            ortDistAngle[wpNumber] = ComputeOrtDistAngle(lastPoint, startedPoints[wpNumber + 1]);
             ortDist[wpNumber] = Rz * ortDistAngle[wpNumber];
             distance[wpNumber] = Math.Sqrt(Math.Pow(ortDist[wpNumber], 2)) + dH[wpNumber];
             pitch[wpNumber] = Math.Atan2(dH[wpNumber], ortDist[wpNumber]);
             roll[wpNumber] = 0;
-            heading[wpNumber] = ComputeHeading(startedPoints[wpNumber], startedPoints[wpNumber + 1], dLon[wpNumber]);
-            heading[wpNumber] += heading[wpNumber] <= 0 ? 2 * Math.PI : 0;
-            heading[wpNumber] -= heading[wpNumber] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
+            heading[wpNumber] = ComputeHeading(lastPoint, startedPoints[wpNumber + 1], dLon[wpNumber]);
+            //heading[wpNumber] += heading[wpNumber] <= 0 ? 2 * Math.PI : 0;
+            //heading[wpNumber] -= heading[wpNumber] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
         }
         internal double GetLUR(int wpNumber, int limit)
         {
@@ -196,12 +198,12 @@ namespace ModellingTrajectoryLib
         {
             return j <= timeTurnInt;
         }
-        internal void SetTurnAngles(int k, double dt)
+        internal void SetTurnAngles(int k, double dt, double altitude)
         {
             roll[k] = rollTarget;
             double velocityValue = velAbs[k] + dVelocityOnEveryIteration;
             double distTurn = velocityValue * dt;
-            pitch[k] = Math.Atan2(0, distTurn);
+            pitch[k] = Math.Atan2((startedPoints[k+1].alt - altitude) /numberOfIterations, distTurn);
             heading[k] += dHeading;
         }
 

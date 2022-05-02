@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MapApplication.ViewModel
 {
-    public class InputError : BaseViewModel
+    public class EquipmentData : BaseViewModel
     {
         private string name;
         private double _value;

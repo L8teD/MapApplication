@@ -1,0 +1,8 @@
+LIBRARY	"Random"
+
+EXPORTS
+	Dryden_initialize			@1		PRIVATE
+	Dryden_step					@2		PRIVATE
+	Dryden_terminate			@3		PRIVATE
+	SetInput					@4		PRIVATE
+	GetOutput					@5		PRIVATE

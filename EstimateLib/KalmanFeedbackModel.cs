@@ -258,7 +258,6 @@ namespace EstimateLib
         }
         private void InitZ(Point point, Velocity velocity, EarthModel earth)
         {
-            Random random = new Random();
             Z = Vector.Zero(6);
 
             double[] _estimatedParams = new double[]

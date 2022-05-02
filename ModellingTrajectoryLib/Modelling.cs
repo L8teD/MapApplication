@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ModellingErrorsLib3;
 using EstimateLib;
+using CommonLib.Params;
 
 namespace ModellingTrajectoryLib
 {
@@ -74,12 +75,9 @@ namespace ModellingTrajectoryLib
         {
             for (int wpNumber = 0; wpNumber < wayPointsCount - 1; wpNumber++)
             {
-                functions.CheckParamsBetweenPPM(wpNumber);
-
                 double LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
                 double PPM_Distance = functions.GetPPM(wpNumber);
                 double PPM_DisctancePrev;
-                int countOfIncreasePPM = 0;
                 while (LUR_Distance < PPM_Distance)
                 {
                     desiredTrack.Track(wpNumber, dt, functions);
@@ -89,10 +87,13 @@ namespace ModellingTrajectoryLib
                     double ortDistAngleCurrent = functions.ComputeOrtDistAngle(desiredTrack.OutPoints.Ideal.Radians, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
 
+                    functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.Radians, 
+                        new Velocity(desiredTrack.OutVelocities.Ideal.E, desiredTrack.OutVelocities.Ideal.N, desiredTrack.OutVelocities.Ideal.H).value);
+
+                    LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
                     if (PPM_DisctancePrev < PPM_Distance)
-                        countOfIncreasePPM++;
-                    if (countOfIncreasePPM > 1)
                         break;
+
                 }
                 if (functions.TurnIsAvailable(wpNumber, wayPointsCount - 2))
                 {
@@ -100,7 +101,7 @@ namespace ModellingTrajectoryLib
 
                     for (double j = 0; functions.TurnIsNotEnded(j); j += dt)
                     {
-                        functions.SetTurnAngles(wpNumber, dt);
+                        functions.SetTurnAngles(wpNumber, dt, desiredTrack.OutPoints.Ideal.Radians.alt);
                         desiredTrack.Track(wpNumber, dt, functions);
                         Kalman(dt);
                     }
@@ -136,6 +137,7 @@ namespace ModellingTrajectoryLib
             output.points.Add(desiredTrack.OutPoints);
             output.velocities.Add(desiredTrack.OutVelocities);
             output.angles.Add(desiredTrack.OutAngles);
+            output.airData.Add(desiredTrack.OutAirData);
             if (output.p_OutList.Count < 400)
             {
                 output.p_OutList.Add(desiredTrack.OutCovar);

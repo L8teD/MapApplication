@@ -153,7 +153,7 @@
     <Compile Include="Model\MainModel.cs" />
     <Compile Include="Model\Types.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
-    <Compile Include="ViewModel\DataClasses\InputError.cs" />
+    <Compile Include="ViewModel\DataClasses\EquipmentData.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\LegendButtonVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\LegendVM.cs" />
     <Compile Include="ViewModel\DataClasses\LogInfo.cs" />
