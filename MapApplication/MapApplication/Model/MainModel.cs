@@ -322,7 +322,7 @@ namespace MapApplication.Model
         }
         public WayPoint SetWayPoint()
         {
-            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 3000, Velocity = 150 };
+            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 1000, Velocity = 130 };
         }
         public InitData SetInputErrors(InitData initData)
         {

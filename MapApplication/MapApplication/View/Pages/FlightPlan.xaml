@@ -99,7 +99,8 @@
                     <GridViewColumn Width="150">Latitude [deg]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Latitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
+                                <TextBox Text="{Binding Path=Latitude}" HorizontalAlignment="Center" Margin="20,0,0,0"
+                                         Style="{StaticResource tb_ListviewStyle}"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -107,21 +108,24 @@
                     <GridViewColumn Width="120">Longitude [deg]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
+                                <TextBox Text="{Binding Path=Longitude}" HorizontalAlignment="Center" Margin="20,0,0,0"
+                                         Style="{StaticResource tb_ListviewStyle}"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="120">Altitude [m]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
+                                <TextBox Text="{Binding Path=Altitude}" HorizontalAlignment="Center" Margin="20,0,0,0"
+                                         Style="{StaticResource tb_ListviewStyle}"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="120">Velocity [km/h]
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center" Margin="50,0,0,0"></TextBox>
+                                <TextBox Text="{Binding Path=Velocity}" HorizontalAlignment="Center" Margin="20,0,0,0"
+                                         Style="{StaticResource tb_ListviewStyle}"></TextBox>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

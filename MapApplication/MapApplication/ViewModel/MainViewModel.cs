@@ -402,8 +402,8 @@ namespace MapApplication.ViewModel
                 RTP.AirportName = myclickedIcon.Title;
                 RTP.Longitude = myclickedIcon.Location.Position.Longitude;
                 RTP.Latitude = myclickedIcon.Location.Position.Latitude;
-                RTP.Velocity = 850;
-                RTP.Altitude = 1500;
+                RTP.Velocity = 130;
+                RTP.Altitude = 1000;
 
                 ListViewWorker.UpdateData(initData.wayPointList, RTP);
             }

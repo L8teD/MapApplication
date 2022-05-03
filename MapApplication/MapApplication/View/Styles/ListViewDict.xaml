@@ -15,4 +15,12 @@
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="FontSize" Value="12" />
     </Style>
+    <Style TargetType="{x:Type TextBox}" x:Key="tb_ListviewStyle">
+        <Setter Property="BorderThickness" Value="0"></Setter>
+        <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
+        <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+        <Setter Property="CaretBrush" Value="#FF6C6C6C"></Setter>
+        <Setter Property="Background" Value="#00000000"></Setter>
+        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+    </Style>
 </ResourceDictionary>

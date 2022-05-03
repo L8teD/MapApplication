@@ -11,7 +11,7 @@ namespace CommonLib.Params
         public Dimension dimension;
         public double lat { get; private set; }
         public double lon { get; private set; }
-        public double alt { get; private set; }
+        public double alt { get; set; }
         public Point(double _lat, double _lon, double _alt, Dimension dim)
         {
             lat = _lat;

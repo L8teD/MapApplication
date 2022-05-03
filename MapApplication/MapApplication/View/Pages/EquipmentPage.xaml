@@ -70,8 +70,7 @@
                             <GridViewColumn Width="75"> Value
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" HorizontalAlignment="Center" FontWeight="Bold"
-                                                 FontSize="16" FontFamily="Segoe UI Light" CaretBrush="#FF6C6C6C" Background="#00000000"></TextBox>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" Style="{StaticResource tb_ListviewStyle}"></TextBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -99,8 +98,7 @@
                             <GridViewColumn Width="75">Value
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" HorizontalAlignment="Center" FontWeight="Bold"
-                                                 FontSize="16" FontFamily="Segoe UI Light" CaretBrush="#FF6C6C6C" Background="#00000000"></TextBox>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" Style="{StaticResource tb_ListviewStyle}"></TextBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -141,8 +139,7 @@
                             <GridViewColumn Width="75">Value
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" HorizontalAlignment="Center" FontWeight="Bold"
-                                                 FontSize="16" FontFamily="Segoe UI Light" CaretBrush="#FF6C6C6C" Background="#00000000"></TextBox>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" Style="{StaticResource tb_ListviewStyle}"></TextBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -203,8 +200,7 @@
                             <GridViewColumn Width="75">Value
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" HorizontalAlignment="Center" FontWeight="Bold"
-                                                 FontSize="16" FontFamily="Segoe UI Light" CaretBrush="#FF6C6C6C" Background="#00000000"></TextBox>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" Style="{StaticResource tb_ListviewStyle}"></TextBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -232,8 +228,7 @@
                             <GridViewColumn Width="75">Value
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" HorizontalAlignment="Center" FontWeight="Bold"
-                                                 FontSize="16" FontFamily="Segoe UI Light" CaretBrush="#FF6C6C6C" Background="#00000000"></TextBox>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" Style="{StaticResource tb_ListviewStyle}"></TextBox>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

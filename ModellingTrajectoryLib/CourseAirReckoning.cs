@@ -24,37 +24,24 @@ namespace ModellingTrajectoryLib
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
         }
-        private static void AddDrydenComponent(ref Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
+        private static Vector GetDrydenComponent(Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
         {
             DrydenOutput _randWind = Import.DrydenModel(windData, modellingAirspeed.value);
 
             Vector randWind = C * new Vector(_randWind.windRand1, _randWind.windRand2, _randWind.windRand3);
 
-            windSpeed.E += randWind[2];
-            windSpeed.N += randWind[1];
-            windSpeed.H += randWind[3];
+            return randWind;
         }
-        public static void Model(ref Parameters parameters, double dt, InputWindData inputWindData)
+        public static void Model(ref Parameters parameters, double dt, InputWindData windData)
         {
             Point _point = parameters.point;
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
-            InputWindData windData = new InputWindData();
 
             windData.angle = Converter.DegToRad(45);
-            windData.speed = 2;
-            Velocity windSpeed = new Velocity(windData.speed, new Angles(windData.angle, 0, 0, Dimension.Radians), dt);
+            //windData.speed = 2;
+            Velocity windSpeed = new Velocity(windData.wind_e, windData.wind_n, windData.wind_d);
 
-            windData.wind_n = windSpeed.N;
-            windData.wind_e = windSpeed.E;
-            windData.wind_d = windSpeed.H;
-
-            windData.L_u = 200;
-            windData.L_v = 200;
-            windData.L_w = 50;
-
-            windData.sigma_u = 1.06;
-            windData.sigma_u = 1.06;
-            windData.sigma_u = 0.7;
+          
 
             
             Velocity modellingAirSpeed = new Velocity(
@@ -62,12 +49,12 @@ namespace ModellingTrajectoryLib
                 parameters.velocity.N - windSpeed.N,
                 parameters.velocity.H);
 
-            AddDrydenComponent(ref windSpeed, windData, modellingAirSpeed, parameters.C);
+            Vector randWind = GetDrydenComponent(windSpeed, windData, modellingAirSpeed, parameters.C);
 
-            modellingAirSpeed = new Velocity(
-                parameters.velocity.E - windSpeed.E,
-                parameters.velocity.N - windSpeed.N,
-                parameters.velocity.H);
+            modellingAirSpeed.E -= randWind[2];
+            modellingAirSpeed.N -= randWind[1];
+            modellingAirSpeed.H -= randWind[3];
+           
 
             double Pd = GetDynamicPressure(atmosphere, modellingAirSpeed);
             double M = GetM(Pd, atmosphere);
@@ -83,14 +70,22 @@ namespace ModellingTrajectoryLib
             if (prevBaroAlt == default(double))
                 verticalSpeed = 0.0;
             else
+            {
                 verticalSpeed = baroAltitude - prevBaroAlt;
+                airSpeed.H = verticalSpeed;
+            }
 
-            AbsoluteOmega absOmega = new AbsoluteOmega(airSpeed, parameters.earthModel, airPoint);
 
-            airPoint = Point.GetCoords(airPoint, absOmega, airSpeed, dt);
+            Velocity recountSpeed = new Velocity(airSpeed.E + randWind[2],
+                                                airSpeed.N + randWind[1],
+                                                airSpeed.H + randWind[3]);
 
+            AbsoluteOmega absOmega = new AbsoluteOmega(recountSpeed, parameters.earthModel, airPoint);
+
+            airPoint = Point.GetCoords(airPoint, absOmega, recountSpeed, dt);
+            airPoint.alt = baroAltitude;
             parameters.airData.point = Converter.RadToDeg(airPoint);
-            parameters.airData.airSpeed = airSpeed;
+            parameters.airData.airSpeed = recountSpeed;
             parameters.airData.windSpeed = windSpeed;
             parameters.airData.angles = parameters.angles;            
 

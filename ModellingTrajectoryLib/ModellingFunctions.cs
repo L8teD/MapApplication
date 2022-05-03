@@ -63,10 +63,10 @@ namespace ModellingTrajectoryLib
             velAbs = new double[velocity.Length - 1];
             for (int i = 1; i < velocity.Length; i++)
             {
-                if (velocity[i - 1] >= 1224)
-                    velocity[i - 1] = 1224;
-                else if (velocity[i] <= 350)
-                    velocity[i - 1] = 350;
+                if (velocity[i - 1] >= 222)
+                    velocity[i - 1] = 222;
+                else if (velocity[i] <= 50)
+                    velocity[i - 1] = 50;
                 velAbs[i - 1] = Converter.KmPerHourToMeterPerSec(velocity[i - 1]);
             }
         }
