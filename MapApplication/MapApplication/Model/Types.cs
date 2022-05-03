@@ -12,10 +12,16 @@ namespace MapApplication.Model
     public class InitData
     {
         public ObservableCollection<WayPoint> wayPointList { get; set; }
+
         public ObservableCollection<EquipmentData> insErrors { get; set; }
         public ObservableCollection<EquipmentData> sensorErrors { get; set; }
+
         public ObservableCollection<EquipmentData> airInfo { get; set; }
+
+        public ObservableCollection<EquipmentData> windInfoDryden { get; set; }
+        public ObservableCollection<EquipmentData> windInfo { get; set; }
     }
+
     public enum DataSource
     {
         twoChannel,

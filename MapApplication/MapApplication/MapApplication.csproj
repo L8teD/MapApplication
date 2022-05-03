@@ -96,6 +96,7 @@
     <Compile Include="Model\Helper\Logger.cs" />
     <Compile Include="Model\Helper\PlotWorker.cs" />
     <Compile Include="Model\Helper\Saver.cs" />
+    <Compile Include="ViewModel\DataClasses\WindInfo.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataRowVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataRowWithChangesVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataTableVM.cs" />

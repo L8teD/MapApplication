@@ -8,13 +8,13 @@
     </Style>
     <Style TargetType="{x:Type Border}" x:Key="Border_Style_outside">
         <Setter Property="BorderBrush" Value="Black"></Setter>
-        <Setter Property="BorderThickness" Value="3"></Setter>
+        <Setter Property="BorderThickness" Value="1.5"></Setter>
         <Setter Property="Margin" Value="10"></Setter>
-        <Setter Property="Background" Value="#FF72BEFF"></Setter>
+        <Setter Property="Background" Value="#FFC3D8DC"></Setter>
     </Style>
     <Style TargetType="{x:Type Border}" x:Key="Border_Style_inside">
         <Setter Property="BorderBrush" Value="Black"></Setter>
-        <Setter Property="BorderThickness" Value="1"></Setter>
+        <Setter Property="BorderThickness" Value="2"></Setter>
         <Setter Property="Margin" Value="0"></Setter>
         <Setter Property="Background" Value="#FFBFCBF3"></Setter>
     </Style>

@@ -23,6 +23,7 @@ namespace ModellingTrajectoryLib
         int wayPointsCount;
         DesiredTrack desiredTrack;
         InitErrors initErrors;
+        InputWindData inputWindData;
         double dt;
 
         ModellingFunctions functions;
@@ -43,7 +44,7 @@ namespace ModellingTrajectoryLib
             data.p_OutList = new List<P_out>();
             data.airData = new List<AirData>();
         }
-        public void Init(InputData input, InitErrors _initErrors)
+        public void Init(InputData input, InitErrors _initErrors, InputWindData _inputWindData)
         {
             dt = _initErrors.dt;
             desiredTrack = new DesiredTrack();
@@ -67,7 +68,7 @@ namespace ModellingTrajectoryLib
             functions.InitStartedData(input.latitude, input.longitude, input.altitude, input.velocity);
             functions.InitParamsBetweenPPM();
             initErrors = _initErrors;
-
+            inputWindData = _inputWindData;
             desiredTrack.FillOutputsData += AddParametersData;
             atmosphereData = Atmosphere.Read();
         }
@@ -80,7 +81,7 @@ namespace ModellingTrajectoryLib
                 double PPM_DisctancePrev;
                 while (LUR_Distance < PPM_Distance)
                 {
-                    desiredTrack.Track(wpNumber, dt, functions);
+                    desiredTrack.Track(wpNumber, dt, functions, inputWindData);
                     Kalman(dt);
 
                     PPM_DisctancePrev = PPM_Distance;
@@ -102,7 +103,7 @@ namespace ModellingTrajectoryLib
                     for (double j = 0; functions.TurnIsNotEnded(j); j += dt)
                     {
                         functions.SetTurnAngles(wpNumber, dt, desiredTrack.OutPoints.Ideal.Radians.alt);
-                        desiredTrack.Track(wpNumber, dt, functions);
+                        desiredTrack.Track(wpNumber, dt, functions, inputWindData);
                         Kalman(dt);
                     }
                 }

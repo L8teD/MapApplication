@@ -68,7 +68,6 @@
     <Compile Include="Import.cs" />
     <Compile Include="MathTransformation.cs" />
     <Compile Include="Matrix\Create.cs" />
-    <Compile Include="Matrix\MatrixOperations.cs" />
     <Compile Include="Params\AbsoluteOmega.cs" />
     <Compile Include="Params\Acceleration.cs" />
     <Compile Include="Params\EarthModel.cs" />

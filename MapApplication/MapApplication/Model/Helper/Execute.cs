@@ -18,9 +18,10 @@ namespace MapApplication.Model.Helper
                 trajectoryModelling = new Modelling();
 
             InputData input;
-            InitErrors initErrors = new InitErrors(); //delete struct creation
-            SetInputs(initData,ref input, ref initErrors);
-            trajectoryModelling.Init(input, initErrors);
+            InitErrors initErrors = new InitErrors();
+            InputWindData inputWindData = new InputWindData();
+            SetInputs(initData,ref input, ref initErrors, ref inputWindData);
+            trajectoryModelling.Init(input, initErrors, inputWindData);
         }
         private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
         {
@@ -31,7 +32,7 @@ namespace MapApplication.Model.Helper
             Init(initData);
             GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
         }
-        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors)
+        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors, ref InputWindData windData)
         {
             inputData = new InputData();
             inputData.latitude = new double[initData.wayPointList.Count];
@@ -46,6 +47,25 @@ namespace MapApplication.Model.Helper
                 inputData.velocity[i] = initData.wayPointList[i].Velocity;
             }
             initErrors = SetInitErrors(initData);
+            windData = SetWindData(initData);
+        }
+        private static InputWindData SetWindData(InitData initData)
+        {
+            InputWindData windData = new InputWindData();
+
+            windData.angle = initData.windInfo[0].Value;
+            windData.wind_e = initData.windInfo[1].Value;
+            windData.wind_n = initData.windInfo[2].Value;
+            windData.wind_d = initData.windInfo[3].Value;
+
+            windData.sigma_u = initData.windInfoDryden[0].Value;
+            windData.sigma_v = initData.windInfoDryden[1].Value;
+            windData.sigma_w = initData.windInfoDryden[2].Value;
+            windData.L_u = initData.windInfoDryden[3].Value;
+            windData.L_v = initData.windInfoDryden[4].Value;
+            windData.L_w = initData.windInfoDryden[5].Value;
+
+            return windData;
         }
         private static InitErrors SetInitErrors(InitData initData)
         {

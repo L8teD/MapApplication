@@ -10,6 +10,7 @@ namespace CommonLib
 {
     public struct InputWindData
     {
+        public double speed;
         public double wind_n;
         public double wind_e;
         public double wind_d;
@@ -19,6 +20,8 @@ namespace CommonLib
         public double sigma_u;
         public double sigma_v;
         public double sigma_w;
+
+        public double angle;
     }
     public struct MatlabOutData
     {
@@ -59,6 +62,7 @@ namespace CommonLib
         public Velocity velocity;
         public Angles angles;
         public AirData airData;
+        public Matrix C;
     }
     public struct Angles
     {
@@ -99,29 +103,29 @@ namespace CommonLib
         {
             switch (point.dimension)
             {
-                case Dimension.InDegrees:
-                    Degrees = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                case Dimension.Degrees:
+                    Degrees = new Point(point.lat, point.lon, point.alt, Dimension.Degrees);
                     Radians = Converter.DegToRad(point);
                     Meters = Converter.DegreesToMeters(point, earth);
                     break;
 
-                case Dimension.InRadians:
+                case Dimension.Radians:
                     Degrees = Converter.RadToDeg(point);
-                    Radians = new Point(point.lat, point.lon, point.alt, Dimension.InRadians);
+                    Radians = new Point(point.lat, point.lon, point.alt, Dimension.Radians);
                     Meters = Converter.RadiansToMeters(point, earth);
                     break;
 
-                case Dimension.InMeters:
+                case Dimension.Meters:
 
                     Degrees = Converter.MetersToDegrees(point, latitude, earth);
                     Radians = Converter.MetersToRadians(point, latitude, earth);
-                    Meters = new Point(point.lat, point.lon, point.alt, Dimension.InMeters);
+                    Meters = new Point(point.lat, point.lon, point.alt, Dimension.Meters);
                     break;
 
                 default:
-                    Degrees = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
-                    Radians = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
-                    Meters = new Point(point.lat, point.lon, point.alt, Dimension.InDegrees);
+                    Degrees = new Point(point.lat, point.lon, point.alt, Dimension.Degrees);
+                    Radians = new Point(point.lat, point.lon, point.alt, Dimension.Degrees);
+                    Meters = new Point(point.lat, point.lon, point.alt, Dimension.Degrees);
                     break;
 
             }
@@ -144,53 +148,53 @@ namespace CommonLib
             if (ISChannel3)
             {
                 Ideal = new PointValue(idP, earth, idP.lat);
-                Point errP = new Point(error[2], error[1], error[3], Dimension.InMeters);
+                Point errP = new Point(error[2], error[1], error[3], Dimension.Meters);
                 Error = new PointValue(errP, earth, idP.lat);
                 Point realP = new Point(
                     Ideal.Meters.lat + Error.Meters.lat,
                     Ideal.Meters.lon + Error.Meters.lon,
                     Ideal.Meters.alt + Error.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 Real = new PointValue(realP, earth, idP.lat);
-                Point estP = new Point(estimate[2], estimate[1], estimate[3], Dimension.InMeters);
+                Point estP = new Point(estimate[2], estimate[1], estimate[3], Dimension.Meters);
                 Estimate = new PointValue(estP, earth, idP.lat);
                 Point corErrP = new Point(
                     Error.Meters.lat - Estimate.Meters.lat,
                     Error.Meters.lon - Estimate.Meters.lon,
                     Error.Meters.alt - Estimate.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 CorrectError = new PointValue(corErrP, earth, idP.lat);
                 Point corTrajP = new Point(
                     Ideal.Meters.lat + CorrectError.Meters.lat,
                     Ideal.Meters.lon + CorrectError.Meters.lon,
                     Ideal.Meters.alt + CorrectError.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
             }
             else
             {
                 Ideal = new PointValue(idP, earth, idP.lat);
-                Point errP = new Point(error[2], error[1], 0, Dimension.InMeters);
+                Point errP = new Point(error[2], error[1], 0, Dimension.Meters);
                 Error = new PointValue(errP, earth, idP.lat);
                 Point realP = new Point(
                     Ideal.Meters.lat + Error.Meters.lat,
                     Ideal.Meters.lon + Error.Meters.lon,
                     Ideal.Meters.alt + Error.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 Real = new PointValue(realP, earth, idP.lat);
-                Point estP = new Point(estimate[2], estimate[1], 0, Dimension.InMeters);
+                Point estP = new Point(estimate[2], estimate[1], 0, Dimension.Meters);
                 Estimate = new PointValue(estP, earth, idP.lat);
                 Point corErrP = new Point(
                     Error.Meters.lat - Estimate.Meters.lat,
                     Error.Meters.lon - Estimate.Meters.lon,
                     Error.Meters.alt - Estimate.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 CorrectError = new PointValue(corErrP, earth, idP.lat);
                 Point corTrajP = new Point(
                     Ideal.Meters.lat + CorrectError.Meters.lat,
                     Ideal.Meters.lon + CorrectError.Meters.lon,
                     Ideal.Meters.alt + CorrectError.Meters.alt,
-                    Dimension.InMeters);
+                    Dimension.Meters);
                 CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
             }
 
@@ -274,25 +278,25 @@ namespace CommonLib
             if (IsChannel3)
             {
                 Ideal = new AngleValue(angles);
-                Angles errAngles = new Angles(error[7], error[8], error[9], Dimension.InRadians);
+                Angles errAngles = new Angles(error[7], error[8], error[9], Dimension.Radians);
                 Error = new AngleValue(errAngles);
                 Angles realAngles = new Angles(
                     Ideal.Radians.heading + Error.Radians.heading,
                     Ideal.Radians.roll + Error.Radians.roll,
                     Ideal.Radians.pitch + Error.Radians.pitch,
-                    Dimension.InRadians);
+                    Dimension.Radians);
                 Real = new AngleValue(realAngles);
             }
             else
             {
                 Ideal = new AngleValue(angles);
-                Angles errAngles = new Angles(error[5], error[6], error[7], Dimension.InRadians);
+                Angles errAngles = new Angles(error[5], error[6], error[7], Dimension.Radians);
                 Error = new AngleValue(errAngles);
                 Angles realAngles = new Angles(
                     Ideal.Radians.heading + Error.Radians.heading,
                     Ideal.Radians.roll + Error.Radians.roll,
                     Ideal.Radians.pitch + Error.Radians.pitch,
-                    Dimension.InRadians);
+                    Dimension.Radians);
                 Real = new AngleValue(realAngles);
             }
         }
@@ -305,25 +309,25 @@ namespace CommonLib
         {
             switch (angles.dimension)
             {
-                case Dimension.InDegrees:
-                    Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InDegrees);
+                case Dimension.Degrees:
+                    Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.Degrees);
                     Radians = new Angles(
                         Converter.DegToRad(angles.heading),
                         Converter.DegToRad(angles.roll),
                         Converter.DegToRad(angles.pitch),
-                        Dimension.InRadians);
+                        Dimension.Radians);
                     break;
-                case Dimension.InRadians:
-                    Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InRadians);
+                case Dimension.Radians:
+                    Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.Radians);
                     Degrees = new Angles(
                         Converter.RadToDeg(angles.heading),
                         Converter.RadToDeg(angles.roll),
                         Converter.RadToDeg(angles.pitch),
-                        Dimension.InDegrees);
+                        Dimension.Degrees);
                     break;
                 default:
-                    Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InRadians);
-                    Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.InDegrees);
+                    Radians = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.Radians);
+                    Degrees = new Angles(angles.heading, angles.roll, angles.pitch, Dimension.Degrees);
                     break;
             }
         }
@@ -337,8 +341,8 @@ namespace CommonLib
     }
     public enum Dimension
     {
-        InDegrees,
-        InRadians,
-        InMeters
+        Degrees,
+        Radians,
+        Meters
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CommonLib;
 using CommonLib.Params;
+using MyMatrix;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +24,47 @@ namespace ModellingTrajectoryLib
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
         }
-        public static void Model(ref Parameters parameters, double dt)
+        private static void AddDrydenComponent(ref Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
+        {
+            DrydenOutput _randWind = Import.DrydenModel(windData, modellingAirspeed.value);
+
+            Vector randWind = C * new Vector(_randWind.windRand1, _randWind.windRand2, _randWind.windRand3);
+
+            windSpeed.E += randWind[2];
+            windSpeed.N += randWind[1];
+            windSpeed.H += randWind[3];
+        }
+        public static void Model(ref Parameters parameters, double dt, InputWindData inputWindData)
         {
             Point _point = parameters.point;
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
+            InputWindData windData = new InputWindData();
 
-            Wind wind = default(Wind);//Weather.Query(parameters.point);
-            Velocity windSpeed = new Velocity(wind.speed, wind.angle, default(double));
+            windData.angle = Converter.DegToRad(45);
+            windData.speed = 2;
+            Velocity windSpeed = new Velocity(windData.speed, new Angles(windData.angle, 0, 0, Dimension.Radians), dt);
+
+            windData.wind_n = windSpeed.N;
+            windData.wind_e = windSpeed.E;
+            windData.wind_d = windSpeed.H;
+
+            windData.L_u = 200;
+            windData.L_v = 200;
+            windData.L_w = 50;
+
+            windData.sigma_u = 1.06;
+            windData.sigma_u = 1.06;
+            windData.sigma_u = 0.7;
+
+            
             Velocity modellingAirSpeed = new Velocity(
+                parameters.velocity.E - windSpeed.E,
+                parameters.velocity.N - windSpeed.N,
+                parameters.velocity.H);
+
+            AddDrydenComponent(ref windSpeed, windData, modellingAirSpeed, parameters.C);
+
+            modellingAirSpeed = new Velocity(
                 parameters.velocity.E - windSpeed.E,
                 parameters.velocity.N - windSpeed.N,
                 parameters.velocity.H);

@@ -24,5 +24,6 @@ namespace MapApplication.View
         {
             InitializeComponent();
         }
+
     }
 }

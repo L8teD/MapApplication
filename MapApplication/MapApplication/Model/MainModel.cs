@@ -329,7 +329,11 @@ namespace MapApplication.Model
             initData.insErrors = new ObservableCollection<EquipmentData>();
             initData.sensorErrors = new ObservableCollection<EquipmentData>();
             initData.airInfo = new ObservableCollection<EquipmentData>();
+            initData.windInfo = new ObservableCollection<EquipmentData>();
+            initData.windInfoDryden = new ObservableCollection<EquipmentData>();
 
+
+            #region InsErrors
             initData.insErrors.Add(new EquipmentData() { Name = "α", Value = 0.25, Dimension = "[deg/h]" });
             initData.insErrors.Add(new EquipmentData() { Name = "β", Value = 0.03, Dimension = "[deg/h]" });
             initData.insErrors.Add(new EquipmentData() { Name = "γ", Value = 0.03, Dimension = "[deg/h]" });
@@ -341,7 +345,9 @@ namespace MapApplication.Model
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVe", Value = 0.5, Dimension = "[m/s]" });
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVn", Value = 0.5, Dimension = "[m/s]" });
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVh", Value = 0.5, Dimension = "[m/s]" });
+            #endregion
 
+            #region SensorErrors
             initData.sensorErrors.Add(new EquipmentData() { Name = "Δn1", Value = 6E-06, Dimension = "[g]" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "Δn2", Value = 6E-06, Dimension = "[g]" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "Δn3", Value = 6E-06, Dimension = "[g]" });
@@ -355,9 +361,27 @@ namespace MapApplication.Model
 
             initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 10, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
+            #endregion
 
-            initData.airInfo.Add(new EquipmentData() { Name = "H0", Value = 0, Dimension = "m" });
+            #region AirInfo
+            initData.airInfo.Add(new EquipmentData() { Name = "H0", Value = 0, Dimension = "[m]" });
+            #endregion
 
+            #region WindInfo
+            initData.windInfo.Add(new EquipmentData() { Name = "Angle", Value = 15, Dimension = "[deg]" });
+
+            initData.windInfo.Add(new EquipmentData() { Name = "wind_E", Value = 3, Dimension = "[m/s]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "wind_N", Value = 2, Dimension = "[m/s]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "wind_H", Value = 1, Dimension = "[m/s]" });
+
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_u", Value = 1.1, Dimension = "[m/s]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_v", Value = 1.1, Dimension = "[m/s]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_w", Value = 0.7, Dimension = "[m/s]" });
+
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "L_u", Value = 200, Dimension = "[m]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "L_v", Value = 200, Dimension = "[m]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "L_w", Value = 50, Dimension = "[m]" });
+            #endregion
             //items.Add(new InputError() { Name = "ΔXc", Value = 10, Dimension = "[m]" });
             //items.Add(new InputError() { Name = "ΔVc", Value = 0.1, Dimension = "[m/s]" });
 

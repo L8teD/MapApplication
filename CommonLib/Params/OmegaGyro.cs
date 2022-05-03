@@ -22,10 +22,10 @@ namespace CommonLib.Params
         private double V_Eprev = 0;
         private double V_Nprev = 0;
         private double V_Hprev = 0;
-        public OmegaGyro(Parameters parameters, Matrix C)
+        public OmegaGyro(Parameters parameters)
         {
             GetProjectionsNZSK(parameters.absOmega, parameters.omegaEarth);
-            GetProjectionSSK(C);
+            GetProjectionSSK(parameters.C);
             GetDot(parameters.point, parameters.velocity, parameters.acceleration, parameters.earthModel, parameters.omegaEarth);
         }
 
@@ -56,7 +56,7 @@ namespace CommonLib.Params
             //Z_dot = (omegaEarth.N * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
             //    velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
 
-            X_dot = -(velocity.E - V_Eprev- velocity.H * velocity.N / earth.R1) / earth.R1;
+            X_dot = -(velocity.E - V_Eprev - velocity.H * velocity.N / earth.R1) / earth.R1;
             Y_dot = (velocity.N - V_Nprev - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
             Z_dot = (velocity.H - V_Hprev * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
                 velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;

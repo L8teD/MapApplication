@@ -55,7 +55,7 @@ namespace ModellingTrajectoryLib
                     latArray[i],
                     lonArray[i],
                     altArray[i],
-                    Dimension.InRadians);
+                    Dimension.Radians);
             }
         }
         private void InitStartedVelocitites(double[] velocity)
@@ -170,7 +170,7 @@ namespace ModellingTrajectoryLib
             angles.heading = heading[k];
             angles.pitch = pitch[k];
             angles.roll = roll[k];
-            angles.dimension = Dimension.InRadians;
+            angles.dimension = Dimension.Radians;
             parameters.angles = angles;
         }
         internal void SetVelocity(ref Parameters parameters, int k, double dt)

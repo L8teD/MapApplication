@@ -20,7 +20,7 @@ namespace ModellingTrajectoryLib
     {
         protected void InitStartedPoint(ref Parameters parameters, InputData input)
         {
-            parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.InRadians);
+            parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.Radians);
         }
         protected void InitNextPoint(ref Parameters parameters, List<Parameters> localParams)
         {

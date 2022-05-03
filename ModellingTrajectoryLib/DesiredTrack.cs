@@ -111,17 +111,17 @@ namespace ModellingTrajectoryLib
         {
             Import.Init();
             localParams = new List<Parameters>();
-            parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.InRadians);
+            parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.Radians);
             localParams.Add(parameters);
 
             CourseAirReckoning.Init(parameters.point);
         }
-        public void Track(int wpNumber,double dt, ModellingFunctions functions)
+        public void Track(int wpNumber,double dt, ModellingFunctions functions, InputWindData inputWindData)
         {
             InitNextPoint(ref parameters, localParams);
 
             ComputeParametersData(wpNumber, dt, functions);
-            CourseAirReckoning.Model(ref parameters, dt);
+            CourseAirReckoning.Model(ref parameters, dt, inputWindData);
 
             //functions.CheckParamsBetweenPPM(wpNumber, parameters.point);
 
@@ -132,7 +132,7 @@ namespace ModellingTrajectoryLib
         {
             functions.SetAngles(ref parameters, wpNumber);
 
-            Matrix C = functions.CreateMatrixC(parameters);
+            parameters.C = functions.CreateMatrixC(parameters);
 
             parameters.earthModel = new EarthModel(parameters.point);
             parameters.gravAcceleration = new GravitationalAcceleration(parameters.point);
@@ -141,8 +141,8 @@ namespace ModellingTrajectoryLib
             functions.SetVelocity(ref parameters, wpNumber, dt);
 
             parameters.absOmega = new AbsoluteOmega(parameters);
-            parameters.acceleration = new Acceleration(parameters, C);
-            parameters.omegaGyro = new OmegaGyro(parameters, C);
+            parameters.acceleration = new Acceleration(parameters);
+            parameters.omegaGyro = new OmegaGyro(parameters);
 
             parameters.point = Point.GetCoords(parameters, dt);
 

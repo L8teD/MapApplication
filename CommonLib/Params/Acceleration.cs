@@ -19,10 +19,10 @@ namespace CommonLib.Params
         private double V_Eprev =0;
         private double V_Nprev =0;
         private double V_Hprev =0;
-        public Acceleration(Parameters parameters, Matrix C)
+        public Acceleration(Parameters parameters)
         {
             GetProjectionNZSK(parameters.absOmega, parameters.velocity, parameters.gravAcceleration, parameters.omegaEarth);
-            GetProjectionSSK(C);
+            GetProjectionSSK(parameters.C);
         }
         public void GetProjectionNZSK(AbsoluteOmega absOmega, Velocity velocity, GravitationalAcceleration gravitationalAcceleration, OmegaEarth omegaEarth)
         {

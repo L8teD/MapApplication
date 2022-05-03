@@ -12,9 +12,9 @@ namespace CommonLib.Params
         double Nprev;
         double Hprev;
         
-        public double E { get; private set; }
-        public double N { get; private set; }
-        public double H { get; private set; }
+        public double E { get; set; }
+        public double N { get; set; }
+        public double H { get; set; }
         public double E_dot { get; private set; }
         public double N_dot { get; private set; }
         public double H_dot { get; private set; }
