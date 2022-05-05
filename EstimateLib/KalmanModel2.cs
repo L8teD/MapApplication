@@ -42,7 +42,7 @@ namespace EstimateLib
         private CoordAccuracy coordAccuracy;
         private VelocityAccuracy velocityAccuracy;
 
-        private void InitX(InitErrors initErrors, Point point,AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
+        private void InitX(InitErrors initErrors, Point point, AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
         {
             X = Vector.Zero(19);
 
@@ -60,12 +60,12 @@ namespace EstimateLib
             }
             else
             {
-                coordAccuracy.longitude += X_dot[1]* initErrors.dt;
-                coordAccuracy.latitude += X_dot[2]* initErrors.dt;
+                coordAccuracy.longitude += X_dot[1] * initErrors.dt;
+                coordAccuracy.latitude += X_dot[2] * initErrors.dt;
                 //coordAccuracy.altitude += X_dot[2][0];
 
-                velocityAccuracy.east += X_dot[3]* initErrors.dt;
-                velocityAccuracy.north += X_dot[4]* initErrors.dt;
+                velocityAccuracy.east += X_dot[3] * initErrors.dt;
+                velocityAccuracy.north += X_dot[4] * initErrors.dt;
                 //velocityAccuracy.H += X_dot[5][0];
             }
             X[1] = coordAccuracy.longitude;
@@ -76,7 +76,7 @@ namespace EstimateLib
 
             Matrix M = Create.MatrixM(angles.heading, angles.pitch);
 
-            Vector orientationErrors = !M * anglesErrors; 
+            Vector orientationErrors = !M * anglesErrors;
 
             double alfa = orientationErrors[1] + X_dot[5] * initErrors.dt;
             double betta = orientationErrors[2] + X_dot[6] * initErrors.dt;
@@ -86,7 +86,7 @@ namespace EstimateLib
             orientationAngles[2] = betta + X[1] / earthModel.R2;
             orientationAngles[3] = gamma + X[1] * Math.Tan(point.lat) / earthModel.R1;
 
-                //anglesErrors = M * orientationAngles;
+            //anglesErrors = M * orientationAngles;
             X[5] = orientationAngles[1];
             X[6] = orientationAngles[2];
             X[7] = orientationAngles[3];
@@ -107,7 +107,7 @@ namespace EstimateLib
             X[18] = 9.81 * 3E-6;
             X[19] = 9.81 * 3E-6;
         }
-        private void InitF(OmegaGyro omegaGyro,AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C)
+        private void InitF(OmegaGyro omegaGyro, AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C)
         {
             F = Matrix.Zero(19);
 
@@ -220,13 +220,13 @@ namespace EstimateLib
         {
             H = Matrix.Zero(4, 19);
 
-            H[1,1] = 1.0;
-            H[2,2] = 1.0;
-            H[3,1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
-            H[3,2] = -absOmega.H;
-            H[3,3] = 1.0;
-            H[4,1] = -velocity.H / earth.R1;
-            H[4,4] = 1.0;
+            H[1, 1] = 1.0;
+            H[2, 2] = 1.0;
+            H[3, 1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
+            H[3, 2] = -absOmega.H;
+            H[3, 3] = 1.0;
+            H[4, 1] = -velocity.H / earth.R1;
+            H[4, 4] = 1.0;
         }
         private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
         {
@@ -270,7 +270,7 @@ namespace EstimateLib
             Vector Z_sns = new Vector(_Z_sns);
             Z = Z_ins - Z_sns;
 
-            R = (snsErrors.Diag() ^ 2 ) * (1.0 / initErrors.dt);
+            R = (snsErrors.Diag() ^ 2) * (1.0 / initErrors.dt);
 
         }
         private void InitAnglesError(InitErrors initErrors)
@@ -294,11 +294,11 @@ namespace EstimateLib
                 P = (eyeMatrix - K * H) * S;
             }
 
-           //G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
+            //G_discrete = (eyeMatrix + F * 0.5 + (F ^ 2) * (1.0 / 6.0)) * G;
 
             G_discrete = F_discrete * G * dt;
 
-            Q = (W_withoutNoise.Diag() ^ 2) * (1.0/dt);
+            Q = (W_withoutNoise.Diag() ^ 2) * (1.0 / dt);
 
             S = F_discrete * P * ~F_discrete + G_discrete * Q * ~G_discrete;
 
@@ -308,7 +308,7 @@ namespace EstimateLib
             {
                 X_previous = X.Dublicate();
             }
-            
+
             X_estimate = F_discrete * X_previous + K * (Z - H * F_discrete * X_previous);
 
             X_previous = X_estimate.Dublicate();
@@ -324,16 +324,16 @@ namespace EstimateLib
             }
             else
             {
-                InitX(initErrors, parameters.point,  parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
+                InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
             }
 
 
-            InitF(parameters.omegaGyro,parameters.absOmega, parameters.earthModel, parameters.acceleration, C);
+            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C);
             InitG(C);
             InitW(initErrors);
 
 
-            X_dot = F * X + G * W; 
+            X_dot = F * X + G * W;
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
             InitZ(parameters.point, parameters.velocity, parameters.earthModel, initErrors);

@@ -159,7 +159,7 @@ namespace ModellingTrajectoryLib
         {
             return Rz * ortDistAngle;
         }
-        
+
         internal Matrix CreateMatrixC(Parameters parameters)
         {
             return Create.MatrixC(parameters.angles);
@@ -173,9 +173,9 @@ namespace ModellingTrajectoryLib
             angles.dimension = Dimension.Radians;
             parameters.angles = angles;
         }
-        internal void SetVelocity(ref Parameters parameters, int k, double dt)
+        internal void SetVelocity(ref Parameters parameters, int k)
         {
-            parameters.velocity = new Velocity(velAbs[k], parameters.angles, dt);
+            parameters.velocity = new Velocity(velAbs[k], parameters.angles, parameters.dt);
         }
         internal bool TurnIsAvailable(int k, int length)
         {
@@ -203,7 +203,7 @@ namespace ModellingTrajectoryLib
             roll[k] = rollTarget;
             double velocityValue = velAbs[k] + dVelocityOnEveryIteration;
             double distTurn = velocityValue * dt;
-            pitch[k] = Math.Atan2((startedPoints[k+1].alt - altitude) /numberOfIterations, distTurn);
+            pitch[k] = Math.Atan2((startedPoints[k + 1].alt - altitude) / numberOfIterations, distTurn);
             heading[k] += dHeading;
         }
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EstimateLib
 {
-    public class KalmanFeedbackModel : IKalman 
+    public class KalmanFeedbackModel : IKalman
     {
         public Vector X { get; set; }
         public Vector X_dot;
@@ -195,58 +195,58 @@ namespace EstimateLib
         }
         private void InitG(Matrix C)
         {
-            G = Matrix.Zero(21, 21);
-            G[4, 19] = C[1, 1];
-            G[4, 20] = C[1, 2];
-            G[4, 21] = C[1, 3];
+            G = Matrix.Zero(21, 6);
+            G[4, 4] = C[1, 1];
+            G[4, 5] = C[1, 2];
+            G[4, 6] = C[1, 3];
 
-            G[5, 19] = C[2, 1];
-            G[5, 20] = C[2, 2];
-            G[5, 21] = C[2, 3];
+            G[5, 4] = C[2, 1];
+            G[5, 5] = C[2, 2];
+            G[5, 6] = C[2, 3];
 
-            G[6, 19] = C[3, 1];
-            G[6, 20] = C[3, 2];
-            G[6, 21] = C[3, 3];
+            G[6, 4] = C[3, 1];
+            G[6, 5] = C[3, 2];
+            G[6, 6] = C[3, 3];
 
-            G[7, 19] = C[1, 1];
-            G[7, 20] = C[1, 2];
-            G[7, 21] = C[1, 3];
+            G[7, 1] = C[1, 1];
+            G[7, 2] = C[1, 2];
+            G[7, 3] = C[1, 3];
 
-            G[8, 19] = C[2, 1];
-            G[8, 20] = C[2, 2];
-            G[8, 21] = C[2, 3];
+            G[8, 1] = C[2, 1];
+            G[8, 2] = C[2, 2];
+            G[8, 3] = C[2, 3];
 
-            G[9, 19] = C[3, 1];
-            G[9, 20] = C[3, 2];
-            G[9, 21] = C[3, 3];
+            G[9, 1] = C[3, 1];
+            G[9, 2] = C[3, 2];
+            G[9, 3] = C[3, 3];
         }
         private void InitW(InitErrors initErrors)
         {
             double gyro_noise = initErrors.accNoise;
             double acc_noise = initErrors.gyroNoise;
 
-            W = Vector.Zero(21);
-            W[16] = gyro_noise * Import.GetRandom();
-            W[17] = gyro_noise * Import.GetRandom();
-            W[18] = gyro_noise * Import.GetRandom();
-            W[19] = acc_noise * Import.GetRandom();
-            W[20] = acc_noise * Import.GetRandom();
-            W[21] = acc_noise * Import.GetRandom();
+            W = Vector.Zero(6);
+            W[1] = gyro_noise * Import.GetRandom();
+            W[2] = gyro_noise * Import.GetRandom();
+            W[3] = gyro_noise * Import.GetRandom();
+            W[4] = acc_noise * Import.GetRandom();
+            W[5] = acc_noise * Import.GetRandom();
+            W[6] = acc_noise * Import.GetRandom();
 
-            W_withoutNoise = Vector.Zero(21);
-            W_withoutNoise[16] = gyro_noise;
-            W_withoutNoise[17] = gyro_noise;
-            W_withoutNoise[18] = gyro_noise;
-            W_withoutNoise[19] = acc_noise;
-            W_withoutNoise[20] = acc_noise;
-            W_withoutNoise[21] = acc_noise;
+            W_withoutNoise = Vector.Zero(6);
+            W_withoutNoise[1] = gyro_noise;
+            W_withoutNoise[2] = gyro_noise;
+            W_withoutNoise[3] = gyro_noise;
+            W_withoutNoise[4] = acc_noise;
+            W_withoutNoise[5] = acc_noise;
+            W_withoutNoise[6] = acc_noise;
         }
         private void InitH(Point point, EarthModel earth, AbsoluteOmega absOmega, Velocity velocity)
         {
             H = Matrix.Zero(6, 21);
 
-            H[1, 1] = 1.0 / (earth.R2 * Math.Cos(point.lat));
-            H[2, 2] = 1.0 / earth.R1;
+            H[1, 1] = 1.0;
+            H[2, 2] = 1.0;
             H[3, 3] = 1.0;
             H[4, 1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
             H[4, 2] = -absOmega.H;
@@ -256,7 +256,7 @@ namespace EstimateLib
             H[6, 6] = 1.0;
 
         }
-        private void InitZ(Point point, Velocity velocity, EarthModel earth)
+        private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
         {
             Z = Vector.Zero(6);
 
@@ -272,27 +272,28 @@ namespace EstimateLib
             Vector estimatedParams = new Vector(_estimatedParams);
             Vector Z_ins = estimatedParams + H * X_delta;
             double[] _snsErrors = new double[] {
-                5.0 / (earth.R2*Math.Cos(point.lat)),
-                5.0 / earth.R1,
+                5.0,
+                5.0,
                 5.0,
                 0.05,
                 0.05,
                 0.05
             };
+            double noise_sns = initErrors.snsNoise;
             Vector snsErrors = new Vector(_snsErrors);
             double[] _Z_sns = new double[]
             {
-                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * 10.0 * Import.GetRandom(),
-                point.lat + snsErrors[2] / (earth.R1) * 10.0 * Import.GetRandom(),
-                point.alt + snsErrors[3] * 10.0 * Import.GetRandom(),
-                velocity.E + snsErrors[4] * 10.0 * Import.GetRandom(),
-                velocity.N + snsErrors[5] * 10.0 * Import.GetRandom(),
-                velocity.H + snsErrors[6] * 10.0 * Import.GetRandom()
+                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * noise_sns * Import.GetRandom(),
+                point.lat + snsErrors[2] / (earth.R1) * noise_sns * Import.GetRandom(),
+                point.alt + snsErrors[3] * noise_sns * Import.GetRandom(),
+                velocity.E + snsErrors[4] * noise_sns * Import.GetRandom(),
+                velocity.N + snsErrors[5] * noise_sns * Import.GetRandom(),
+                velocity.H + snsErrors[6] * noise_sns * Import.GetRandom()
             };
             Vector Z_sns = new Vector(_Z_sns);
             Z = Z_ins - Z_sns;
 
-            R = snsErrors.Diag() ^ 2;
+            R = snsErrors.Diag() ^ 2 * (1.0 / initErrors.dt);
         }
         private void InitAnglesError(InitErrors initErrors)
         {
@@ -303,20 +304,24 @@ namespace EstimateLib
         private void Kalman(double dt)
         {
             eyeMatrix = Matrix.Identity(21);
-            F_discrete = eyeMatrix + F*dt + (F*dt ^ 2) * 0.5;
+            F_discrete = eyeMatrix + F * dt;// + (F*dt ^ 2) * 0.5;
 
             if (P == null)
             {
                 P = X_delta.Diag() ^ 2;
             }
+            else
+            {
+                P = (eyeMatrix - K * H) * S;
+            }
 
-            G_discrete = (eyeMatrix + F*dt * 0.5 + (F*dt ^ 2) * (1.0 / 6.0)) * G*dt;
+            G_discrete = F_discrete * G * dt; //(eyeMatrix + F*dt * 0.5 + (F*dt ^ 2) * (1.0 / 6.0)) * G*dt;
 
-            Q = W_withoutNoise.Diag() ^ 2;
+            Q = W_withoutNoise.Diag() ^ 2 * (1.0 / dt);
 
             S = F_discrete * P * ~F_discrete + G_discrete * Q * ~G_discrete;
             K = S * ~H * !(H * S * ~H + R);
-            P = (eyeMatrix - K * H) * S;
+
             if (X_estimate == null)
             {
                 X_previous = X_delta.Dublicate();
@@ -354,7 +359,7 @@ namespace EstimateLib
             X_dot = F * X_delta + G * W;
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
-            InitZ(parameters.point, parameters.velocity, parameters.earthModel);
+            InitZ(parameters.point, parameters.velocity, parameters.earthModel, initErrors);
 
             Kalman(dt);
 

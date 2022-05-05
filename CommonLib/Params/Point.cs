@@ -23,10 +23,10 @@ namespace CommonLib.Params
         {
             return new double[] { absOmega.E, absOmega.N / Math.Cos(point.lat), velocity.H };
         }
-        public static Point GetCoords(Parameters parameters, double dt)
+        public static Point GetCoords(Parameters parameters)
         {
             double[] increments = GetCoordsIncrement(parameters.point, parameters.absOmega, parameters.velocity);
-            return IncrementCoords(parameters.point, increments, dt);
+            return IncrementCoords(parameters.point, increments, parameters.dt);
         }
         public static Point GetCoords(Point point, AbsoluteOmega absOmega, Velocity velocity, double dt)
         {

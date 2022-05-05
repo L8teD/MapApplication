@@ -26,7 +26,7 @@ namespace CommonLib.Params
         {
             GetProjectionsNZSK(parameters.absOmega, parameters.omegaEarth);
             GetProjectionSSK(parameters.C);
-            GetDot(parameters.point, parameters.velocity, parameters.acceleration, parameters.earthModel, parameters.omegaEarth);
+            GetDot(parameters.point, parameters.velocity, parameters.acceleration, parameters.earthModel, parameters.omegaEarth, parameters.dt);
         }
 
         private void GetProjectionsNZSK(AbsoluteOmega absOmega, OmegaEarth omegaEarth)
@@ -42,7 +42,7 @@ namespace CommonLib.Params
             Y = omega_XYZ[2];
             Z = omega_XYZ[3];
         }
-        private void GetDot(Point point, Velocity velocity, Acceleration acceleration, EarthModel earth, OmegaEarth omegaEarth)
+        private void GetDot(Point point, Velocity velocity, Acceleration acceleration, EarthModel earth, OmegaEarth omegaEarth, double dt)
         {
             if (V_Eprev == 0 && V_Hprev == 0 && V_Nprev == 0)
             {
@@ -56,10 +56,15 @@ namespace CommonLib.Params
             //Z_dot = (omegaEarth.N * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
             //    velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
 
-            X_dot = -(velocity.E - V_Eprev - velocity.H * velocity.N / earth.R1) / earth.R1;
-            Y_dot = (velocity.N - V_Nprev - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
-            Z_dot = (velocity.H - V_Hprev * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
-                velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
+            //X_dot = -((velocity.E - V_Eprev) / dt - velocity.H * velocity.N / earth.R1) / earth.R1;
+            //Y_dot = ((velocity.N - V_Nprev) / dt - omegaEarth.H * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
+            //Z_dot = ((velocity.H - V_Hprev) / dt * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
+            //    velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2 / 100.0;
+
+            X_dot = -((velocity.N - V_Nprev) / dt - velocity.H * velocity.N / earth.R1) / earth.R1;
+            Y_dot = ((velocity.E - V_Eprev) / dt - omegaEarth.H * Math.Sin(point.lat) * velocity.N - velocity.H * velocity.E / earth.R2) / earth.R2;
+            Z_dot = ((velocity.H - V_Hprev) / dt * velocity.N + acceleration.E * Math.Tan(point.lat) + velocity.H * this.H +
+                velocity.E * velocity.N / (earth.R2 * Math.Pow(Math.Cos(point.lat), 2))) / earth.R2;// / 100.0;
         }
     }
 }

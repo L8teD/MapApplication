@@ -92,7 +92,7 @@ namespace ModellingTrajectoryLib
                     p_Out.vn = Math.Sqrt(kalmanModel.P[5, 5]);
                     p_Out.vh = Math.Sqrt(kalmanModel.P[6, 6]);
                 }
-                
+
                 return p_Out;
             }
             private set
@@ -116,19 +116,21 @@ namespace ModellingTrajectoryLib
 
             CourseAirReckoning.Init(parameters.point);
         }
-        public void Track(int wpNumber,double dt, ModellingFunctions functions, InputWindData inputWindData)
+        public void Track(int wpNumber, double dt, ModellingFunctions functions, InputWindData inputWindData, InputAirData inputAirData)
         {
+            parameters.dt = dt;
+
             InitNextPoint(ref parameters, localParams);
 
-            ComputeParametersData(wpNumber, dt, functions);
-            CourseAirReckoning.Model(ref parameters, dt, inputWindData);
+            ComputeParametersData(wpNumber, functions);
+            CourseAirReckoning.Model(ref parameters, inputWindData, inputAirData);
 
             //functions.CheckParamsBetweenPPM(wpNumber, parameters.point);
 
             localParams.Add(parameters);
         }
 
-        protected void ComputeParametersData(int wpNumber, double dt, ModellingFunctions functions)
+        protected void ComputeParametersData(int wpNumber, ModellingFunctions functions)
         {
             functions.SetAngles(ref parameters, wpNumber);
 
@@ -138,13 +140,13 @@ namespace ModellingTrajectoryLib
             parameters.gravAcceleration = new GravitationalAcceleration(parameters.point);
             parameters.omegaEarth = new OmegaEarth(parameters.point);
 
-            functions.SetVelocity(ref parameters, wpNumber, dt);
+            functions.SetVelocity(ref parameters, wpNumber);
 
             parameters.absOmega = new AbsoluteOmega(parameters);
             parameters.acceleration = new Acceleration(parameters);
             parameters.omegaGyro = new OmegaGyro(parameters);
 
-            parameters.point = Point.GetCoords(parameters, dt);
+            parameters.point = Point.GetCoords(parameters);
 
         }
         public void Kalman(IKalman kalman, InitErrors initErrors, ModellingFunctions functions, double dt)

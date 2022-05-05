@@ -23,6 +23,12 @@ namespace CommonLib
 
         public double angle;
     }
+    public struct InputAirData
+    {
+        public double relativeAltitude;
+        public double pressureError;
+        public double tempratureError;
+    }
     public struct MatlabOutData
     {
         public double baro_h;
@@ -63,6 +69,7 @@ namespace CommonLib
         public Angles angles;
         public AirData airData;
         public Matrix C;
+        public double dt;
     }
     public struct Angles
     {

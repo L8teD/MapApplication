@@ -23,7 +23,7 @@ namespace ModellingTrajectoryLib
             try
             {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
-                using (StreamReader sr = new StreamReader(@"B:\Ucheba\Диплом\Soft_from_work\ModellingTrajectoryLib\AnotherFiles\atmosphere.csv"))
+                using (StreamReader sr = new StreamReader(@"..\..\..\..\ModellingTrajectoryLib\AnotherFiles\atmosphere.csv"))
                 {
                     string[] array;
                     sr.ReadLine();// skip header
@@ -69,5 +69,5 @@ namespace ModellingTrajectoryLib
             return atmosphereList;
         }
     }
-    
+
 }

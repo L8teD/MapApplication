@@ -20,8 +20,9 @@ namespace MapApplication.Model.Helper
             InputData input;
             InitErrors initErrors = new InitErrors();
             InputWindData inputWindData = new InputWindData();
-            SetInputs(initData,ref input, ref initErrors, ref inputWindData);
-            trajectoryModelling.Init(input, initErrors, inputWindData);
+            InputAirData inputAirData = new InputAirData();
+            SetInputs(initData, ref input, ref initErrors, ref inputWindData, ref inputAirData);
+            trajectoryModelling.Init(input, initErrors, inputWindData, inputAirData);
         }
         private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
         {
@@ -32,7 +33,7 @@ namespace MapApplication.Model.Helper
             Init(initData);
             GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
         }
-        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors, ref InputWindData windData)
+        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors, ref InputWindData windData, ref InputAirData inputAirData)
         {
             inputData = new InputData();
             inputData.latitude = new double[initData.wayPointList.Count];
@@ -46,14 +47,25 @@ namespace MapApplication.Model.Helper
                 inputData.altitude[i] = initData.wayPointList[i].Altitude;
                 inputData.velocity[i] = initData.wayPointList[i].Velocity;
             }
+            inputAirData = SetAirData(initData);
             initErrors = SetInitErrors(initData);
             windData = SetWindData(initData);
+        }
+        private static InputAirData SetAirData(InitData initData)
+        {
+            InputAirData airData = new InputAirData();
+
+            airData.relativeAltitude = initData.airInfo[0].Value;
+            airData.pressureError = initData.windInfo[4].Value;
+            airData.tempratureError = initData.windInfo[5].Value;
+
+            return airData;
         }
         private static InputWindData SetWindData(InitData initData)
         {
             InputWindData windData = new InputWindData();
 
-            windData.angle = initData.windInfo[0].Value;
+            windData.angle = Converter.DegToRad(initData.windInfo[0].Value);
             windData.wind_e = initData.windInfo[1].Value;
             windData.wind_n = initData.windInfo[2].Value;
             windData.wind_d = initData.windInfo[3].Value;
@@ -92,7 +104,7 @@ namespace MapApplication.Model.Helper
             initErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value);
 
             initErrors.accNoise = initData.sensorErrors[6].Value;
-            initErrors.gyroNoise = initData.sensorErrors[7].Value;
+            initErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value);
             initErrors.snsNoise = initData.sensorErrors[8].Value;
 
             initErrors.dt = initData.sensorErrors[9].Value;

@@ -24,10 +24,9 @@ namespace ModellingTrajectoryLib
         DesiredTrack desiredTrack;
         InitErrors initErrors;
         InputWindData inputWindData;
+        InputAirData inputAirData;
         double dt;
-
         ModellingFunctions functions;
-        List<Atmosphere> atmosphereData;
         public void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOut3, ref OutputData feedbackOut2)
         {
             Model();
@@ -44,7 +43,7 @@ namespace ModellingTrajectoryLib
             data.p_OutList = new List<P_out>();
             data.airData = new List<AirData>();
         }
-        public void Init(InputData input, InitErrors _initErrors, InputWindData _inputWindData)
+        public void Init(InputData input, InitErrors _initErrors, InputWindData _inputWindData, InputAirData _inputAirData)
         {
             dt = _initErrors.dt;
             desiredTrack = new DesiredTrack();
@@ -67,10 +66,11 @@ namespace ModellingTrajectoryLib
 
             functions.InitStartedData(input.latitude, input.longitude, input.altitude, input.velocity);
             functions.InitParamsBetweenPPM();
+
             initErrors = _initErrors;
             inputWindData = _inputWindData;
+            inputAirData = _inputAirData;
             desiredTrack.FillOutputsData += AddParametersData;
-            atmosphereData = Atmosphere.Read();
         }
         public void Model()
         {
@@ -81,15 +81,15 @@ namespace ModellingTrajectoryLib
                 double PPM_DisctancePrev;
                 while (LUR_Distance < PPM_Distance)
                 {
-                    desiredTrack.Track(wpNumber, dt, functions, inputWindData);
+                    desiredTrack.Track(wpNumber, dt, functions, inputWindData, inputAirData);
                     Kalman(dt);
 
                     PPM_DisctancePrev = PPM_Distance;
                     double ortDistAngleCurrent = functions.ComputeOrtDistAngle(desiredTrack.OutPoints.Ideal.Radians, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
 
-                    functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.Radians, 
-                        new Velocity(desiredTrack.OutVelocities.Ideal.E, desiredTrack.OutVelocities.Ideal.N, desiredTrack.OutVelocities.Ideal.H).value);
+                    functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.Radians,
+                        new Velocity(desiredTrack.OutVelocities.Ideal.E, desiredTrack.OutVelocities.Ideal.N, desiredTrack.OutVelocities.Ideal.H).module);
 
                     LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
                     if (PPM_DisctancePrev < PPM_Distance)
@@ -103,23 +103,21 @@ namespace ModellingTrajectoryLib
                     for (double j = 0; functions.TurnIsNotEnded(j); j += dt)
                     {
                         functions.SetTurnAngles(wpNumber, dt, desiredTrack.OutPoints.Ideal.Radians.alt);
-                        desiredTrack.Track(wpNumber, dt, functions, inputWindData);
+                        desiredTrack.Track(wpNumber, dt, functions, inputWindData, inputAirData);
                         Kalman(dt);
                     }
                 }
-                
-                //outputData2.airData.Add(idealTrajectory.OutPoints);
             }
         }
         private void Kalman(double dt)
         {
             desiredTrack.Kalman(kalmanModel2, initErrors, functions, dt);
-            //desiredTrack.Kalman(kalmanModel3, initErrors, functions, dt);
+            desiredTrack.Kalman(kalmanModel3, initErrors, functions, dt);
             //desiredTrack.Kalman(kalmanFeedbackModel3, initErrors, functions, dt);
         }
         public void AddParametersData(IKalman kalman)
         {
-            if (counterAddPlotData % (1.0/dt) == 0)
+            if (counterAddPlotData % (1.0 / dt) == 0)
             {
                 if (kalman is KalmanFeedbackModel)
                     FillOutputData(feedbackOutput3);
@@ -139,10 +137,12 @@ namespace ModellingTrajectoryLib
             output.velocities.Add(desiredTrack.OutVelocities);
             output.angles.Add(desiredTrack.OutAngles);
             output.airData.Add(desiredTrack.OutAirData);
-            if (output.p_OutList.Count < 400)
-            {
-                output.p_OutList.Add(desiredTrack.OutCovar);
-            }
+            output.p_OutList.Add(desiredTrack.OutCovar);
+
+            //if (output.p_OutList.Count < 400)
+            //{
+            //    output.p_OutList.Add(desiredTrack.OutCovar);
+            //}
         }
     }
 }

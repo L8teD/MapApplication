@@ -374,6 +374,9 @@ namespace MapApplication.Model
             initData.windInfo.Add(new EquipmentData() { Name = "wind_N", Value = 2, Dimension = "[m/s]" });
             initData.windInfo.Add(new EquipmentData() { Name = "wind_H", Value = 1, Dimension = "[m/s]" });
 
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 0, Dimension = "[P]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0, Dimension = "[K]" });
+
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_u", Value = 1.1, Dimension = "[m/s]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_v", Value = 1.1, Dimension = "[m/s]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_w", Value = 0.7, Dimension = "[m/s]" });
