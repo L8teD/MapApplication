@@ -119,6 +119,7 @@ namespace EstimateLib
             F[3, 4] = 2 * absOmega.H;
 
             F[3, 6] = acceleration.H;
+            F[3, 7] = -acceleration.N;
 
             F[3, 14] = C[1, 1];
             F[3, 15] = C[1, 2];
@@ -128,8 +129,8 @@ namespace EstimateLib
             F[3, 19] = C[1, 3] * acceleration.Z;
 
             F[4, 1] = -(omegaGyro.Z_dot - absOmega.E * absOmega.N);
-            F[4, 2] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(omegaGyro.E, 2) + Math.Pow(omegaGyro.H, 2);
-            F[4, 3] = -2 * omegaGyro.H;
+            F[4, 2] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(absOmega.E, 2) + Math.Pow(absOmega.H, 2);
+            F[4, 3] = -2 * absOmega.H;
 
             F[4, 5] = -acceleration.H;
             F[4, 7] = acceleration.E;

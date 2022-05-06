@@ -68,7 +68,7 @@ namespace EstimateLib
 
 
             X[4] = velocityAccuracy.east + (velocity.H / earthModel.R2 + absOmega.E * Math.Tan(point.lat)) * X[1] + absOmega.H * X[3];
-            X[5] = velocityAccuracy.north + velocity.H / earthModel.R1 * X[1];
+            X[5] = velocityAccuracy.north + velocity.H / earthModel.R1 * X[1] - absOmega.E * X[3];
             X[6] = velocityAccuracy.H;
 
             Matrix M = Create.MatrixM(angles.heading, angles.pitch);
@@ -110,12 +110,12 @@ namespace EstimateLib
         {
             F = Matrix.Zero(21);
 
-            F[1, 3] = 1;
-            F[2, 4] = 1;
-            F[3, 5] = 1;
+            F[1, 4] = 1;
+            F[2, 5] = 1;
+            F[3, 6] = 1;
 
             F[4, 1] = -Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(absOmega.N, 2) + Math.Pow(absOmega.H, 2);
-            F[4, 2] = -omegaGyro.Z_dot - absOmega.E * absOmega.N;
+            F[4, 2] = omegaGyro.Z_dot - absOmega.E * absOmega.N;
             F[4, 3] = -(omegaGyro.Y_dot + absOmega.E * absOmega.H);
             F[4, 5] = 2 * absOmega.H;
             F[4, 6] = -2 * absOmega.N;
@@ -150,7 +150,7 @@ namespace EstimateLib
             F[6, 2] = -(omegaGyro.X_dot + absOmega.N * absOmega.H);
             F[6, 3] = 2 * Math.Pow(earthModel.shulerFrequency, 2) + Math.Pow(absOmega.E, 2) + Math.Pow(absOmega.N, 2);
             F[6, 4] = 2 * absOmega.N;
-            F[6, 5] = 2 * absOmega.E;
+            F[6, 5] = -2 * absOmega.E;
 
             F[6, 7] = acceleration.N;
             F[6, 8] = acceleration.E;
@@ -162,8 +162,8 @@ namespace EstimateLib
             F[6, 19] = C[3, 2] * acceleration.Y;
             F[6, 20] = C[3, 3] * acceleration.Z;
 
-            F[7, 7] = absOmega.H;
-            F[7, 8] = -absOmega.N;
+            F[7, 8] = absOmega.H;
+            F[7, 9] = -absOmega.N;
 
             F[7, 10] = C[1, 1];
             F[7, 11] = C[1, 2];
@@ -258,12 +258,12 @@ namespace EstimateLib
         private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
         {
             Z = Vector.Zero(6);
-
+            Point _point = Converter.RadiansToMeters(point, earth);
             double[] _estimatedParams = new double[]
             {
-                 point.lon,
-                 point.lat,
-                 point.alt,
+                 _point.lon,
+                 _point.lat,
+                 _point.alt,
                  velocity.E,
                  velocity.N,
                  velocity.H,
@@ -282,9 +282,9 @@ namespace EstimateLib
             Vector snsErrors = new Vector(_snsErrors);
             double[] _Z_sns = new double[]
             {
-                point.lon + snsErrors[1] / (earth.R2 * Math.Cos(point.lat)) * noise_sns * Import.GetRandom(),
-                point.lat + snsErrors[2] / (earth.R1) * noise_sns * Import.GetRandom(),
-                point.alt + snsErrors[3] * noise_sns * Import.GetRandom(),
+                _point.lon + snsErrors[1] * noise_sns * Import.GetRandom(),
+                _point.lat + snsErrors[2] * noise_sns * Import.GetRandom(),
+                _point.alt + snsErrors[3] * noise_sns * Import.GetRandom(),
                 velocity.E + snsErrors[4] * noise_sns * Import.GetRandom(),
                 velocity.N + snsErrors[5] * noise_sns * Import.GetRandom(),
                 velocity.H + snsErrors[6] * noise_sns * Import.GetRandom()

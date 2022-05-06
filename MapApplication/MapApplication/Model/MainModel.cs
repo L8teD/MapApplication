@@ -359,7 +359,7 @@ namespace MapApplication.Model
             initData.sensorErrors.Add(new EquipmentData() { Name = "acc noise", Value = 0.001, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "gyro noise", Value = 0.001, Dimension = "" });
 
-            initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 10, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 1, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
             #endregion
 

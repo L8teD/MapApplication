@@ -39,8 +39,8 @@ namespace CommonLib
         public static Matrix MatrixM(double heading, double pitch)
         {
             Matrix M = Matrix.Zero(3);
-            double headingReverse = MathTransformation.ReverseAngle(heading);
-
+            //double headingReverse = MathTransformation.ReverseAngle(heading);
+            double headingReverse = heading;
             M[1,1] = Math.Sin(headingReverse) * Math.Tan(pitch);
             M[1,2] = Math.Cos(headingReverse) * Math.Tan(pitch);
             M[1,3] = -1;
