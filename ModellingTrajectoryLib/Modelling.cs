@@ -12,31 +12,28 @@ namespace ModellingTrajectoryLib
 {
     public class Modelling
     {
-        public OutputData outputData3 = new OutputData();
-        public OutputData outputData2 = new OutputData();
-        public OutputData feedbackOutput3 = new OutputData();
-        public OutputData feedbackOutput2 = new OutputData();
-        private KalmanFeedbackModel kalmanFeedbackModel3;
-        private KalmanModel kalmanModel3;
-        private KalmanModel2 kalmanModel2;
+        public T_OutputFull Output = new T_OutputFull();
+        private IKalman ActualFeedbackKalman;
+        private IKalman ActualKalman;
+        private IKalman DesiredFeedbackKalman;
+        private IKalman DesiredKalman;
 
         int wayPointsCount;
-        DesiredTrack desiredTrack;
+        BaseTrajectory desiredTrack;
+        BaseTrajectory actualTrack;
         InitErrors initErrors;
         InputWindData inputWindData;
         InputAirData inputAirData;
         double dt;
         ModellingFunctions functions;
-        public void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOut3, ref OutputData feedbackOut2)
+        public void GetOutputs(ref T_OutputFull output)
         {
             Model();
-            threeChannelOutput = outputData3;
-            twoChannelOutput = outputData2;
-            feedbackOut3 = feedbackOutput3;
-            feedbackOut2 = feedbackOutput2;
+            output = Output;
         }
         private void CreateOutputDataLists(ref OutputData data)
         {
+            data = new OutputData();
             data.points = new List<PointSet>();
             data.velocities = new List<VelocitySet>();
             data.angles = new List<AnglesSet>();
@@ -47,22 +44,28 @@ namespace ModellingTrajectoryLib
         {
             dt = _initErrors.dt;
             desiredTrack = new DesiredTrack();
+            actualTrack = new ActualTrack();
             input.latitude = Converter.DegToRad(input.latitude);
             input.longitude = Converter.DegToRad(input.longitude);
 
             wayPointsCount = input.latitude.Length;
 
-            CreateOutputDataLists(ref outputData3);
-            CreateOutputDataLists(ref outputData2);
-            CreateOutputDataLists(ref feedbackOutput3);
-            CreateOutputDataLists(ref feedbackOutput2);
+            CreateOutputDataLists(ref Output.DesiredTrack.Feedback);
+            CreateOutputDataLists(ref Output.DesiredTrack.Default);
+            CreateOutputDataLists(ref Output.ActualTrack.Feedback);
+            CreateOutputDataLists(ref Output.ActualTrack.Default);
 
 
             functions = new ModellingFunctions();
-            kalmanModel2 = new KalmanModel2();
-            kalmanFeedbackModel3 = new KalmanFeedbackModel();
-            kalmanModel3 = new KalmanModel();
-            desiredTrack.Init(input);
+
+            DesiredFeedbackKalman = new KalmanFeedbackModel();
+            DesiredKalman = new KalmanModel();
+
+            ActualFeedbackKalman = new KalmanFeedbackModel();
+            ActualKalman = new KalmanModel();
+
+            desiredTrack.Init(input, inputAirData, inputWindData);
+            actualTrack.Init(input, inputAirData, inputWindData);
 
             functions.InitStartedData(input.latitude, input.longitude, input.altitude, input.velocity);
             functions.InitParamsBetweenPPM();
@@ -70,7 +73,8 @@ namespace ModellingTrajectoryLib
             initErrors = _initErrors;
             inputWindData = _inputWindData;
             inputAirData = _inputAirData;
-            desiredTrack.FillOutputsData += AddParametersData;
+            desiredTrack.FillOutputsData += FillDesiredTrackOutput;
+            actualTrack.FillOutputsData += FillActualTrackOutput;
         }
         public void Model()
         {
@@ -81,7 +85,8 @@ namespace ModellingTrajectoryLib
                 double PPM_DisctancePrev;
                 while (LUR_Distance < PPM_Distance)
                 {
-                    desiredTrack.Track(wpNumber, dt, functions, inputWindData, inputAirData);
+                    desiredTrack.Track(wpNumber, dt, functions);
+                    actualTrack.Track(wpNumber, dt, functions);
                     Kalman(dt);
 
                     PPM_DisctancePrev = PPM_Distance;
@@ -103,7 +108,8 @@ namespace ModellingTrajectoryLib
                     for (double j = 0; functions.TurnIsNotEnded(j); j += dt)
                     {
                         functions.SetTurnAngles(wpNumber, dt, desiredTrack.OutPoints.Ideal.Radians.alt);
-                        desiredTrack.Track(wpNumber, dt, functions, inputWindData, inputAirData);
+                        desiredTrack.Track(wpNumber, dt, functions);
+                        actualTrack.Track(wpNumber, dt, functions);
                         Kalman(dt);
                     }
                 }
@@ -111,38 +117,47 @@ namespace ModellingTrajectoryLib
         }
         private void Kalman(double dt)
         {
-            desiredTrack.Kalman(kalmanModel2, initErrors, functions, dt);
-            desiredTrack.Kalman(kalmanModel3, initErrors, functions, dt);
-            desiredTrack.Kalman(kalmanFeedbackModel3, initErrors, functions, dt);
+            desiredTrack.Estimation(DesiredKalman, initErrors, functions, dt);
+            desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, functions, dt);
+
+            actualTrack.Estimation(ActualKalman, initErrors, functions, dt);
+            actualTrack.Estimation(ActualFeedbackKalman, initErrors, functions, dt);
         }
-        public void AddParametersData(IKalman kalman)
+        private int counterAddPlotDataDes = 0;
+        private int counterAddPlotDataAct = 0;
+        public void FillDesiredTrackOutput(IKalman kalman)
         {
-            if (counterAddPlotData % (1.0 / dt) == 0)
+            if (counterAddPlotDataDes % (1.0 / dt) == 0)
             {
                 if (kalman is KalmanFeedbackModel)
-                    FillOutputData(feedbackOutput3);
-                else if (kalman is KalmanModel2)
-                    FillOutputData(outputData2);
+                    FillOutputData(Output.DesiredTrack.Feedback, desiredTrack);
                 else if (kalman is KalmanModel)
-                    FillOutputData(outputData3);
+                    FillOutputData(Output.DesiredTrack.Default, desiredTrack);
             }
-            if (kalman is KalmanModel2)
-                counterAddPlotData++;
+            if (kalman is KalmanModel)
+                counterAddPlotDataDes++;
 
         }
-        private int counterAddPlotData = 0;
-        private void FillOutputData(OutputData output)
+        public void FillActualTrackOutput(IKalman kalman)
         {
-            output.points.Add(desiredTrack.OutPoints);
-            output.velocities.Add(desiredTrack.OutVelocities);
-            output.angles.Add(desiredTrack.OutAngles);
-            output.airData.Add(desiredTrack.OutAirData);
-            output.p_OutList.Add(desiredTrack.OutCovar);
+            if (counterAddPlotDataAct % (1.0 / dt) == 0)
+            {
+                if (kalman is KalmanFeedbackModel)
+                    FillOutputData(Output.ActualTrack.Feedback, actualTrack);
+                else if (kalman is KalmanModel)
+                    FillOutputData(Output.ActualTrack.Default, actualTrack);
+            }
+            if (kalman is KalmanModel)
+                counterAddPlotDataAct++;
+        }
 
-            //if (output.p_OutList.Count < 400)
-            //{
-            //    output.p_OutList.Add(desiredTrack.OutCovar);
-            //}
+        private void FillOutputData(OutputData output, ITrajectory trajectory)
+        {
+            output.points.Add(trajectory.OutPoints);
+            output.velocities.Add(trajectory.OutVelocities);
+            output.angles.Add(trajectory.OutAngles);
+            output.airData.Add(trajectory.OutAirData);
+            output.p_OutList.Add(trajectory.OutCovar);
         }
     }
 }

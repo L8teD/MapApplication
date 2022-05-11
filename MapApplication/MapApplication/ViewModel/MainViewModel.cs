@@ -287,6 +287,7 @@ namespace MapApplication.ViewModel
             initData = new InitData();
             PlotTable = new PlotTableVM(m_Model);
             initData.wayPointList = new ObservableCollection<WayPoint>();
+            m_Model.SetTemplateRoute(initData.wayPointList);
 
 
             SetMapView(Map);
@@ -304,7 +305,7 @@ namespace MapApplication.ViewModel
             ErrorDataTable = new DataTableVM(PlotCharacter.Error);
             EstimateDataTable = new DataTableVM(PlotCharacter.Estimate);
 
-            MapElementWorker.AddAirportsOnMAp();
+            MapElementWorker.AddAirportsOnMap();
             airportsLayer = new MapElementsLayer() { MapElements = MapElementWorker.airportsMapElements };
             airportsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
             airportsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;

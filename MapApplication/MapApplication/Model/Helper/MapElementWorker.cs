@@ -14,7 +14,7 @@ namespace MapApplication.Model
         public static List<Airport> airportsData;
         public static List<MapElement> airportsMapElements;
 
-        public static void AddAirportsOnMAp()
+        public static void AddAirportsOnMap()
         {
             airportsData = Airport.GetAirportsData();
             airportsMapElements = new List<MapElement>();

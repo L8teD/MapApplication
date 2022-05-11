@@ -24,14 +24,14 @@ namespace MapApplication.Model.Helper
             SetInputs(initData, ref input, ref initErrors, ref inputWindData, ref inputAirData);
             trajectoryModelling.Init(input, initErrors, inputWindData, inputAirData);
         }
-        private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
-        {
-            trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
-        }
-        public static void CreateTrajectory(InitData initData, ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
+        //private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
+        //{
+        //    trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
+        //}
+        public static void CreateTrajectory(InitData initData, ref T_OutputFull Output)
         {
             Init(initData);
-            GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
+            trajectoryModelling.GetOutputs(ref Output);
         }
         private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors, ref InputWindData windData, ref InputAirData inputAirData)
         {

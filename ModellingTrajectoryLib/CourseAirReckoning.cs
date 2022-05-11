@@ -11,21 +11,21 @@ namespace ModellingTrajectoryLib
 {
     public class CourseAirReckoning
     {
-        static double adiabaticKoef = 1.4; //k
-        static double gaseConst = 29.27125; //R
+        double adiabaticKoef = 1.4; //k
+        double gaseConst = 29.27125; //R
 
 
-        static double prevBaroAlt;
-        static Point airPoint;
-        static List<Atmosphere> atmosphereData;
+        double prevBaroAlt;
+        Point airPoint;
+        List<Atmosphere> atmosphereData;
 
-        public static void Init(Point _point)
+        public void Init(Point _point)
         {
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
             prevBaroAlt = default(double);
         }
-        private static Vector GetDrydenComponent(Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
+        private Vector GetDrydenComponent(Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
         {
             DrydenOutput _randWind = Import.DrydenModel(windData, modellingAirspeed.module);
 
@@ -33,7 +33,7 @@ namespace ModellingTrajectoryLib
 
             return randWind;
         }
-        public static void Model(ref Parameters parameters, InputWindData windData, InputAirData airData)
+        public void Model(ref Parameters parameters, InputWindData windData, InputAirData airData)
         {
             Point _point = parameters.point;
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
@@ -88,7 +88,7 @@ namespace ModellingTrajectoryLib
 
             prevBaroAlt = baroAltitude;
         }
-        private static double GetDynamicPressure(Atmosphere atm, Velocity vel, double dP)
+        private double GetDynamicPressure(Atmosphere atm, Velocity vel, double dP)
         {
             double Ps_meters = Converter.PascalToKgM(atm.pressure.pascal) + dP;
             double massDensity = atm.density / atm.gravitationalAcceleration;
@@ -99,20 +99,20 @@ namespace ModellingTrajectoryLib
 
             return Converter.KgMToPascal(Pd_meters);
         }
-        private static double GetM(double Pd, Atmosphere atm)
+        private double GetM(double Pd, Atmosphere atm)
         {
             double Ps = atm.pressure.pascal;
 
             return Math.Sqrt(2.0 / (adiabaticKoef - 1.0) * (Math.Pow(Pd / Ps + 1, (adiabaticKoef - 1.0) / adiabaticKoef) - 1.0));
         }
-        private static double GetAirSpeed(Atmosphere atm, double M)
+        private double GetAirSpeed(Atmosphere atm, double M)
         {
             double ksi = 1.0;
             double c = Math.Sqrt(adiabaticKoef * atm.gravitationalAcceleration * gaseConst);
             double machFunction = c * M / Math.Sqrt(1 + 0.2 * ksi * Math.Pow(M, 2));
             return machFunction * Math.Sqrt(atm.temperature.kelvin);
         }
-        private static double GetBaroAltitude(double m_Altitude, Atmosphere atm, double M, InputAirData airData)
+        private double GetBaroAltitude(double m_Altitude, Atmosphere atm, double M, InputAirData airData)
         {
             double middleTemp;
             double ksi = 1.0;
@@ -125,7 +125,7 @@ namespace ModellingTrajectoryLib
             return baroAlt + airData.relativeAltitude;
 
         }
-        private static bool CompareAltitude(double alt1, double alt2)
+        private bool CompareAltitude(double alt1, double alt2)
         {
             /*altitude-step in csv-file = 50m*/
             return (Math.Abs(alt1 - alt2) < 25.0);

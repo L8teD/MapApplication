@@ -93,6 +93,16 @@ namespace CommonLib
         public Angles angles;
         public double windAngle;
     }
+    public struct T_OutputFull
+    {
+        public T_Output DesiredTrack;
+        public T_Output ActualTrack;
+    }
+    public struct T_Output
+    {
+        public OutputData Feedback;
+        public OutputData Default;
+    }
     public struct OutputData
     {
         public List<PointSet> points;

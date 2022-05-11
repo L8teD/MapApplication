@@ -24,10 +24,7 @@ namespace MapApplication.Model
 {
     public class MainModel
     {
-        OutputData threeChannelOutput;
-        OutputData twoChannelOutput;
-        OutputData feedbackOutput2;
-        OutputData feedbackOutput3;
+        T_OutputFull OutputData;
         OutputData indicatedData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
@@ -61,24 +58,22 @@ namespace MapApplication.Model
             timerTrajectory.Elapsed += TimerTrajectory_Elapsed;
         }
 
-
-
         public void SwitchIndicatedData(DataSource source)
         {
             if (indicatedData.points == null) return;
             switch (source)
             {
                 case DataSource.threeChannel:
-                    indicatedData = DublicateOutputData(threeChannelOutput);
+                    indicatedData = DublicateOutputData(OutputData.ActualTrack.Default);
                     break;
                 case DataSource.twoChannel:
-                    indicatedData = DublicateOutputData(twoChannelOutput);
+                    indicatedData = DublicateOutputData(OutputData.DesiredTrack.Default);
                     break;
                 case DataSource.threeChannelFeedback:
-                    indicatedData = DublicateOutputData(feedbackOutput3);
+                    indicatedData = DublicateOutputData(OutputData.ActualTrack.Feedback);
                     break;
                 case DataSource.twoChannelFeedback:
-                    indicatedData = DublicateOutputData(feedbackOutput2);
+                    indicatedData = DublicateOutputData(OutputData.DesiredTrack.Feedback);
                     break;
             }
         }
@@ -166,12 +161,11 @@ namespace MapApplication.Model
         public void Compute(InitData initData)
         {
             RefreshDrawingTrajectoryParams();
-            threeChannelOutput = new OutputData();
-            twoChannelOutput = new OutputData();
+            OutputData = new T_OutputFull();
             try
             {
-                Execute.CreateTrajectory(initData, ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
-                indicatedData = DublicateOutputData(twoChannelOutput);
+                Execute.CreateTrajectory(initData, ref OutputData);
+                indicatedData = DublicateOutputData(OutputData.DesiredTrack.Default);
                 CreatePlotData();
                 RefreshPlots();
             }
@@ -217,11 +211,11 @@ namespace MapApplication.Model
         }
         private void CreatePlotData()
         {
-            indicatedListOfPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
-            twoChannelPlotData = PlotWorker.CreatePlotData(twoChannelOutput);
-            threeChannelPlotData = PlotWorker.CreatePlotData(threeChannelOutput);
-            feedbackPlotData2 = PlotWorker.CreatePlotData(feedbackOutput2);
-            feedbackPlotData3 = PlotWorker.CreatePlotData(feedbackOutput3);
+            indicatedListOfPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
+            twoChannelPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
+            threeChannelPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Default);
+            feedbackPlotData2 = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Feedback);
+            feedbackPlotData3 = PlotWorker.CreatePlotData(OutputData.ActualTrack.Feedback);
         }
         public void SwitchPlotData(DataSource source)
         {
@@ -277,6 +271,50 @@ namespace MapApplication.Model
             }
             
             return copy;
+        }
+
+        public void SetTemplateRoute(ObservableCollection<WayPoint> wayPointList)
+        {
+            WayPoint wayPoint = new WayPoint();
+            #region wp#1
+            wayPoint.Latitude = 55;
+            wayPoint.Longitude = 37;
+            wayPoint.Altitude = 600;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #region wp#2
+            wayPoint.Latitude = 55;
+            wayPoint.Longitude = 37.2;
+            wayPoint.Altitude = 600;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #region wp#3
+            wayPoint.Latitude = 55.2;
+            wayPoint.Longitude = 37.2;
+            wayPoint.Altitude = 600;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #region wp#4
+            wayPoint.Latitude = 55.2;
+            wayPoint.Longitude = 37;
+            wayPoint.Altitude = 600;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #region wp#5
+            wayPoint.Latitude = 55;
+            wayPoint.Longitude = 37;
+            wayPoint.Altitude = 600;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
         }
         public void SetDataFromLogger(LogInfo info, ObservableCollection<WayPoint> wayPointList)
         {
