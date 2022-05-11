@@ -29,7 +29,7 @@ namespace ModellingTrajectoryLib
         {
             DrydenOutput _randWind = Import.DrydenModel(windData, modellingAirspeed.module);
 
-            Vector randWind = C * new Vector(_randWind.windRand1, _randWind.windRand2, _randWind.windRand3);
+            Vector randWind = !C * new Vector(_randWind.windRand1, _randWind.windRand2, _randWind.windRand3);
 
             return randWind;
         }

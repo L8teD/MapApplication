@@ -113,7 +113,7 @@ namespace ModellingTrajectoryLib
         {
             desiredTrack.Kalman(kalmanModel2, initErrors, functions, dt);
             desiredTrack.Kalman(kalmanModel3, initErrors, functions, dt);
-            //desiredTrack.Kalman(kalmanFeedbackModel3, initErrors, functions, dt);
+            desiredTrack.Kalman(kalmanFeedbackModel3, initErrors, functions, dt);
         }
         public void AddParametersData(IKalman kalman)
         {
