@@ -275,7 +275,7 @@ namespace MapApplication.Model
             if (plotDataList == null) return null;
             return plotDataList.Find(item => item.name == name && item.character == character);
         }
-        public static LineSeries CreateLineSeries(PlotData data)
+        public static LineSeries CreateLineSeries(PlotData data, string title)
         {
             if (data == null) return null;
 
@@ -289,7 +289,7 @@ namespace MapApplication.Model
                 LineStyle = LineStyle.Solid,
                 MarkerType = MarkerType.None,
                 Color = SelectPlotColor(data.character),
-                Title = SelectPlotCharacter(data.character)
+                Title = title
             };
             foreach (DataPoint point in data.values)
             {
@@ -333,6 +333,40 @@ namespace MapApplication.Model
                     return "";
             }
         }
+        public static PlotName SelectPlotName(string name)
+        {
+            switch (name)
+            {
+                case "Latitude":
+                    return PlotName.Latitude;
+
+                case "Longitude":
+                    return PlotName.Longitude;
+
+                case "Altitude":
+                    return PlotName.Altitude;
+
+                case "East Velocity":
+                    return PlotName.VelocityEast;
+
+                case "North Velocity":
+                    return PlotName.VelocityNorth;
+
+                case "Vertical Velocity":
+                    return PlotName.VelocityH;
+
+                case "Heading":
+                    return PlotName.Heading;
+
+                case "Roll":
+                    return PlotName.Roll;
+                case "Pitch":
+                    return PlotName.Pitch;
+
+                default:
+                    return PlotName.None;
+            }
+        }
         public static string SelectPlotName(PlotName name)
         {
             switch (name)
@@ -355,6 +389,8 @@ namespace MapApplication.Model
                     return "Roll";
                 case PlotName.Pitch:
                     return "Pitch";
+                case PlotName.None:
+                    return "";
                 default:
                     return "";
             }

@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using Windows.Devices.Geolocation;
 using Windows.UI.Xaml.Controls.Maps;
 using CommonLib;
+using OxyPlot;
 
 namespace MapApplication.ViewModel
 {
@@ -30,6 +31,8 @@ namespace MapApplication.ViewModel
         public DataTableWithChangesVM IdealDataTable { get; set; }
         public DataTableVM ErrorDataTable { get; set; }
         public DataTableVM EstimateDataTable { get; set; }
+
+        public PlotPageVM plotPageVM{ get; set; }
 
         public WayPoint Waypoint
         {
@@ -77,13 +80,13 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
-        private RelayCommand cmd_SelectionChanged;
-        public RelayCommand Cmd_SelectionChanged
+        private RelayCommand cmd_LoggerSelectionChanged;
+        public RelayCommand Cmd_LoggerSelectionChanged
         {
             get
             {
-                return cmd_SelectionChanged ??
-                (cmd_SelectionChanged = new RelayCommand(obj =>
+                return cmd_LoggerSelectionChanged ??
+                (cmd_LoggerSelectionChanged = new RelayCommand(obj =>
                 {
 
                     m_Model.SetDataFromLogger((LogInfo)obj, initData.wayPointList);
@@ -279,6 +282,7 @@ namespace MapApplication.ViewModel
             }
         }
         #endregion
+
         public MainViewModel(Microsoft.Toolkit.Wpf.UI.Controls.MapControl map)
         {
             Map = map;
@@ -289,7 +293,8 @@ namespace MapApplication.ViewModel
             initData.wayPointList = new ObservableCollection<WayPoint>();
             m_Model.SetTemplateRoute(initData.wayPointList);
 
-
+            plotPageVM = new PlotPageVM(m_Model);
+           
             SetMapView(Map);
 
             Waypoint = m_Model.SetWayPoint();
@@ -297,6 +302,7 @@ namespace MapApplication.ViewModel
             m_Model.DrawTrajectoryAction += DrawLine;
 
             m_Model.UpdateTableData += M_Model_UpdateTableData;
+
 
             initData = m_Model.SetInputErrors(initData);
             loggerInfoList = m_Model.GetInfoFromLogger();

@@ -29,10 +29,10 @@ namespace MapApplication.Model
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
         public List<PlotData> indicatedListOfPlotData;
-        private List<PlotData> twoChannelPlotData;
-        private List<PlotData> threeChannelPlotData;
-        private List<PlotData> feedbackPlotData2;
-        private List<PlotData> feedbackPlotData3;
+        private List<PlotData> desiredPlotData;
+        private List<PlotData> actualPlotData;
+        private List<PlotData> desiredFeedbackPlotData;
+        private List<PlotData> actualFeedbackPlotData;
 
         private List<BasicGeoposition> trajectoryPoints;
 
@@ -45,6 +45,8 @@ namespace MapApplication.Model
         public event Action<string, string, List<LineSeries>> RefreshHeadingPlot;
         public event Action<string, string, List<LineSeries>> RefreshPitchPlot;
         public event Action<string, string, List<LineSeries>> RefreshRollPlot;
+
+        public event Action<List<PlotData>, List<PlotData>> SetPlotData;
 
         public event Action<OutputData, int> UpdateTableData;
 
@@ -193,18 +195,18 @@ namespace MapApplication.Model
             List<LineSeries> lineSeriesList = new List<LineSeries>();
             plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, indicatedListOfPlotData);
 
-            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
             plotData = PlotWorker.SelectData(name, PlotCharacter.Real, indicatedListOfPlotData);
-            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+            lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
             if (name != PlotName.Pitch && name != PlotName.Heading && name != PlotName.Roll)
             {
                 plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, indicatedListOfPlotData);
-                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
                 plotData = PlotWorker.SelectData(name, PlotCharacter.CourseAir, indicatedListOfPlotData);
-                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData));
+                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
             }
 
             action.Invoke(plotData.xAxisName, plotData.yAxisName, lineSeriesList);
@@ -212,10 +214,12 @@ namespace MapApplication.Model
         private void CreatePlotData()
         {
             indicatedListOfPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
-            twoChannelPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
-            threeChannelPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Default);
-            feedbackPlotData2 = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Feedback);
-            feedbackPlotData3 = PlotWorker.CreatePlotData(OutputData.ActualTrack.Feedback);
+            desiredPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
+            actualPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Default);
+            desiredFeedbackPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Feedback);
+            actualFeedbackPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Feedback);
+
+            SetPlotData.Invoke(desiredPlotData, actualPlotData);
         }
         public void SwitchPlotData(DataSource source)
         {
@@ -223,16 +227,16 @@ namespace MapApplication.Model
             switch (source)
             {
                 case DataSource.threeChannel:
-                    indicatedListOfPlotData = DublicatePlotData(threeChannelPlotData);
+                    indicatedListOfPlotData = DublicatePlotData(actualPlotData);
                     break;
                 case DataSource.twoChannel:
-                    indicatedListOfPlotData = DublicatePlotData(twoChannelPlotData);
+                    indicatedListOfPlotData = DublicatePlotData(desiredPlotData);
                     break;
                 case DataSource.threeChannelFeedback:
-                    indicatedListOfPlotData = DublicatePlotData(feedbackPlotData3);
+                    indicatedListOfPlotData = DublicatePlotData(actualFeedbackPlotData);
                     break;
                 case DataSource.twoChannelFeedback:
-                    indicatedListOfPlotData = DublicatePlotData(feedbackPlotData2);
+                    indicatedListOfPlotData = DublicatePlotData(desiredFeedbackPlotData);
                     break;
             }
             RefreshPlots();

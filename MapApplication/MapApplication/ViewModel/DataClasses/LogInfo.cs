@@ -15,7 +15,7 @@ namespace MapApplication.ViewModel
             set
             {
                 element = value;
-                OnPropertyChanged("ID");
+                OnPropertyChanged("Element");
             }
         }
     }

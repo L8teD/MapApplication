@@ -44,9 +44,9 @@ namespace MapApplication.ViewModel
         }
         public static readonly DependencyProperty IsCheckedProperty =
             DependencyProperty.Register("IsCheckedPropertyName", typeof(bool), typeof(LegendButtonVM), new PropertyMetadata(true));
-        private PlotControlVM m_PlotControlVM;
+        private IPlotControl m_PlotControlVM;
         private PlotVM m_plotVM;
-        public LegendButtonVM(PlotControlVM plotControlVM, PlotVM plotVM)
+        public LegendButtonVM(IPlotControl plotControlVM, PlotVM plotVM)
         {
             m_PlotControlVM = plotControlVM;
             m_plotVM = plotVM;

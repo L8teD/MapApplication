@@ -25,6 +25,7 @@ namespace MapApplication.View
         FlightData flightData;
         DebugMode debugMode;
         EquipmentPage equipment;
+        PlotPage plotPage;
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +34,7 @@ namespace MapApplication.View
             flightData = new FlightData();
             debugMode = new DebugMode();
             equipment = new EquipmentPage();
+            plotPage = new PlotPage();
 
             MainViewModel mainViewModel = new MainViewModel(flightPlan.Map);
 
@@ -40,6 +42,7 @@ namespace MapApplication.View
             flightData.DataContext = mainViewModel;
             debugMode.DataContext = mainViewModel;
             equipment.DataContext = mainViewModel;
+            plotPage.DataContext = mainViewModel.plotPageVM;
 
             Uri iconUri = new Uri("pack://application:,,,/AnotherFiles/Images/MAI_logo.ico", UriKind.RelativeOrAbsolute);
             this.Icon = BitmapFrame.Create(iconUri);
@@ -68,6 +71,11 @@ namespace MapApplication.View
         private void btn_EquipmentPage_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.NavigationService.Navigate(equipment);
+        }
+
+        private void btn_PlotPage_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.NavigationService.Navigate(plotPage);
         }
     }
 }

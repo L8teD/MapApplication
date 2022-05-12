@@ -125,7 +125,7 @@
                 </ListBox.ItemTemplate>
                 <ie:Interaction.Triggers>
                     <ie:EventTrigger EventName="SelectionChanged">
-                        <ie:InvokeCommandAction Command="{Binding Cmd_SelectionChanged}"  CommandParameter="{Binding ElementName=lb_LoggerInfo, Path=SelectedItem}"/>
+                        <ie:InvokeCommandAction Command="{Binding Cmd_LoggerSelectionChanged}"  CommandParameter="{Binding ElementName=lb_LoggerInfo, Path=SelectedItem}"/>
                     </ie:EventTrigger>
                 </ie:Interaction.Triggers>
             </ListBox>

@@ -17,7 +17,7 @@ namespace MapApplication.ViewModel
         public LegendButtonVM legendBtn4 { get; set; }
         public LegendButtonVM legendBtn5 { get; set; }
         public List<LegendButtonVM> legendBtns;
-        public LegendVM(PlotControlVM plotControlVM, PlotVM plotVM)
+        public LegendVM(IPlotControl plotControlVM, PlotVM plotVM)
         {
             legendBtn1 = new LegendButtonVM(plotControlVM, plotVM);
             legendBtn2 = new LegendButtonVM(plotControlVM, plotVM);

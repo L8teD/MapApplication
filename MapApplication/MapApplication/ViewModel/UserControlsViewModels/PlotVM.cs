@@ -27,7 +27,12 @@ namespace MapApplication.ViewModel
             MyPlotModel.Title = title;
 
         }
-        
+        public void ChangePlotTitle(string plotName)
+        {
+            MyPlotModel.Title = plotName;
+            MyPlotModel.InvalidatePlot(true);
+
+        }
         public void Home()
         {
             if (lastXAxesName != null && lastYAxesName != null)

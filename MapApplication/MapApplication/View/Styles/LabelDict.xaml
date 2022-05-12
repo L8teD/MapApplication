@@ -7,7 +7,13 @@
     </Style>
     <Style TargetType="{x:Type TextBlock}" x:Key="Tblock_Style" BasedOn="{StaticResource MainStyle}">
         
-
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" x:Key="newTblockStyle">
+        
+        <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="Control.HorizontalAlignment" Value="Center"></Setter>
+        <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+        <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
     </Style>
     <Style TargetType="{x:Type Label}" x:Key="Lb_Style" BasedOn="{StaticResource MainStyle}">
         

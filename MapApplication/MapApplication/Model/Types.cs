@@ -71,7 +71,8 @@ namespace MapApplication.Model
         VelocityH,
         Heading,
         Roll,
-        Pitch
+        Pitch,
+        None
     }
     public enum ActivePlotState
     {

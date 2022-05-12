@@ -97,6 +97,7 @@
     <Compile Include="Model\Helper\PlotWorker.cs" />
     <Compile Include="Model\Helper\Saver.cs" />
     <Compile Include="ViewModel\DataClasses\WindInfo.cs" />
+    <Compile Include="ViewModel\PlotPageVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataRowVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataRowWithChangesVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\DataTableVM.cs" />
@@ -113,6 +114,9 @@
     </Compile>
     <Compile Include="View\Pages\FlightPlan.xaml.cs">
       <DependentUpon>FlightPlan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Pages\PlotPage.xaml.cs">
+      <DependentUpon>PlotPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\PlotWindow.xaml.cs">
       <DependentUpon>PlotWindow.xaml</DependentUpon>
@@ -186,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Pages\FlightPlan.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Pages\PlotPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

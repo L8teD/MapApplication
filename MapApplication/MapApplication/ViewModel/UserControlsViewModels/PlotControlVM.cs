@@ -12,17 +12,31 @@ using System.Windows.Media;
 
 namespace MapApplication.ViewModel
 {
-    public class PlotControlVM : BaseViewModel
+    public interface IPlotControl
+    {
+        PlotVM plot { get; set; }
+        List<LineSeries> IndicatedSeries { get; set; }
+        List<LineSeries> RemovedSeries { get; set; }
+    }
+    public class BasePlotControl : IPlotControl
+    {
+        public PlotVM plot { get; set; }
+        public List<LineSeries> IndicatedSeries { get; set; }
+        public List<LineSeries> RemovedSeries { get; set; }
+    }
+    public class PlotControlVM : BaseViewModel, IPlotControl
     {
         private bool isWindow;
         public ActivePlotState CurrentPlotState { get; set; }
-        public PlotVM plotVM { get; set; }
+        public PlotVM plot { get; set; }
         public LegendVM legendControlVM { get; set; }
         private MainModel m_Model;
-        private RelayCommand cmd_Home;
         private PlotName currentTitle;
-        public List<LineSeries> IndicatedSeries;
-        public List<LineSeries> RemovedSeries;
+        public List<LineSeries> IndicatedSeries { get; set; }
+        public List<LineSeries> RemovedSeries { get; set; }
+
+        #region Commands
+        private RelayCommand cmd_Home;
         public RelayCommand Cmd_Home
         {
             get
@@ -30,7 +44,7 @@ namespace MapApplication.ViewModel
                 return cmd_Home ??
                 (cmd_Home = new RelayCommand(obj =>
                 {
-                    plotVM.Home();
+                    plot.Home();
 
                 }));
             }
@@ -89,14 +103,14 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
-
+        #endregion
 
         public PlotControlVM(PlotName plotName, MainModel model, bool fromWindow = false)
         {
             m_Model = model;
-            plotVM = new PlotVM(PlotWorker.SelectPlotName(plotName));
+            plot = new PlotVM(PlotWorker.SelectPlotName(plotName));
             currentTitle = plotName;
-            legendControlVM = new LegendVM(this, plotVM);
+            legendControlVM = new LegendVM(this, plot);
             IndicatedSeries = new List<LineSeries>();
             RemovedSeries = new List<LineSeries>();
 
@@ -127,7 +141,7 @@ namespace MapApplication.ViewModel
             foreach (PlotCharacter character in characters)
             {
                 plotData = PlotWorker.SelectData(currentTitle, character, m_Model.indicatedListOfPlotData);
-                IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData));
+                IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
                 if (plotData != null)
                 {
@@ -140,7 +154,7 @@ namespace MapApplication.ViewModel
         }
         public void Plot(string xAxisName, string yAxisName, List<LineSeries> seriesList)
         {
-            plotVM.Plot(xAxisName, yAxisName, seriesList);
+            plot.Plot(xAxisName, yAxisName, seriesList);
             IndicatedSeries = seriesList;
 
             legendControlVM.ClearLegendsVis();
@@ -153,14 +167,11 @@ namespace MapApplication.ViewModel
                     SolidColorBrush legendElColor = new SolidColorBrush(Color.FromArgb(series.Color.A, series.Color.R, series.Color.G, series.Color.B));
                     string legendElText = series.Title;
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i], legendElColor, legendElText);
-                    
-                    
+                  
                 }
                 else
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i]);
-            }
-            
-            
+            }           
         }
     }
 }

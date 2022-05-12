@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="0.6*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <local:Plot Grid.ColumnSpan="5" Grid.RowSpan="3">
-                <ContentControl Content="{Binding plotVM}"></ContentControl>
+                <ContentControl Content="{Binding plot}"></ContentControl>
             </local:Plot>
             <Border Grid.Column="0">
                 <Grid>
