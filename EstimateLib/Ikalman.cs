@@ -15,7 +15,7 @@ namespace EstimateLib
         Vector X { get; set; }
         Vector X_estimate { get; set; }
         Matrix P { get; set; }
-        void Model(InitErrors initErrors, Parameters parameters, Matrix C, double dt);
+        void Model(InitErrors initErrors,InputAirData inputAirData, Parameters parameters, Matrix C, double dt);
     }
     public abstract class BaseKalman : IKalman
     {
@@ -112,19 +112,19 @@ namespace EstimateLib
             X_error[11] = initErrors.gyroError.second;
             X_error[12] = initErrors.gyroError.third;
 
-            X_error[13] = 2E-5;
-            X_error[14] = 2E-5;
-            X_error[15] = 2E-5;
+            X_error[13] = initErrors.temperatureCoef;
+            X_error[14] = initErrors.temperatureCoef;
+            X_error[15] = initErrors.temperatureCoef;
 
             X_error[16] = initErrors.accelerationError.first;
             X_error[17] = initErrors.accelerationError.second;
             X_error[18] = initErrors.accelerationError.third;
 
-            X_error[19] = 9.81 * 3E-6;
-            X_error[20] = 9.81 * 3E-6;
-            X_error[21] = 9.81 * 3E-6;
+            X_error[19] = 9.81 * initErrors.temperatureCoef;
+            X_error[20] = 9.81 * initErrors.temperatureCoef;
+            X_error[21] = 9.81 * initErrors.temperatureCoef;
         }
-        private void InitF(OmegaGyro omegaGyro, AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C)
+        private void InitF(OmegaGyro omegaGyro, AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C, InputAirData airData)
         {
             F = Matrix.Zero(21);
 
@@ -141,9 +141,9 @@ namespace EstimateLib
             F[4, 8] = acceleration.H;
             F[4, 9] = -acceleration.N;
 
-            F[4, 16] = C[1, 1];
-            F[4, 17] = C[1, 2];
-            F[4, 18] = C[1, 3];
+            F[4, 16] = C[1, 1] * acceleration.X * (15 + airData.tempratureError);
+            F[4, 17] = C[1, 2] * acceleration.Y * (15 + airData.tempratureError);
+            F[4, 18] = C[1, 3] * acceleration.Z * (15 + airData.tempratureError);
             F[4, 19] = C[1, 1] * acceleration.X;
             F[4, 20] = C[1, 2] * acceleration.Y;
             F[4, 21] = C[1, 3] * acceleration.Z;
@@ -157,9 +157,9 @@ namespace EstimateLib
             F[5, 7] = -acceleration.H;
             F[5, 9] = acceleration.E;
 
-            F[5, 16] = C[2, 1];
-            F[5, 17] = C[2, 2];
-            F[5, 18] = C[2, 3];
+            F[5, 16] = C[2, 1] * acceleration.X * (15 + airData.tempratureError);
+            F[5, 17] = C[2, 2] * acceleration.Y * (15 + airData.tempratureError);
+            F[5, 18] = C[2, 3] * acceleration.Z * (15 + airData.tempratureError);
             F[5, 19] = C[2, 1] * acceleration.X;
             F[5, 20] = C[2, 2] * acceleration.Y;
             F[5, 21] = C[2, 3] * acceleration.Z;
@@ -173,9 +173,9 @@ namespace EstimateLib
             F[6, 7] = acceleration.N;
             F[6, 8] = acceleration.E;
 
-            F[6, 15] = C[3, 1];
-            F[6, 16] = C[3, 2];
-            F[6, 17] = C[3, 3];
+            F[6, 15] = C[3, 1] * acceleration.X * (15 + airData.tempratureError);
+            F[6, 16] = C[3, 2] * acceleration.Y * (15 + airData.tempratureError);
+            F[6, 17] = C[3, 3] * acceleration.Z * (15 + airData.tempratureError);
             F[6, 18] = C[3, 1] * acceleration.X;
             F[6, 19] = C[3, 2] * acceleration.Y;
             F[6, 20] = C[3, 3] * acceleration.Z;
@@ -183,9 +183,9 @@ namespace EstimateLib
             F[7, 8] = absOmega.H;
             F[7, 9] = -absOmega.N;
 
-            F[7, 10] = C[1, 1];
-            F[7, 11] = C[1, 2];
-            F[7, 12] = C[1, 3];
+            F[7, 10] = C[1, 1] * omegaGyro.X * (15 + airData.tempratureError);
+            F[7, 11] = C[1, 2] * omegaGyro.Y * (15 + airData.tempratureError);
+            F[7, 12] = C[1, 3] * omegaGyro.Z * (15 + airData.tempratureError);
             F[7, 13] = C[1, 1] * omegaGyro.X;
             F[7, 14] = C[1, 2] * omegaGyro.Y;
             F[7, 15] = C[1, 3] * omegaGyro.Z;
@@ -193,9 +193,9 @@ namespace EstimateLib
             F[8, 7] = -absOmega.H;
             F[8, 9] = absOmega.E;
 
-            F[8, 10] = C[2, 1];
-            F[8, 11] = C[2, 2];
-            F[8, 12] = C[2, 3];
+            F[8, 10] = C[2, 1] * omegaGyro.X * (15 + airData.tempratureError);
+            F[8, 11] = C[2, 2] * omegaGyro.Y * (15 + airData.tempratureError);
+            F[8, 12] = C[2, 3] * omegaGyro.Z * (15 + airData.tempratureError);
             F[8, 13] = C[2, 1] * omegaGyro.X;
             F[8, 14] = C[2, 2] * omegaGyro.Y;
             F[8, 15] = C[2, 3] * omegaGyro.Z;
@@ -203,9 +203,9 @@ namespace EstimateLib
             F[9, 7] = absOmega.N;
             F[9, 8] = -absOmega.E;
 
-            F[9, 10] = C[3, 1];
-            F[9, 11] = C[3, 2];
-            F[9, 12] = C[3, 3];
+            F[9, 10] = C[3, 1] * omegaGyro.X * (15 + airData.tempratureError);
+            F[9, 11] = C[3, 2] * omegaGyro.Y * (15 + airData.tempratureError);
+            F[9, 12] = C[3, 3] * omegaGyro.Z * (15 + airData.tempratureError);
             F[9, 13] = C[3, 1] * omegaGyro.X;
             F[9, 14] = C[3, 2] * omegaGyro.Y;
             F[9, 15] = C[3, 3] * omegaGyro.Z;
@@ -348,7 +348,7 @@ namespace EstimateLib
 
             X_previous = X_estimate.Dublicate();
         }
-        public void Model(InitErrors initErrors, Parameters parameters, Matrix C, double dt)
+        public void Model(InitErrors initErrors, InputAirData inputAirData, Parameters parameters, Matrix C, double dt)
         {
             if (X == null)
             {
@@ -362,7 +362,7 @@ namespace EstimateLib
             }
 
 
-            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C);
+            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C, inputAirData);
             InitG(C);
             InitW(initErrors);
 

@@ -150,11 +150,11 @@ namespace ModellingTrajectoryLib
 
         }
         
-        public void Estimation(IKalman kalman, InitErrors initErrors, ModellingFunctions functions, double dt)
+        public void Estimation(IKalman kalman, InitErrors initErrors,InputAirData airData, ModellingFunctions functions, double dt)
         {
             Matrix C = functions.CreateMatrixC(parameters);
             kalmanModel = kalman;
-            kalmanModel.Model(initErrors, parameters, C, dt);
+            kalmanModel.Model(initErrors, airData, parameters, C, dt);
             FillOutputsData?.Invoke(kalman);
         }
         protected void InitStartedPoint(ref Parameters parameters, InputData input)

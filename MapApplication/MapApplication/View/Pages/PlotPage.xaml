@@ -40,8 +40,29 @@
                         </ie:EventTrigger>
                     </ie:Interaction.Triggers>
                 </ComboBox>
+                <TextBlock Style="{StaticResource newTblockStyle}" Margin="0,12,0,0 ">Source</TextBlock>
+                <ComboBox x:Name="cb_SourceType" ItemsSource="{Binding ElementName=cb_ParamType,Path=SelectedItem.Value[0]}"
+                          Grid.Column="0" SelectedIndex="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5,10" Padding="20,10"
+                          FontFamily="Segoe UI Light" FontSize="14" MinWidth="155">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Margin" Value="1"></Setter>
+                            <Setter Property="BorderThickness" Value="0.5" />
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="Control.HorizontalAlignment" Value="Stretch"></Setter>
+                            <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+                            <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                    <ie:Interaction.Triggers>
+                        <ie:EventTrigger EventName="SelectionChanged">
+                            <ie:InvokeCommandAction Command="{Binding SourceSelectionChanged}"  CommandParameter="{Binding ElementName=cb_SourceType, Path=SelectedItem}"/>
+                        </ie:EventTrigger>
+                    </ie:Interaction.Triggers>
+                </ComboBox>
                 <TextBlock Style="{StaticResource newTblockStyle}" Margin="0,12,0,0 ">Chart type</TextBlock>
-                <ComboBox x:Name="cb_CharacterType" ItemsSource="{Binding ElementName=cb_ParamType,Path=SelectedItem.Value}"
+                <ComboBox x:Name="cb_CharacterType" ItemsSource="{Binding ElementName=cb_ParamType,Path=SelectedItem.Value[1]}"
                           Grid.Column="0" SelectedIndex="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5,10" Padding="20,10"
                           FontFamily="Segoe UI Light" FontSize="14" MinWidth="155">
                     <ComboBox.ItemContainerStyle>

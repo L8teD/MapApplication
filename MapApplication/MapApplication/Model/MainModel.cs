@@ -403,6 +403,7 @@ namespace MapApplication.Model
 
             initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 1, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Kt", Value = 1.2E-5, Dimension = "1/`C" });
             #endregion
 
             #region AirInfo

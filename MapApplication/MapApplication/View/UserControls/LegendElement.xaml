@@ -19,11 +19,11 @@
             </ToggleButton.CommandParameter>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"></ColumnDefinition>
-                    <ColumnDefinition Width="45"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="2.25*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Ellipse Grid.Column="0" Fill="{Binding ColorPropertyName}" Width="15" Height="10"></Ellipse>
-                <TextBlock x:Name="tblock" Grid.Column="1" Text="{Binding TextPropertyName}" FontSize="13" FontWeight="DemiBold"
+                <Ellipse Grid.Column="0" Fill="{Binding ColorPropertyName}" Width="20" Height="10"></Ellipse>
+                <TextBlock x:Name="tblock" Grid.Column="1" Text="{Binding TextPropertyName}" FontSize="14" FontWeight="DemiBold" Margin="5,2"
                            HorizontalAlignment="Center"></TextBlock>
             </Grid>
         </ToggleButton>

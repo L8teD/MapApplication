@@ -10,6 +10,7 @@ namespace ModellingErrorsLib3
         public VelocityAccuracy velocityAccuracy;
         public GyroError gyroError;
         public AccError accelerationError;
+        public double temperatureCoef;
         public double accNoise;
         public double gyroNoise;
         public double snsNoise;

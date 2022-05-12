@@ -10,7 +10,7 @@ using ModellingErrorsLib3;
 
 namespace EstimateLib
 {
-    public class KalmanModel2 : IKalman
+    public class KalmanModel2
     {
         public Vector X { get; set; }
         public Vector X_dot;

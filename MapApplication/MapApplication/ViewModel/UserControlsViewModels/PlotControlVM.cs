@@ -141,10 +141,12 @@ namespace MapApplication.ViewModel
             foreach (PlotCharacter character in characters)
             {
                 plotData = PlotWorker.SelectData(currentTitle, character, m_Model.indicatedListOfPlotData);
-                IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
+
+                
 
                 if (plotData != null)
                 {
+                    IndicatedSeries.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
                     xAxisName = plotData.xAxisName;
                     yAxisName = plotData.yAxisName;
                 }

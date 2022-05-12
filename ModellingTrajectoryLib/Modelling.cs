@@ -117,11 +117,13 @@ namespace ModellingTrajectoryLib
         }
         private void Kalman(double dt)
         {
-            desiredTrack.Estimation(DesiredKalman, initErrors, functions, dt);
-            desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, functions, dt);
+            InputAirData desiredAirData = inputAirData;
+            desiredAirData.tempratureError = 0;
+            desiredTrack.Estimation(DesiredKalman, initErrors, desiredAirData, functions, dt);
+            desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, desiredAirData, functions, dt);
 
-            actualTrack.Estimation(ActualKalman, initErrors, functions, dt);
-            actualTrack.Estimation(ActualFeedbackKalman, initErrors, functions, dt);
+            actualTrack.Estimation(ActualKalman, initErrors, inputAirData, functions, dt);
+            actualTrack.Estimation(ActualFeedbackKalman, initErrors, inputAirData, functions, dt);
         }
         private int counterAddPlotDataDes = 0;
         private int counterAddPlotDataAct = 0;

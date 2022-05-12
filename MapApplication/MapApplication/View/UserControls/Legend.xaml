@@ -10,7 +10,7 @@
         <StackPanel>
             <local:LegendElement>
                 <ContentControl Content="{Binding legendBtn1}"></ContentControl>
-            </local:LegendElement>
+            </local:LegendElement >
             <local:LegendElement>
                 <ContentControl Content="{Binding legendBtn2}"></ContentControl>
             </local:LegendElement>

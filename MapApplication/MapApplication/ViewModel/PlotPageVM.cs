@@ -16,7 +16,7 @@ namespace MapApplication.ViewModel
         public PlotVM plot { get; set; }
         public LegendVM legendControlVM { get; set; }
 
-        public Dictionary<string, string[]> cb_Data { get; set; }
+        public Dictionary<string, string[][]> cb_Data { get; set; }
         public List<LineSeries> IndicatedSeries { get; set; }
         public List<LineSeries> RemovedSeries { get; set; }
         List<PlotData> desiredPlotData;
@@ -34,6 +34,7 @@ namespace MapApplication.ViewModel
                 return cmd_Home ??
                 (cmd_Home = new RelayCommand(obj =>
                 {
+                    RefreshPlot();
                     plot.Home();
 
                 }));
@@ -47,7 +48,7 @@ namespace MapApplication.ViewModel
                 return cmd_ParamSelectionChanged ??
                 (cmd_ParamSelectionChanged = new RelayCommand(obj =>
                 {
-                    string paramName = ((KeyValuePair<string, string[]>)obj).Key;
+                    string paramName = ((KeyValuePair<string, string[][]>)obj).Key;
 
                     if(paramName != null)
                     {
@@ -55,10 +56,10 @@ namespace MapApplication.ViewModel
 
                         currentPlotName = PlotWorker.SelectPlotName(paramName);
 
-                        string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, PlotCharacter.Error);
+                        string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
 
                         FillSeries(currentPlotName, currentCharacter);
-                        Plot("time, [sec]", yAxis);
+                        Plot("time, [sec]", paramName + " " + yAxis);
                     }
                     
                 }));
@@ -79,7 +80,28 @@ namespace MapApplication.ViewModel
                     string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
 
                     FillSeries(currentPlotName, currentCharacter);
-                    Plot("time, [sec]", yAxis);
+                    Plot("time, [sec]", PlotWorker.SelectPlotName(currentPlotName) + " " + yAxis);
+
+
+                }));
+            }
+        }
+        private RelayCommand cmd_SourceSelectionChanged;
+        public RelayCommand SourceSelectionChanged
+        {
+            get
+            {
+                return cmd_SourceSelectionChanged ??
+                (cmd_SourceSelectionChanged = new RelayCommand(obj =>
+                {
+                    string sourceName = obj as string;
+
+                    //currentCharacter = PlotWorker.SelectPlotCharacter(characterName);
+
+                    //string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
+
+                    //FillSeries(currentPlotName, currentCharacter);
+                    //Plot("time, [sec]", yAxis);
 
 
                 }));
@@ -92,21 +114,23 @@ namespace MapApplication.ViewModel
         {
             plot = new PlotVM("Latitude");
             legendControlVM = new LegendVM(this, plot);
-           
-            
             SetComboBoxData();
-
 
             m_Model.SetPlotData += M_Model_SetPlotData;
 
-
             IndicatedSeries = new List<LineSeries>();
             RemovedSeries = new List<LineSeries>();
+        }
+        public void RefreshPlot()
+        {
+            string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
 
+            FillSeries(currentPlotName, currentCharacter);
+            Plot("time, [sec]", yAxis);
         }
         private void SetComboBoxData()
         {
-            cb_Data = new Dictionary<string, string[]>();
+            cb_Data = new Dictionary<string, string[][]>();
 
             string[] paramNames = new string[]
             {
@@ -120,16 +144,17 @@ namespace MapApplication.ViewModel
                 "Roll",
                 "Pitch"
             };
-            string[] horizontalCharacter = new string[]
+            string[] sources = new string[]
             {
-                "Ideal",
-                "Error",
-                "Estimate",
-                "Error - Estimate",
-                "Ideal + Error",
-                "P"
+                "BINS",
+                "GNSS",
+                "SVS"
             };
-            string[] verticalCHaracter = new string[]
+            string[] angleSources = new string[]
+            {
+                "BINS"
+            };
+            string[] fullCharacter = new string[]
             {
                 "Ideal",
                 "Error",
@@ -144,16 +169,15 @@ namespace MapApplication.ViewModel
                 "Error",
                 "Ideal + Error"
             };
-            cb_Data.Add(paramNames[0], horizontalCharacter);
-            cb_Data.Add(paramNames[1], horizontalCharacter);
-            cb_Data.Add(paramNames[2], verticalCHaracter);
-            cb_Data.Add(paramNames[3], horizontalCharacter);
-            cb_Data.Add(paramNames[4], horizontalCharacter);
-            cb_Data.Add(paramNames[5], verticalCHaracter);
-            cb_Data.Add(paramNames[6], angleCharacter);
-            cb_Data.Add(paramNames[7], angleCharacter);
-            cb_Data.Add(paramNames[8], angleCharacter);
-
+            cb_Data.Add(paramNames[0], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[1], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[2], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[3], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[4], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[5], new string[][] { sources, fullCharacter });
+            cb_Data.Add(paramNames[6], new string[][] { angleSources, angleCharacter });
+            cb_Data.Add(paramNames[7], new string[][] { angleSources, angleCharacter });
+            cb_Data.Add(paramNames[8], new string[][] { angleSources, angleCharacter });
         }
         private void M_Model_SetPlotData(List<PlotData> arg1, List<PlotData> arg2)
         {

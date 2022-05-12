@@ -108,6 +108,7 @@ namespace MapApplication.Model.Helper
             initErrors.snsNoise = initData.sensorErrors[8].Value;
 
             initErrors.dt = initData.sensorErrors[9].Value;
+            initErrors.temperatureCoef = initData.sensorErrors[10].Value;
 
             return initErrors;
         }
