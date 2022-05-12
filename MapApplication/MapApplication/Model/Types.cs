@@ -49,6 +49,11 @@ namespace MapApplication.Model
             }
         }
     }
+    public enum TrajectoryType
+    {
+        DesiredTrack,
+        ActualTrack
+    }
     public enum PlotCharacter
     {
         Ideal,

@@ -278,17 +278,26 @@ namespace MapApplication.Model
         public static LineSeries CreateLineSeries(PlotData data, string title)
         {
             if (data == null) return null;
-
+            OxyColor color;
+            if (title == "Actual Track")
+            {
+                color = SelectPlotColor(TrajectoryType.ActualTrack);
+            }
+            else if (title == "Desired Track")
+            {
+                color = SelectPlotColor(TrajectoryType.DesiredTrack);
+            }
+            else
+            {
+                color = SelectPlotColor(data.character);
+            }
             LineSeries series = new LineSeries()
             {
-                //ItemsSource = data,
-                DataFieldX = "x",
-                DataFieldY = "Y",
                 StrokeThickness = 2,
                 MarkerSize = 0,
                 LineStyle = LineStyle.Solid,
                 MarkerType = MarkerType.None,
-                Color = SelectPlotColor(data.character),
+                Color = color,
                 Title = title
             };
             foreach (DataPoint point in data.values)
@@ -309,6 +318,39 @@ namespace MapApplication.Model
                 return OxyColors.Black;
 
         }
+        public static OxyColor SelectPlotColor(TrajectoryType type)
+        {
+            switch (type)
+            {
+                case TrajectoryType.DesiredTrack:
+                    return OxyColors.Blue;
+                case TrajectoryType.ActualTrack:
+                    return OxyColors.Red;
+                default : return OxyColors.Black;
+            }
+        }
+
+        public static PlotCharacter SelectPlotCharacter(string character)
+        {
+            switch (character)
+            {
+                case "Ideal":
+                    return PlotCharacter.Ideal;
+                case "Error":
+                    return PlotCharacter.Error;
+                case "Estimate":
+                    return PlotCharacter.Estimate;
+                case "Error - Estimate":
+                    return PlotCharacter.CorrectError;
+                case "Ideal + Error":
+                    return PlotCharacter.Real;
+                case "P":
+                    return PlotCharacter.P;
+                default:
+                    return PlotCharacter.None;
+            }
+        }
+
         public static string SelectPlotCharacter(PlotCharacter character)
         {
             switch (character)

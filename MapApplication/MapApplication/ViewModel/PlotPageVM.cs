@@ -15,10 +15,15 @@ namespace MapApplication.ViewModel
     {
         public PlotVM plot { get; set; }
         public LegendVM legendControlVM { get; set; }
+
+        public Dictionary<string, string[]> cb_Data { get; set; }
         public List<LineSeries> IndicatedSeries { get; set; }
         public List<LineSeries> RemovedSeries { get; set; }
         List<PlotData> desiredPlotData;
         List<PlotData> actualPlotData;
+
+        PlotName currentPlotName = PlotName.Longitude;
+        PlotCharacter currentCharacter = PlotCharacter.Ideal;
 
         #region Commands
         private RelayCommand cmd_Home;
@@ -42,15 +47,41 @@ namespace MapApplication.ViewModel
                 return cmd_ParamSelectionChanged ??
                 (cmd_ParamSelectionChanged = new RelayCommand(obj =>
                 {
-                    string paramName = (obj as TextBlock).Text;
-                    plot.ChangePlotTitle(paramName);
+                    string paramName = ((KeyValuePair<string, string[]>)obj).Key;
 
-                    PlotName plotName = PlotWorker.SelectPlotName(paramName);
-                    string yAxis = PlotWorker.SelectPlotDimension(plotName, PlotCharacter.Error);
+                    if(paramName != null)
+                    {
+                        plot.ChangePlotTitle(paramName);
 
+                        currentPlotName = PlotWorker.SelectPlotName(paramName);
 
-                    FillSeries(plotName);
+                        string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, PlotCharacter.Error);
+
+                        FillSeries(currentPlotName, currentCharacter);
+                        Plot("time, [sec]", yAxis);
+                    }
+                    
+                }));
+            }
+        }
+        private RelayCommand cmd_CharacterSelectionChanged;
+        public RelayCommand CharacterSelectionChanged
+        {
+            get
+            {
+                return cmd_CharacterSelectionChanged ??
+                (cmd_CharacterSelectionChanged = new RelayCommand(obj =>
+                {
+                    string characterName = obj as string;
+
+                    currentCharacter = PlotWorker.SelectPlotCharacter(characterName);
+
+                    string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
+
+                    FillSeries(currentPlotName, currentCharacter);
                     Plot("time, [sec]", yAxis);
+
+
                 }));
             }
         }
@@ -61,6 +92,10 @@ namespace MapApplication.ViewModel
         {
             plot = new PlotVM("Latitude");
             legendControlVM = new LegendVM(this, plot);
+           
+            
+            SetComboBoxData();
+
 
             m_Model.SetPlotData += M_Model_SetPlotData;
 
@@ -69,25 +104,74 @@ namespace MapApplication.ViewModel
             RemovedSeries = new List<LineSeries>();
 
         }
+        private void SetComboBoxData()
+        {
+            cb_Data = new Dictionary<string, string[]>();
 
+            string[] paramNames = new string[]
+            {
+                "Latitude",
+                "Longitude",
+                "Altitude",
+                "East Velocity",
+                "North Velocity",
+                "Vertical Velocity",
+                "Heading",
+                "Roll",
+                "Pitch"
+            };
+            string[] horizontalCharacter = new string[]
+            {
+                "Ideal",
+                "Error",
+                "Estimate",
+                "Error - Estimate",
+                "Ideal + Error",
+                "P"
+            };
+            string[] verticalCHaracter = new string[]
+            {
+                "Ideal",
+                "Error",
+                "Estimate",
+                "Error - Estimate",
+                "Ideal + Error",
+                "P"
+            };
+            string[] angleCharacter = new string[]
+            {
+                "Ideal",
+                "Error",
+                "Ideal + Error"
+            };
+            cb_Data.Add(paramNames[0], horizontalCharacter);
+            cb_Data.Add(paramNames[1], horizontalCharacter);
+            cb_Data.Add(paramNames[2], verticalCHaracter);
+            cb_Data.Add(paramNames[3], horizontalCharacter);
+            cb_Data.Add(paramNames[4], horizontalCharacter);
+            cb_Data.Add(paramNames[5], verticalCHaracter);
+            cb_Data.Add(paramNames[6], angleCharacter);
+            cb_Data.Add(paramNames[7], angleCharacter);
+            cb_Data.Add(paramNames[8], angleCharacter);
+
+        }
         private void M_Model_SetPlotData(List<PlotData> arg1, List<PlotData> arg2)
         {
             M_Model_SetDesiredData(arg1);
             M_Model_SetActualData(arg2);
         }
-        private void FillSeries(PlotName name)
+        private void FillSeries(PlotName name, PlotCharacter character)
         {
             IndicatedSeries.Clear();
             RemovedSeries.Clear();
 
             IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, PlotCharacter.Error, desiredPlotData), 
+                PlotWorker.SelectData(name, character, desiredPlotData), 
                 "Desired Track"));
 
             IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, PlotCharacter.Error, actualPlotData), 
+                PlotWorker.SelectData(name, character, actualPlotData), 
                 "Actual Track"));
-
         }
 
         private void M_Model_SetDesiredData(List<PlotData> obj)
@@ -108,8 +192,9 @@ namespace MapApplication.ViewModel
             {
                 if (IndicatedSeries[i] != null)
                 {
-
+                    
                     LineSeries series = IndicatedSeries[i];
+
                     SolidColorBrush legendElColor = new SolidColorBrush(Color.FromArgb(series.Color.A, series.Color.R, series.Color.G, series.Color.B));
                     string legendElText = series.Title;
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i], legendElColor, legendElText);
