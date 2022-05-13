@@ -25,14 +25,14 @@ namespace MapApplication.Model
     public class MainModel
     {
         T_OutputFull OutputData;
-        OutputData indicatedData;
+        TrackData indicatedData;
         List<DebugInfo> infoList;
         DebugInfo selectedInfo;
-        public List<PlotData> indicatedListOfPlotData;
-        private List<PlotData> desiredPlotData;
-        private List<PlotData> actualPlotData;
-        private List<PlotData> desiredFeedbackPlotData;
-        private List<PlotData> actualFeedbackPlotData;
+        public DisplayGraphicData indicatedPlotData;
+        private DisplayGraphicData desiredPlotData;
+        private DisplayGraphicData actualPlotData;
+        private DisplayGraphicData desiredFeedbackPlotData;
+        private DisplayGraphicData actualFeedbackPlotData;
 
         private List<BasicGeoposition> trajectoryPoints;
 
@@ -46,9 +46,9 @@ namespace MapApplication.Model
         public event Action<string, string, List<LineSeries>> RefreshPitchPlot;
         public event Action<string, string, List<LineSeries>> RefreshRollPlot;
 
-        public event Action<List<PlotData>, List<PlotData>> SetPlotData;
+        public event Action<DisplayGraphicData, DisplayGraphicData> SetPlotData;
 
-        public event Action<OutputData, int> UpdateTableData;
+        public event Action<TrackData, int> UpdateTableData;
 
         public event Action<List<BasicGeoposition>, int> DrawTrajectoryAction;
 
@@ -62,33 +62,33 @@ namespace MapApplication.Model
 
         public void SwitchIndicatedData(DataSource source)
         {
-            if (indicatedData.points == null) return;
+            if (indicatedData.INS.points == null) return;
             switch (source)
             {
                 case DataSource.threeChannel:
-                    indicatedData = DublicateOutputData(OutputData.ActualTrack.Default);
+                    indicatedData = DublicateTrackData(OutputData.Default.ActualTrack);
                     break;
                 case DataSource.twoChannel:
-                    indicatedData = DublicateOutputData(OutputData.DesiredTrack.Default);
+                    indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
                     break;
                 case DataSource.threeChannelFeedback:
-                    indicatedData = DublicateOutputData(OutputData.ActualTrack.Feedback);
+                    indicatedData = DublicateTrackData(OutputData.Feedback.ActualTrack);
                     break;
                 case DataSource.twoChannelFeedback:
-                    indicatedData = DublicateOutputData(OutputData.DesiredTrack.Feedback);
+                    indicatedData = DublicateTrackData(OutputData.Feedback.DesiredTrack);
                     break;
             }
         }
         public void DrawFullTrajctory()
         {
             RefreshDrawingTrajectoryParams();
-            while (second < indicatedData.points.Count)
+            while (second < indicatedData.INS.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
                 {
-                    Latitude = indicatedData.points[second].CorrectTrajectory.Degrees.lat,
-                    Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon,
-                    Altitude = indicatedData.points[second].CorrectTrajectory.Degrees.alt
+                    Latitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lat,
+                    Longitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lon,
+                    Altitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.alt
                     //Latitude = indicatedData.airData[second].point.lat,
                     //Longitude = indicatedData.airData[second].point.lon,
                     //Altitude = indicatedData.airData[second].point.alt
@@ -108,17 +108,17 @@ namespace MapApplication.Model
         }
         private void TimerTrajectory_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (second < indicatedData.points.Count)
+            if (second < indicatedData.INS.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
                 {
-                    Latitude = indicatedData.points[second - 1].CorrectTrajectory.Degrees.lat,
-                    Longitude = indicatedData.points[second - 1].CorrectTrajectory.Degrees.lon
+                    Latitude = indicatedData.INS.points[second - 1].CorrectTrajectory.GetValueOrDefault().Degrees.lat,
+                    Longitude = indicatedData.INS.points[second - 1].CorrectTrajectory.GetValueOrDefault().Degrees.lon
                 });
                 trajectoryPoints.Add(new BasicGeoposition()
                 {
-                    Latitude = indicatedData.points[second].CorrectTrajectory.Degrees.lat,
-                    Longitude = indicatedData.points[second].CorrectTrajectory.Degrees.lon
+                    Latitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lat,
+                    Longitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lon
                 });
 
                 DrawTrajectoryAction?.Invoke(trajectoryPoints, 1);
@@ -167,7 +167,7 @@ namespace MapApplication.Model
             try
             {
                 Execute.CreateTrajectory(initData, ref OutputData);
-                indicatedData = DublicateOutputData(OutputData.DesiredTrack.Default);
+                indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
                 CreatePlotData();
                 RefreshPlots();
             }
@@ -193,19 +193,16 @@ namespace MapApplication.Model
         {
             PlotData plotData;
             List<LineSeries> lineSeriesList = new List<LineSeries>();
-            plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, indicatedListOfPlotData);
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Ideal, indicatedPlotData.Display);
 
             lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
-            plotData = PlotWorker.SelectData(name, PlotCharacter.Real, indicatedListOfPlotData);
+            plotData = PlotWorker.SelectData(name, PlotCharacter.Real, indicatedPlotData.Display);
             lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
 
             if (name != PlotName.Pitch && name != PlotName.Heading && name != PlotName.Roll)
             {
-                plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, indicatedListOfPlotData);
-                lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
-
-                plotData = PlotWorker.SelectData(name, PlotCharacter.CourseAir, indicatedListOfPlotData);
+                plotData = PlotWorker.SelectData(name, PlotCharacter.CorrectTrajectory, indicatedPlotData.Display);
                 lineSeriesList.Add(PlotWorker.CreateLineSeries(plotData, PlotWorker.SelectPlotCharacter(plotData.character)));
             }
 
@@ -213,47 +210,44 @@ namespace MapApplication.Model
         }
         private void CreatePlotData()
         {
-            indicatedListOfPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
-            desiredPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Default);
-            actualPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Default);
-            desiredFeedbackPlotData = PlotWorker.CreatePlotData(OutputData.DesiredTrack.Feedback);
-            actualFeedbackPlotData = PlotWorker.CreatePlotData(OutputData.ActualTrack.Feedback);
+            PlotWorker.CreatePlotData(ref indicatedPlotData, OutputData.Default.DesiredTrack);
+            PlotWorker.CreatePlotData(ref desiredPlotData, OutputData.Default.DesiredTrack);
+            PlotWorker.CreatePlotData(ref desiredFeedbackPlotData, OutputData.Feedback.DesiredTrack);
+            PlotWorker.CreatePlotData(ref actualPlotData, OutputData.Default.ActualTrack);
+            PlotWorker.CreatePlotData(ref actualFeedbackPlotData, OutputData.Feedback.ActualTrack);
+
 
             SetPlotData.Invoke(desiredPlotData, actualPlotData);
         }
         public void SwitchPlotData(DataSource source)
         {
-            if (indicatedListOfPlotData == null) return;
+            if (indicatedPlotData == null) return;
             switch (source)
             {
                 case DataSource.threeChannel:
-                    indicatedListOfPlotData = DublicatePlotData(actualPlotData);
+                    indicatedPlotData = actualPlotData.Copy();
                     break;
                 case DataSource.twoChannel:
-                    indicatedListOfPlotData = DublicatePlotData(desiredPlotData);
+                    indicatedPlotData = desiredPlotData.Copy();
                     break;
                 case DataSource.threeChannelFeedback:
-                    indicatedListOfPlotData = DublicatePlotData(actualFeedbackPlotData);
+                    indicatedPlotData = actualFeedbackPlotData.Copy();
                     break;
                 case DataSource.twoChannelFeedback:
-                    indicatedListOfPlotData = DublicatePlotData(desiredFeedbackPlotData);
+                    indicatedPlotData = desiredFeedbackPlotData.Copy();
                     break;
             }
             RefreshPlots();
         }
-        private List<PlotData> DublicatePlotData(List<PlotData> original)
+        
+        private TrackData DublicateTrackData(TrackData original)
         {
-            if (original == null) return new List<PlotData>();
-            List<PlotData> copy = new List<PlotData>();
+            TrackData copy = new TrackData();
 
-            for (int i = 0; i < original.Count; i++)
-            {
-                List<double> doubleList = new List<double>();
-                foreach (DataPoint point in original[i].values)
-                    doubleList.Add(point.Y);
-                PlotData data = new PlotData(original[i].name, original[i].character, doubleList);
-                copy.Add(data);
-            }
+            copy.INS = DublicateOutputData(original.INS);
+            copy.GNSS = DublicateOutputData(original.GNSS);
+            copy.KVS = DublicateOutputData(original.KVS);
+
             return copy;
         }
         private OutputData DublicateOutputData(OutputData original)
@@ -266,12 +260,10 @@ namespace MapApplication.Model
                 copy.velocities = new List<VelocitySet>();
                 copy.angles = new List<AnglesSet>();
                 copy.p_OutList = new List<P_out>();
-                copy.airData = new List<AirData>();
                 copy.points.AddRange(original.points);
                 copy.velocities.AddRange(original.velocities);
                 copy.angles.AddRange(original.angles);
                 copy.p_OutList.AddRange(original.p_OutList);
-                copy.airData.AddRange(original.airData);
             }
             
             return copy;
@@ -289,36 +281,36 @@ namespace MapApplication.Model
             #endregion
 
             #region wp#2
-            wayPoint.Latitude = 55;
-            wayPoint.Longitude = 37.2;
+            wayPoint.Latitude = 55.5;
+            wayPoint.Longitude = 37.5;
             wayPoint.Altitude = 600;
             wayPoint.Velocity = 80;
             AddWayPoint(wayPointList, wayPoint);
             #endregion
 
-            #region wp#3
-            wayPoint.Latitude = 55.2;
-            wayPoint.Longitude = 37.2;
-            wayPoint.Altitude = 600;
-            wayPoint.Velocity = 80;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#3
+            //wayPoint.Latitude = 55.2;
+            //wayPoint.Longitude = 37.2;
+            //wayPoint.Altitude = 600;
+            //wayPoint.Velocity = 80;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
 
-            #region wp#4
-            wayPoint.Latitude = 55.2;
-            wayPoint.Longitude = 37;
-            wayPoint.Altitude = 600;
-            wayPoint.Velocity = 80;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#4
+            //wayPoint.Latitude = 55.2;
+            //wayPoint.Longitude = 37;
+            //wayPoint.Altitude = 600;
+            //wayPoint.Velocity = 80;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
 
-            #region wp#5
-            wayPoint.Latitude = 55;
-            wayPoint.Longitude = 37;
-            wayPoint.Altitude = 600;
-            wayPoint.Velocity = 80;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#5
+            //wayPoint.Latitude = 55;
+            //wayPoint.Longitude = 37;
+            //wayPoint.Altitude = 600;
+            //wayPoint.Velocity = 80;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
         }
         public void SetDataFromLogger(LogInfo info, ObservableCollection<WayPoint> wayPointList)
         {
@@ -373,6 +365,7 @@ namespace MapApplication.Model
             initData.airInfo = new ObservableCollection<EquipmentData>();
             initData.windInfo = new ObservableCollection<EquipmentData>();
             initData.windInfoDryden = new ObservableCollection<EquipmentData>();
+            initData.gnssErrors = new ObservableCollection<EquipmentData>();
 
 
             #region InsErrors
@@ -387,6 +380,8 @@ namespace MapApplication.Model
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVe", Value = 0.5, Dimension = "[m/s]" });
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVn", Value = 0.5, Dimension = "[m/s]" });
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVh", Value = 0.5, Dimension = "[m/s]" });
+
+            initData.insErrors.Add(new EquipmentData() { Name = "dt", Value = 0.25, Dimension = "" });
             #endregion
 
             #region SensorErrors
@@ -401,8 +396,6 @@ namespace MapApplication.Model
             initData.sensorErrors.Add(new EquipmentData() { Name = "acc noise", Value = 0.001, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "gyro noise", Value = 0.001, Dimension = "" });
 
-            initData.sensorErrors.Add(new EquipmentData() { Name = "sns noise", Value = 1, Dimension = "" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
             initData.sensorErrors.Add(new EquipmentData() { Name = "Kt", Value = 1.2E-5, Dimension = "1/`C" });
             #endregion
 
@@ -411,8 +404,6 @@ namespace MapApplication.Model
             #endregion
 
             #region WindInfo
-            initData.windInfo.Add(new EquipmentData() { Name = "Angle", Value = 15, Dimension = "[deg]" });
-
             initData.windInfo.Add(new EquipmentData() { Name = "wind_E", Value = 3, Dimension = "[m/s]" });
             initData.windInfo.Add(new EquipmentData() { Name = "wind_N", Value = 2, Dimension = "[m/s]" });
             initData.windInfo.Add(new EquipmentData() { Name = "wind_H", Value = 1, Dimension = "[m/s]" });
@@ -428,10 +419,14 @@ namespace MapApplication.Model
             initData.windInfoDryden.Add(new EquipmentData() { Name = "L_v", Value = 200, Dimension = "[m]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "L_w", Value = 50, Dimension = "[m]" });
             #endregion
-            //items.Add(new InputError() { Name = "ΔXc", Value = 10, Dimension = "[m]" });
-            //items.Add(new InputError() { Name = "ΔVc", Value = 0.1, Dimension = "[m/s]" });
 
-            //SaveInitDataHandler += ListViewWorker.SaveInitDataHandler;
+
+            #region GnssInfo
+            initData.gnssErrors.Add(new EquipmentData() { Name = "ΔXc", Value = 10, Dimension = "[m]" });
+            initData.gnssErrors.Add(new EquipmentData() { Name = "ΔVc", Value = 0.1, Dimension = "[m/s]" });
+            initData.gnssErrors.Add(new EquipmentData() { Name = "noise", Value = 1, Dimension = "" });
+            #endregion
+
 
             return initData;
         }

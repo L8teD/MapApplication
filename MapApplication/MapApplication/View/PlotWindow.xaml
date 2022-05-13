@@ -22,7 +22,7 @@
                 <ColumnDefinition Width="35"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <v:Plot Grid.ColumnSpan="6" Grid.Row="1">
-                <ContentControl Content="{Binding plotWindowControlVM.plotVM}"></ContentControl>
+                <ContentControl Content="{Binding plotWindowControlVM.plot}"></ContentControl>
             </v:Plot>
 
             <RadioButton Content="Trajectory"  Grid.Column="0" Style="{StaticResource rb_Style}"

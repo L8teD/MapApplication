@@ -11,7 +11,17 @@ namespace MapApplication.Model
 {
     public class PlotWorker
     {
-        public static List<PlotData> CreatePlotData(OutputData outputData)
+        public static void CreatePlotData(ref DisplayGraphicData graphicData, TrackData data)
+        {
+            if (graphicData == null)
+                graphicData = new DisplayGraphicData();
+
+            graphicData.INS = CreatePlotData(data.INS, Source.INS);
+            graphicData.GNSS = CreatePlotData(data.GNSS, Source.GNSS);
+            graphicData.KVS = CreatePlotData(data.KVS, Source.KVS);
+            graphicData.SwitchSource(Source.INS);
+        }
+        public static List<PlotData> CreatePlotData(OutputData outputData, Source source)
         {
             List<PlotData> plotDatas = new List<PlotData>();
 
@@ -39,55 +49,71 @@ namespace MapApplication.Model
             List<double> latCorrectTraj = new List<double>();
             List<double> lonCorrectTraj = new List<double>();
             List<double> altCorrectTraj = new List<double>();
+
             foreach (PointSet pointSet in outputData.points)
             {
-                latIdeal.Add(pointSet.Ideal.Degrees.lat);
-                lonIdeal.Add(pointSet.Ideal.Degrees.lon);
-                altIdeal.Add(pointSet.Ideal.Degrees.alt);
+                if (pointSet.Ideal != null)
+                {
+                    latIdeal.Add(pointSet.Ideal.GetValueOrDefault().Degrees.lat);
+                    lonIdeal.Add(pointSet.Ideal.GetValueOrDefault().Degrees.lon);
+                    altIdeal.Add(pointSet.Ideal.GetValueOrDefault().Degrees.alt);
+                }
+                    
+                if (pointSet.Real != null)
+                {
+                    latReal.Add(pointSet.Real.GetValueOrDefault().Degrees.lat);
+                    lonReal.Add(pointSet.Real.GetValueOrDefault().Degrees.lon);
+                    altReal.Add(pointSet.Real.GetValueOrDefault().Degrees.alt);
+                }
 
-                latReal.Add(pointSet.Real.Degrees.lat);
-                lonReal.Add(pointSet.Real.Degrees.lon);
-                altReal.Add(pointSet.Real.Degrees.alt);
-
-                latCorrectTraj.Add(pointSet.CorrectTrajectory.Degrees.lat);
-                lonCorrectTraj.Add(pointSet.CorrectTrajectory.Degrees.lon);
-                altCorrectTraj.Add(pointSet.CorrectTrajectory.Degrees.alt);
-
-                latError.Add(pointSet.Error.Meters.lat);
-                lonError.Add(pointSet.Error.Meters.lon);
-                altError.Add(pointSet.Error.Meters.alt);
-
-                latEstimate.Add(pointSet.Estimate.Meters.lat);
-                lonEstimate.Add(pointSet.Estimate.Meters.lon);
-                altEstimate.Add(pointSet.Estimate.Meters.alt);
-
-                latCorrectError.Add(pointSet.CorrectError.Meters.lat);
-                lonCorrectError.Add(pointSet.CorrectError.Meters.lon);
-                altCorrectError.Add(pointSet.CorrectError.Meters.alt);
+                if (pointSet.CorrectTrajectory != null)
+                {
+                    latCorrectTraj.Add(pointSet.CorrectTrajectory.GetValueOrDefault().Degrees.lat);
+                    lonCorrectTraj.Add(pointSet.CorrectTrajectory.GetValueOrDefault().Degrees.lon);
+                    altCorrectTraj.Add(pointSet.CorrectTrajectory.GetValueOrDefault().Degrees.alt);
+                }
+                if (pointSet.Error != null)
+                {
+                    latError.Add(pointSet.Error.GetValueOrDefault().Meters.lat);
+                    lonError.Add(pointSet.Error.GetValueOrDefault().Meters.lon);
+                    altError.Add(pointSet.Error.GetValueOrDefault().Meters.alt);
+                }
+                if (pointSet.Estimate != null)
+                {
+                    latEstimate.Add(pointSet.Estimate.GetValueOrDefault().Meters.lat);
+                    lonEstimate.Add(pointSet.Estimate.GetValueOrDefault().Meters.lon);
+                    altEstimate.Add(pointSet.Estimate.GetValueOrDefault().Meters.alt);
+                }
+                if (pointSet.CorrectError != null)
+                {
+                    latCorrectError.Add(pointSet.CorrectError.GetValueOrDefault().Meters.lat);
+                    lonCorrectError.Add(pointSet.CorrectError.GetValueOrDefault().Meters.lon);
+                    altCorrectError.Add(pointSet.CorrectError.GetValueOrDefault().Meters.alt);
+                }
             }
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Ideal, latIdeal));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Ideal, lonIdeal));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Ideal, altIdeal));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Ideal, source, latIdeal));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Ideal, source, lonIdeal));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Ideal, source, altIdeal));
 
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Real, latReal));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Real, lonReal));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Real, altReal));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Real, source, latReal));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Real, source, lonReal));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Real, source, altReal));
 
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CorrectTrajectory, latCorrectTraj));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CorrectTrajectory, lonCorrectTraj));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CorrectTrajectory, altCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CorrectTrajectory, source, latCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CorrectTrajectory, source, lonCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CorrectTrajectory, source, altCorrectTraj));
 
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Error, latError));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Error, lonError));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Error, altError));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Error, source, latError));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Error, source, lonError));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Error, source, altError));
 
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Estimate, latEstimate));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Estimate, lonEstimate));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Estimate, altEstimate));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.Estimate, source, latEstimate));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.Estimate, source, lonEstimate));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.Estimate, source, altEstimate));
 
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CorrectError, latCorrectError));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CorrectError, lonCorrectError));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CorrectError, altCorrectError));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CorrectError, source, latCorrectError));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CorrectError, source, lonCorrectError));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CorrectError, source, altCorrectError));
             #endregion
 
             #region Velocities Lists
@@ -116,53 +142,66 @@ namespace MapApplication.Model
             List<double> VhCorrectTraj = new List<double>();
             foreach (VelocitySet velocitySet in outputData.velocities)
             {
-                VeIdeal.Add(velocitySet.Ideal.E);
-                VnIdeal.Add(velocitySet.Ideal.N);
-                VhIdeal.Add(velocitySet.Ideal.H);
-
-                VeReal.Add(velocitySet.Real.E);
-                VnReal.Add(velocitySet.Real.N);
-                VhReal.Add(velocitySet.Real.H);
-
-                VeCorrectTraj.Add(velocitySet.CorrectTrajectory.E);
-                VnCorrectTraj.Add(velocitySet.CorrectTrajectory.N);
-                VhCorrectTraj.Add(velocitySet.CorrectTrajectory.H);
-
-                VeError.Add(velocitySet.Error.E);
-                VnError.Add(velocitySet.Error.N);
-                VhError.Add(velocitySet.Error.H);
-
-                VeEstimate.Add(velocitySet.Estimate.E);
-                VnEstimate.Add(velocitySet.Estimate.N);
-                VhEstimate.Add(velocitySet.Estimate.H);
-
-                VeCorrectError.Add(velocitySet.CorrectError.E);
-                VnCorrectError.Add(velocitySet.CorrectError.N);
-                VhCorrectError.Add(velocitySet.CorrectError.H);
+                if (velocitySet.Ideal != null)
+                {
+                    VeIdeal.Add(velocitySet.Ideal.GetValueOrDefault().E);
+                    VnIdeal.Add(velocitySet.Ideal.GetValueOrDefault().N);
+                    VhIdeal.Add(velocitySet.Ideal.GetValueOrDefault().H);
+                }
+                if (velocitySet.Real != null)
+                {
+                    VeReal.Add(velocitySet.Real.GetValueOrDefault().E);
+                    VnReal.Add(velocitySet.Real.GetValueOrDefault().N);
+                    VhReal.Add(velocitySet.Real.GetValueOrDefault().H);
+                }
+                if (velocitySet.CorrectTrajectory != null)
+                {
+                    VeCorrectTraj.Add(velocitySet.CorrectTrajectory.GetValueOrDefault().E);
+                    VnCorrectTraj.Add(velocitySet.CorrectTrajectory.GetValueOrDefault().N);
+                    VhCorrectTraj.Add(velocitySet.CorrectTrajectory.GetValueOrDefault().H);
+                }
+                if (velocitySet.Error != null)
+                {
+                    VeError.Add(velocitySet.Error.GetValueOrDefault().E);
+                    VnError.Add(velocitySet.Error.GetValueOrDefault().N);
+                    VhError.Add(velocitySet.Error.GetValueOrDefault().H);
+                }
+                if (velocitySet.Estimate != null)
+                {
+                    VeEstimate.Add(velocitySet.Estimate.GetValueOrDefault().E);
+                    VnEstimate.Add(velocitySet.Estimate.GetValueOrDefault().N);
+                    VhEstimate.Add(velocitySet.Estimate.GetValueOrDefault().H);
+                }
+                if (velocitySet.CorrectError != null)
+                {
+                    VeCorrectError.Add(velocitySet.CorrectError.GetValueOrDefault().E);
+                    VnCorrectError.Add(velocitySet.CorrectError.GetValueOrDefault().N);
+                    VhCorrectError.Add(velocitySet.CorrectError.GetValueOrDefault().H);
+                }
             }
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Ideal, VeIdeal));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Ideal, VnIdeal));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Ideal, VhIdeal));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Ideal, source, VeIdeal));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Ideal, source, VnIdeal));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Ideal, source, VhIdeal));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Real, VeReal));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Real, VnReal));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Real, VhReal));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Real, source, VeReal));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Real, source, VnReal));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Real, source, VhReal));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CorrectTrajectory, VeCorrectTraj));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CorrectTrajectory, VnCorrectTraj));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CorrectTrajectory, VhCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CorrectTrajectory, source, VeCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CorrectTrajectory, source, VnCorrectTraj));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CorrectTrajectory, source, VhCorrectTraj));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Error, VeError));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Error, VnError));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Error, VhError));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Error, source, VeError));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Error, source, VnError));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Error, source, VhError));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Estimate, VeEstimate));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Estimate, VnEstimate));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Estimate, VhEstimate));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.Estimate, source, VeEstimate));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.Estimate, source, VnEstimate));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.Estimate, source, VhEstimate));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CorrectError, VeCorrectError));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CorrectError, VnCorrectError));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CorrectError, VhCorrectError));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CorrectError, source, VeCorrectError));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CorrectError, source, VnCorrectError));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CorrectError, source, VhCorrectError));
             #endregion
 
             #region Angles Lists
@@ -180,30 +219,36 @@ namespace MapApplication.Model
 
             foreach (AnglesSet anglesSet in outputData.angles)
             {
-                headingIdeal.Add(anglesSet.Ideal.Degrees.heading);
-                pitchIdeal.Add(anglesSet.Ideal.Degrees.pitch);
-                rollIdeal.Add(anglesSet.Ideal.Degrees.roll);
-
-                headingReal.Add(anglesSet.Real.Degrees.heading);
-                pitchReal.Add(anglesSet.Real.Degrees.pitch);
-                rollReal.Add(anglesSet.Real.Degrees.roll);
-
-                headingError.Add(anglesSet.Error.Degrees.heading);
-                pitchError.Add(anglesSet.Error.Degrees.pitch);
-                rollError.Add(anglesSet.Error.Degrees.roll);
-
+                if (anglesSet.Ideal != null)
+                {
+                    headingIdeal.Add(anglesSet.Ideal.GetValueOrDefault().Degrees.heading);
+                    pitchIdeal.Add(anglesSet.Ideal.GetValueOrDefault().Degrees.pitch);
+                    rollIdeal.Add(anglesSet.Ideal.GetValueOrDefault().Degrees.roll);
+                }
+                if (anglesSet.Real != null)
+                {
+                    headingReal.Add(anglesSet.Real.GetValueOrDefault().Degrees.heading);
+                    pitchReal.Add(anglesSet.Real.GetValueOrDefault().Degrees.pitch);
+                    rollReal.Add(anglesSet.Real.GetValueOrDefault().Degrees.roll);
+                }
+                if (anglesSet.Error != null)
+                {
+                    headingError.Add(anglesSet.Error.GetValueOrDefault().Degrees.heading);
+                    pitchError.Add(anglesSet.Error.GetValueOrDefault().Degrees.pitch);
+                    rollError.Add(anglesSet.Error.GetValueOrDefault().Degrees.roll);
+                }
             }
-            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Ideal, headingIdeal));
-            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Ideal, pitchIdeal));
-            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Ideal, rollIdeal));
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Ideal, source, headingIdeal));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Ideal, source, pitchIdeal));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Ideal, source, rollIdeal));
 
-            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Real, headingReal));
-            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Real, pitchReal));
-            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Real, rollReal));
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Real, source, headingReal));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Real, source, pitchReal));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Real, source, rollReal));
 
-            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Error, headingError));
-            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Error, pitchError));
-            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Error, rollError));
+            plotDatas.Add(new PlotData(PlotName.Heading, PlotCharacter.Error, source, headingError));
+            plotDatas.Add(new PlotData(PlotName.Pitch, PlotCharacter.Error, source, pitchError));
+            plotDatas.Add(new PlotData(PlotName.Roll, PlotCharacter.Error, source, rollError));
 
             #endregion
 
@@ -227,48 +272,66 @@ namespace MapApplication.Model
                 Vn_P.Add(p.vn);
                 Vh_P.Add(p.vh);
             }
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.P, long_P));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.P, lat_P));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.P, alt_P));
+            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.P, source, long_P));
+            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.P, source, lat_P));
+            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.P, source, alt_P));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.P, Ve_P));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.P, Vn_P));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.P, Vh_P));
+            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.P, source, Ve_P));
+            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.P, source, Vn_P));
+            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.P, source, Vh_P));
 
             #endregion
 
             #region Course Air Lists
-            List<double> long_Air = new List<double>();
-            List<double> lat_Air = new List<double>();
-            List<double> alt_Air = new List<double>();
+            //List<double> long_Air = new List<double>();
+            //List<double> lat_Air = new List<double>();
+            //List<double> alt_Air = new List<double>();
 
-            List<double> Ve_Air = new List<double>();
-            List<double> Vn_Air = new List<double>();
-            List<double> Vh_Air = new List<double>();
+            //List<double> Ve_Air = new List<double>();
+            //List<double> Vn_Air = new List<double>();
+            //List<double> Vh_Air = new List<double>();
 
 
-            foreach (AirData airData in outputData.airData)
-            {
-                long_Air.Add(airData.point.lon);
-                lat_Air.Add(airData.point.lat);
-                alt_Air.Add(airData.point.alt);
+            //foreach (AirData airData in outputData.airData)
+            //{
+            //    long_Air.Add(airData.point.lon);
+            //    lat_Air.Add(airData.point.lat);
+            //    alt_Air.Add(airData.point.alt);
 
-                Ve_Air.Add(airData.airSpeed.E);
-                Vn_Air.Add(airData.airSpeed.N);
-                Vh_Air.Add(airData.airSpeed.H);
-            }
-            plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CourseAir, lat_Air));
-            plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CourseAir, long_Air));
-            plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CourseAir, alt_Air));
+            //    Ve_Air.Add(airData.airSpeed.E);
+            //    Vn_Air.Add(airData.airSpeed.N);
+            //    Vh_Air.Add(airData.airSpeed.H);
+            //}
+            //plotDatas.Add(new PlotData(PlotName.Latitude, PlotCharacter.CourseAir, lat_Air));
+            //plotDatas.Add(new PlotData(PlotName.Longitude, PlotCharacter.CourseAir, long_Air));
+            //plotDatas.Add(new PlotData(PlotName.Altitude, PlotCharacter.CourseAir, alt_Air));
 
-            plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CourseAir, Ve_Air));
-            plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CourseAir, Vn_Air));
-            plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CourseAir, Vh_Air));
+            //plotDatas.Add(new PlotData(PlotName.VelocityEast, PlotCharacter.CourseAir, Ve_Air));
+            //plotDatas.Add(new PlotData(PlotName.VelocityNorth, PlotCharacter.CourseAir, Vn_Air));
+            //plotDatas.Add(new PlotData(PlotName.VelocityH, PlotCharacter.CourseAir, Vh_Air));
 
 
 
             #endregion
+
             return plotDatas;
+        }
+        public static List<PlotData> DublicatePlotData(List<PlotData> original)
+        {
+            if (original == null) return new List<PlotData>();
+            List<PlotData> copy = new List<PlotData>();
+
+            copy.AddRange(original);
+
+            //for (int i = 0; i < original.Count; i++)
+            //{
+            //    List<double> doubleList = new List<double>();
+            //    foreach (DataPoint point in original[i].values)
+            //        doubleList.Add(point.Y);
+            //    PlotData data = new PlotData(original[i].name, original[i].character, doubleList);
+            //    copy.Add(data);
+            //}
+            return copy;
         }
         public static PlotData SelectData(PlotName name, PlotCharacter character, List<PlotData> plotDataList)
         {
@@ -329,7 +392,20 @@ namespace MapApplication.Model
                 default : return OxyColors.Black;
             }
         }
-
+        public static Source SelectSource(string sourceName)
+        {
+            switch (sourceName)
+            {
+                case "INS":
+                    return Source.INS;
+                case "GNSS":
+                    return Source.GNSS;
+                case "SVS":
+                    return Source.KVS;
+                default:
+                    return Source.INS;
+            }
+        }
         public static PlotCharacter SelectPlotCharacter(string character)
         {
             switch (character)
@@ -369,8 +445,6 @@ namespace MapApplication.Model
                     return "Estimate";
                 case PlotCharacter.P:
                     return "P";
-                case PlotCharacter.CourseAir:
-                    return "CourseAir";
                 default:
                     return "";
             }
@@ -447,7 +521,7 @@ namespace MapApplication.Model
                     return "[deg]";
                 else
                 {
-                    if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory || character == PlotCharacter.CourseAir)
+                    if (character == PlotCharacter.Ideal || character == PlotCharacter.Real || character == PlotCharacter.CorrectTrajectory)
                     {
                         if (name == PlotName.Altitude)
                             return "[m]";

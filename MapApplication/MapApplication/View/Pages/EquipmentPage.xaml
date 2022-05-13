@@ -159,17 +159,40 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="4.2*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
 
                 <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="Black" Margin="60,20" CornerRadius="10">
                     <TextBlock Text="GLOBAL POSITION SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBlack" FontSize="22" FontFamily="Segoe UI Light"></TextBlock>
                 </Border>
+                <ListView Margin="5" ItemsSource="{Binding Path=initData.gnssErrors}" Grid.Column="1" Grid.Row="1" Background="#FFE3EADF"
+                          HorizontalAlignment="Stretch" BorderThickness="3" BorderBrush="LightGray">
+                    <ListView.View>
+                        <GridView  ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
+                            <GridViewColumn Width="50">Name
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="16" FontFamily="Segoe UI Light" Foreground="Black"></TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="75">Value
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Path=Value}" Width="60" BorderThickness="0" Style="{StaticResource tb_ListviewStyle}"></TextBox>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="62">Dimension
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Dimension}" Width="60" HorizontalAlignment="Left" FontSize="16" FontFamily="Segoe UI Light" Foreground="Black"></TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </Border>
         <Border Style="{StaticResource Border_Style_outside}" Grid.ColumnSpan="3" Grid.Row="1">

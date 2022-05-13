@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace CommonLib
 {
+    #region Input 
+    public struct Input
+    {
+        public TrajectoryInput trajectory;
+        public InputWindData wind;
+        public InputAirData air;
+        public InsErrors INS;
+        public GnssErrors GNSS;
+    }
     public struct InputWindData
     {
         public double speed;
@@ -20,8 +29,6 @@ namespace CommonLib
         public double sigma_u;
         public double sigma_v;
         public double sigma_w;
-
-        public double angle;
     }
     public struct InputAirData
     {
@@ -29,6 +36,61 @@ namespace CommonLib
         public double pressureError;
         public double tempratureError;
     }
+    #region InitErrors Struct
+    public struct InsErrors
+    {
+        public AngleAccuracy angleAccuracy;
+        public CoordAccuracy coordAccuracy;
+        public VelocityAccuracy velocityAccuracy;
+        public GyroError gyroError;
+        public AccError accelerationError;
+        public double temperatureCoef;
+        public double accNoise;
+        public double gyroNoise;
+
+        public double dt; //вынести отсюда
+    }
+    public struct GnssErrors
+    {
+        public double noise;
+
+        public double sateliteErrorCoord;
+        public double sateliteErrorVelocity;
+    }
+    public struct AngleAccuracy
+    {
+        public double heading { get; set; }
+        public double pitch { get; set; }
+        public double roll { get; set; }
+    }
+    public struct CoordAccuracy
+    {
+        public double latitude { get; set; }
+        public double longitude { get; set; }
+        public double altitude { get; set; }
+    }
+    public struct VelocityAccuracy
+    {
+        public double east { get; set; }
+        public double north { get; set; }
+        public double H { get; set; }
+    }
+    public struct GyroError
+    {
+        public double first { get; set; }
+        public double second { get; set; }
+        public double third { get; set; }
+    }
+    public struct AccError
+    {
+        public double first { get; set; }
+        public double second { get; set; }
+        public double third { get; set; }
+    }
+    #endregion
+
+    #endregion
+
     public struct MatlabOutData
     {
         public double baro_h;
@@ -56,6 +118,7 @@ namespace CommonLib
         public double vn { get; set; }
         public double vh { get; set; }
     }
+
     public struct Parameters
     {
         public AbsoluteOmega absOmega;
@@ -67,7 +130,6 @@ namespace CommonLib
         public Point point;
         public Velocity velocity;
         public Angles angles;
-        public AirData airData;
         public Matrix C;
         public double dt;
     }
@@ -93,23 +155,31 @@ namespace CommonLib
         public Angles angles;
         public double windAngle;
     }
-    public struct T_OutputFull
+
+    public struct TrackData
     {
-        public T_Output DesiredTrack;
-        public T_Output ActualTrack;
+        public OutputData INS;
+        public OutputData GNSS;
+        public OutputData KVS;
     }
+
     public struct T_Output
     {
-        public OutputData Feedback;
-        public OutputData Default;
+        public TrackData DesiredTrack;
+        public TrackData ActualTrack;
     }
+    public struct T_OutputFull
+    {
+        public T_Output Feedback;
+        public T_Output Default;
+    }
+    
     public struct OutputData
     {
         public List<PointSet> points;
         public List<VelocitySet> velocities;
         public List<AnglesSet> angles;
         public List<P_out> p_OutList;
-        public List<AirData> airData;
     }
     public struct PointValue
     {
@@ -150,12 +220,12 @@ namespace CommonLib
     }
     public struct PointSet
     {
-        public PointValue Ideal;
-        public PointValue Error;
-        public PointValue Real;
-        public PointValue Estimate;
-        public PointValue CorrectError;
-        public PointValue CorrectTrajectory;
+        public PointValue? Ideal;
+        public PointValue? Error;
+        public PointValue? Real;
+        public PointValue? Estimate;
+        public PointValue? CorrectError;
+        public PointValue? CorrectTrajectory;
         public PointSet(Point idP, Vector error, Vector estimate, EarthModel earth, bool ISChannel3 = true)
         {
             if (error == null)
@@ -168,23 +238,23 @@ namespace CommonLib
                 Point errP = new Point(error[2], error[1], error[3], Dimension.Meters);
                 Error = new PointValue(errP, earth, idP.lat);
                 Point realP = new Point(
-                    Ideal.Meters.lat + Error.Meters.lat,
-                    Ideal.Meters.lon + Error.Meters.lon,
-                    Ideal.Meters.alt + Error.Meters.alt,
+                    Ideal.Value.Meters.lat + Error.Value.Meters.lat,
+                    Ideal.Value.Meters.lon + Error.Value.Meters.lon,
+                    Ideal.Value.Meters.alt + Error.Value.Meters.alt,
                     Dimension.Meters);
                 Real = new PointValue(realP, earth, idP.lat);
                 Point estP = new Point(estimate[2], estimate[1], estimate[3], Dimension.Meters);
                 Estimate = new PointValue(estP, earth, idP.lat);
                 Point corErrP = new Point(
-                    Error.Meters.lat - Estimate.Meters.lat,
-                    Error.Meters.lon - Estimate.Meters.lon,
-                    Error.Meters.alt - Estimate.Meters.alt,
+                    Error.Value.Meters.lat - Estimate.Value.Meters.lat,
+                    Error.Value.Meters.lon - Estimate.Value.Meters.lon,
+                    Error.Value.Meters.alt - Estimate.Value.Meters.alt,
                     Dimension.Meters);
                 CorrectError = new PointValue(corErrP, earth, idP.lat);
                 Point corTrajP = new Point(
-                    Ideal.Meters.lat + CorrectError.Meters.lat,
-                    Ideal.Meters.lon + CorrectError.Meters.lon,
-                    Ideal.Meters.alt + CorrectError.Meters.alt,
+                    Ideal.Value.Meters.lat + CorrectError.Value.Meters.lat,
+                    Ideal.Value.Meters.lon + CorrectError.Value.Meters.lon,
+                    Ideal.Value.Meters.alt + CorrectError.Value.Meters.alt,
                     Dimension.Meters);
                 CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
             }
@@ -194,23 +264,23 @@ namespace CommonLib
                 Point errP = new Point(error[2], error[1], 0, Dimension.Meters);
                 Error = new PointValue(errP, earth, idP.lat);
                 Point realP = new Point(
-                    Ideal.Meters.lat + Error.Meters.lat,
-                    Ideal.Meters.lon + Error.Meters.lon,
-                    Ideal.Meters.alt + Error.Meters.alt,
+                    Ideal.Value.Meters.lat + Error.Value.Meters.lat,
+                    Ideal.Value.Meters.lon + Error.Value.Meters.lon,
+                    Ideal.Value.Meters.alt + Error.Value.Meters.alt,
                     Dimension.Meters);
                 Real = new PointValue(realP, earth, idP.lat);
                 Point estP = new Point(estimate[2], estimate[1], 0, Dimension.Meters);
                 Estimate = new PointValue(estP, earth, idP.lat);
                 Point corErrP = new Point(
-                    Error.Meters.lat - Estimate.Meters.lat,
-                    Error.Meters.lon - Estimate.Meters.lon,
-                    Error.Meters.alt - Estimate.Meters.alt,
+                    Error.Value.Meters.lat - Estimate.Value.Meters.lat,
+                    Error.Value.Meters.lon - Estimate.Value.Meters.lon,
+                    Error.Value.Meters.alt - Estimate.Value.Meters.alt,
                     Dimension.Meters);
                 CorrectError = new PointValue(corErrP, earth, idP.lat);
                 Point corTrajP = new Point(
-                    Ideal.Meters.lat + CorrectError.Meters.lat,
-                    Ideal.Meters.lon + CorrectError.Meters.lon,
-                    Ideal.Meters.alt + CorrectError.Meters.alt,
+                    Ideal.Value.Meters.lat + CorrectError.Value.Meters.lat,
+                    Ideal.Value.Meters.lon + CorrectError.Value.Meters.lon,
+                    Ideal.Value.Meters.alt + CorrectError.Value.Meters.alt,
                     Dimension.Meters);
                 CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
             }
@@ -219,12 +289,12 @@ namespace CommonLib
     }
     public struct VelocitySet
     {
-        public VelocityValue Ideal;
-        public VelocityValue Error;
-        public VelocityValue Real;
-        public VelocityValue Estimate;
-        public VelocityValue CorrectError;
-        public VelocityValue CorrectTrajectory;
+        public VelocityValue? Ideal;
+        public VelocityValue? Error;
+        public VelocityValue? Real;
+        public VelocityValue? Estimate;
+        public VelocityValue? CorrectError;
+        public VelocityValue? CorrectTrajectory;
         public VelocitySet(Velocity velocity, Vector error, Vector estimate, bool ISChannel3 = true)
         {
             if (error == null)
@@ -236,36 +306,36 @@ namespace CommonLib
                 Ideal = new VelocityValue(velocity.E, velocity.N, velocity.H);
                 Error = new VelocityValue(error[4], error[5], error[6]);
                 Real = new VelocityValue(
-                    Ideal.E + Error.E,
-                    Ideal.N + Error.N,
-                    Ideal.H + Error.H);
+                    Ideal.Value.E + Error.Value.E,
+                    Ideal.Value.N + Error.Value.N,
+                    Ideal.Value.H + Error.Value.H);
                 Estimate = new VelocityValue(estimate[4], estimate[5], estimate[6]);
                 CorrectError = new VelocityValue(
-                    Error.E - Estimate.E,
-                    Error.N - Estimate.N,
-                    Error.H - Estimate.H);
+                    Error.Value.E - Estimate.Value.E,
+                    Error.Value.N - Estimate.Value.N,
+                    Error.Value.H - Estimate.Value.H);
                 CorrectTrajectory = new VelocityValue(
-                    Ideal.E + CorrectError.E,
-                    Ideal.N + CorrectError.N,
-                    Ideal.H + CorrectError.H);
+                    Ideal.Value.E + CorrectError.Value.E,
+                    Ideal.Value.N + CorrectError.Value.N,
+                    Ideal.Value.H + CorrectError.Value.H);
             }
             else
             {
                 Ideal = new VelocityValue(velocity.E, velocity.N, 0);
                 Error = new VelocityValue(error[3], error[4], 0);
                 Real = new VelocityValue(
-                    Ideal.E + Error.E,
-                    Ideal.N + Error.N,
-                    Ideal.H + Error.H);
+                    Ideal.Value.E + Error.Value.E,
+                    Ideal.Value.N + Error.Value.N,
+                    Ideal.Value.H + Error.Value.H);
                 Estimate = new VelocityValue(estimate[3], estimate[4], 0);
                 CorrectError = new VelocityValue(
-                    Error.E - Estimate.E,
-                    Error.N - Estimate.N,
-                    Error.H - Estimate.H);
+                    Error.Value.E - Estimate.Value.E,
+                    Error.Value.N - Estimate.Value.N,
+                    Error.Value.H - Estimate.Value.H);
                 CorrectTrajectory = new VelocityValue(
-                    Ideal.E + CorrectError.E,
-                    Ideal.N + CorrectError.N,
-                    Ideal.H + CorrectError.H);
+                    Ideal.Value.E + CorrectError.Value.E,
+                    Ideal.Value.N + CorrectError.Value.N,
+                    Ideal.Value.H + CorrectError.Value.H);
             }
 
 
@@ -285,9 +355,9 @@ namespace CommonLib
     }
     public struct AnglesSet
     {
-        public AngleValue Ideal;
-        public AngleValue Error;
-        public AngleValue Real;
+        public AngleValue? Ideal;
+        public AngleValue? Error;
+        public AngleValue? Real;
         public AnglesSet(Angles angles, Vector error, bool IsChannel3 = true)
         {
             if (error == null)
@@ -298,9 +368,9 @@ namespace CommonLib
                 Angles errAngles = new Angles(error[7], error[8], error[9], Dimension.Radians);
                 Error = new AngleValue(errAngles);
                 Angles realAngles = new Angles(
-                    Ideal.Radians.heading + Error.Radians.heading,
-                    Ideal.Radians.roll + Error.Radians.roll,
-                    Ideal.Radians.pitch + Error.Radians.pitch,
+                    Ideal.Value.Radians.heading + Error.Value.Radians.heading,
+                    Ideal.Value.Radians.roll + Error.Value.Radians.roll,
+                    Ideal.Value.Radians.pitch + Error.Value.Radians.pitch,
                     Dimension.Radians);
                 Real = new AngleValue(realAngles);
             }
@@ -310,9 +380,9 @@ namespace CommonLib
                 Angles errAngles = new Angles(error[5], error[6], error[7], Dimension.Radians);
                 Error = new AngleValue(errAngles);
                 Angles realAngles = new Angles(
-                    Ideal.Radians.heading + Error.Radians.heading,
-                    Ideal.Radians.roll + Error.Radians.roll,
-                    Ideal.Radians.pitch + Error.Radians.pitch,
+                    Ideal.Value.Radians.heading + Error.Value.Radians.heading,
+                    Ideal.Value.Radians.roll + Error.Value.Radians.roll,
+                    Ideal.Value.Radians.pitch + Error.Value.Radians.pitch,
                     Dimension.Radians);
                 Real = new AngleValue(realAngles);
             }
@@ -349,7 +419,7 @@ namespace CommonLib
             }
         }
     }
-    public struct InputData
+    public struct TrajectoryInput
     {
         public double[] latitude { get; set; }
         public double[] longitude { get; set; }
@@ -362,4 +432,5 @@ namespace CommonLib
         Radians,
         Meters
     }
+
 }

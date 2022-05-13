@@ -17,12 +17,10 @@ namespace MapApplication.Model.Helper
             if (trajectoryModelling == null)
                 trajectoryModelling = new Modelling();
 
-            InputData input;
-            InitErrors initErrors = new InitErrors();
-            InputWindData inputWindData = new InputWindData();
-            InputAirData inputAirData = new InputAirData();
-            SetInputs(initData, ref input, ref initErrors, ref inputWindData, ref inputAirData);
-            trajectoryModelling.Init(input, initErrors, inputWindData, inputAirData);
+            Input input = new Input();
+
+            SetInputs(initData, ref input);
+            trajectoryModelling.Init(input);
         }
         //private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
         //{
@@ -33,9 +31,17 @@ namespace MapApplication.Model.Helper
             Init(initData);
             trajectoryModelling.GetOutputs(ref Output);
         }
-        private static void SetInputs(InitData initData, ref InputData inputData, ref InitErrors initErrors, ref InputWindData windData, ref InputAirData inputAirData)
+        private static void SetInputs(InitData initData, ref Input input)
         {
-            inputData = new InputData();
+            input.trajectory = SetTrajectoryInput(initData);
+            input.air = SetAirData(initData);
+            input.INS = SetInsErrors(initData);
+            input.wind = SetWindData(initData);
+            input.GNSS = SetGnssErrors(initData);
+        }
+        private static TrajectoryInput SetTrajectoryInput(InitData initData)
+        {
+            TrajectoryInput inputData = new TrajectoryInput();
             inputData.latitude = new double[initData.wayPointList.Count];
             inputData.longitude = new double[initData.wayPointList.Count];
             inputData.altitude = new double[initData.wayPointList.Count];
@@ -47,17 +53,15 @@ namespace MapApplication.Model.Helper
                 inputData.altitude[i] = initData.wayPointList[i].Altitude;
                 inputData.velocity[i] = initData.wayPointList[i].Velocity;
             }
-            inputAirData = SetAirData(initData);
-            initErrors = SetInitErrors(initData);
-            windData = SetWindData(initData);
+            return inputData;
         }
         private static InputAirData SetAirData(InitData initData)
         {
             InputAirData airData = new InputAirData();
 
             airData.relativeAltitude = initData.airInfo[0].Value;
-            airData.pressureError = initData.windInfo[4].Value;
-            airData.tempratureError = initData.windInfo[5].Value;
+            airData.pressureError = initData.windInfo[3].Value;
+            airData.tempratureError = initData.windInfo[4].Value;
 
             return airData;
         }
@@ -65,10 +69,9 @@ namespace MapApplication.Model.Helper
         {
             InputWindData windData = new InputWindData();
 
-            windData.angle = Converter.DegToRad(initData.windInfo[0].Value);
-            windData.wind_e = initData.windInfo[1].Value;
-            windData.wind_n = initData.windInfo[2].Value;
-            windData.wind_d = initData.windInfo[3].Value;
+            windData.wind_e = initData.windInfo[0].Value;
+            windData.wind_n = initData.windInfo[1].Value;
+            windData.wind_d = initData.windInfo[2].Value;
 
             windData.sigma_u = initData.windInfoDryden[0].Value;
             windData.sigma_v = initData.windInfoDryden[1].Value;
@@ -79,38 +82,48 @@ namespace MapApplication.Model.Helper
 
             return windData;
         }
-        private static InitErrors SetInitErrors(InitData initData)
+        private static InsErrors SetInsErrors(InitData initData)
         {
-            InitErrors initErrors = new InitErrors();
+            InsErrors insErrors = new InsErrors();
 
-            initErrors.angleAccuracy.heading = initData.insErrors[0].Value;
-            initErrors.angleAccuracy.pitch = initData.insErrors[1].Value;
-            initErrors.angleAccuracy.roll = initData.insErrors[2].Value;
+            insErrors.angleAccuracy.heading = initData.insErrors[0].Value;
+            insErrors.angleAccuracy.pitch = initData.insErrors[1].Value;
+            insErrors.angleAccuracy.roll = initData.insErrors[2].Value;
 
-            initErrors.coordAccuracy.latitude = initData.insErrors[3].Value;
-            initErrors.coordAccuracy.longitude = initData.insErrors[4].Value;
-            initErrors.coordAccuracy.altitude = initData.insErrors[5].Value;
+            insErrors.coordAccuracy.latitude = initData.insErrors[3].Value;
+            insErrors.coordAccuracy.longitude = initData.insErrors[4].Value;
+            insErrors.coordAccuracy.altitude = initData.insErrors[5].Value;
 
-            initErrors.velocityAccuracy.east = initData.insErrors[6].Value;
-            initErrors.velocityAccuracy.north = initData.insErrors[7].Value;
-            initErrors.velocityAccuracy.H = initData.insErrors[8].Value;
+            insErrors.velocityAccuracy.east = initData.insErrors[6].Value;
+            insErrors.velocityAccuracy.north = initData.insErrors[7].Value;
+            insErrors.velocityAccuracy.H = initData.insErrors[8].Value;
 
-            initErrors.accelerationError.first = initData.sensorErrors[0].Value;
-            initErrors.accelerationError.second = initData.sensorErrors[1].Value;
-            initErrors.accelerationError.third = initData.sensorErrors[2].Value;
+            insErrors.dt = initData.insErrors[9].Value;
 
-            initErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value);
-            initErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value);
-            initErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value);
+            insErrors.accelerationError.first = initData.sensorErrors[0].Value;
+            insErrors.accelerationError.second = initData.sensorErrors[1].Value;
+            insErrors.accelerationError.third = initData.sensorErrors[2].Value;
 
-            initErrors.accNoise = initData.sensorErrors[6].Value;
-            initErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value);
-            initErrors.snsNoise = initData.sensorErrors[8].Value;
+            insErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value);
+            insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value);
+            insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value);
 
-            initErrors.dt = initData.sensorErrors[9].Value;
-            initErrors.temperatureCoef = initData.sensorErrors[10].Value;
+            insErrors.accNoise = initData.sensorErrors[6].Value;
+            insErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value);
 
-            return initErrors;
+            insErrors.temperatureCoef = initData.sensorErrors[8].Value;
+
+            return insErrors;
+        }
+        private static GnssErrors SetGnssErrors(InitData initData)
+        {
+            GnssErrors gnss = new GnssErrors();
+
+            gnss.sateliteErrorCoord = initData.gnssErrors[0].Value;
+            gnss.sateliteErrorVelocity = initData.gnssErrors[1].Value;
+            gnss.noise = initData.gnssErrors[2].Value;
+
+            return gnss;
         }
     }
 }

@@ -7,44 +7,32 @@ using System.Threading.Tasks;
 
 namespace CommonLib
 {
+
+
     public class Import
     {
-        public static void Init()
-        {
-            Randomize.Random_initialize();
-            Dryden.Dryden_initialize();
-        }
-        public static double GetRandom()
-        {
-            double output = 0;
-            Randomize.Random_step();
-            Randomize.GetOutput(ref output);
-            return output;
-        }
-        public static DrydenOutput DrydenModel(InputWindData windData, double airSpeed)
-        {
-            DrydenInput input = new DrydenInput();
-            input.rand1 = GetRandom();
-            input.rand2 = GetRandom();
-            input.rand3 = GetRandom();
-            DrydenLocal local = new DrydenLocal(windData, airSpeed);
-
-            Dryden.SetInput(ref input, ref local);
-
-            for (int i = 0; i < 50; i++) //50 - эмпирически определено соответствие 1сек расчета симулинка
-            {
-                Dryden.Dryden_step();
-            }
-
-            DrydenOutput output = new DrydenOutput();
-
-            Dryden.GetOutput(ref output);
-
-            return output;
-        }
+        
     }
     public class Randomize
     {
+        //Random random;
+        public void Init(int seed)
+        {
+            //random = new Random();
+            Random_initialize();
+        }
+        public double GetRandom()
+        {
+            double output = 0;
+            //int i = random.Next(0, 100);
+            //
+            //for (int j = 0; j < i; j++)
+            Random_step();
+
+            GetOutput(ref output);
+            return output;
+        }
+
         [DllImport("Random.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void Random_step();
         [DllImport("Random.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -52,8 +40,33 @@ namespace CommonLib
         [DllImport("Random.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void GetOutput(ref double output);
     }
-    class Dryden
+    public class Dryden
     {
+        public void Init()
+        {
+            Dryden_initialize();
+        }
+        public DrydenOutput Model(InputWindData windData, double airSpeed, Randomize randomize)
+        {
+            DrydenInput input = new DrydenInput();
+            input.rand1 = randomize.GetRandom();
+            input.rand2 = randomize.GetRandom();
+            input.rand3 = randomize.GetRandom();
+            DrydenLocal local = new DrydenLocal(windData, airSpeed);
+
+            SetInput(ref input, ref local);
+
+            for (int i = 0; i < 50; i++) //50 - эмпирически определено соответствие 1сек расчета симулинка
+            {
+                Dryden_step();
+            }
+
+            DrydenOutput output = new DrydenOutput();
+
+            GetOutput(ref output);
+
+            return output;
+        }
 
         [DllImport("Dryden.dll", CallingConvention = CallingConvention.Cdecl)]
         internal static extern void Dryden_step();
@@ -65,7 +78,7 @@ namespace CommonLib
         internal static extern void GetOutput(ref DrydenOutput output);
     }
 
-    #region Dryden
+    #region Dryden Types
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

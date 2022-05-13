@@ -9,12 +9,76 @@ using System.Threading.Tasks;
 
 namespace MapApplication.Model
 {
+    public class DisplayGraphicData
+    {
+        private Source activeSource;
+        private List<PlotData> display;
+        public List<PlotData> Display
+        {
+            get { return display; }
+            set
+            {
+                if (value == null) return;
+
+                if (display == null)
+                    display = new List<PlotData>();
+
+                else if (display.Equals(value)) return;
+
+                display.Clear();
+                display.AddRange(value);
+            }
+        }
+        public List<PlotData> INS;
+        public List<PlotData> GNSS;
+        public List<PlotData> KVS;
+        public void SwitchSource(Source source)
+        {
+            switch (source)
+            {
+                case Source.INS:
+                    display = INS;
+                    break;
+                case Source.GNSS:
+                    display = GNSS;
+                    break;
+                case Source.KVS:
+                    display = KVS;
+                    break;
+                default:
+                    display = INS;
+                    break;
+            }
+            activeSource = source;
+        }
+        public DisplayGraphicData Copy()
+        {
+            DisplayGraphicData copy = new DisplayGraphicData(activeSource);
+            copy.INS = PlotWorker.DublicatePlotData(INS);
+            copy.GNSS = PlotWorker.DublicatePlotData(GNSS);
+            copy.KVS = PlotWorker.DublicatePlotData(KVS);
+            return copy;
+        }
+        public DisplayGraphicData()
+        {
+            SwitchSource(Source.INS);
+        }
+        public DisplayGraphicData(Source source)
+        {
+            SwitchSource(source);
+        }
+
+
+
+    }
     public class InitData
     {
         public ObservableCollection<WayPoint> wayPointList { get; set; }
 
         public ObservableCollection<EquipmentData> insErrors { get; set; }
         public ObservableCollection<EquipmentData> sensorErrors { get; set; }
+
+        public ObservableCollection<EquipmentData> gnssErrors { get; set; }
 
         public ObservableCollection<EquipmentData> airInfo { get; set; }
 
@@ -33,13 +97,15 @@ namespace MapApplication.Model
     {
         public PlotName name;
         public PlotCharacter character;
+        public Source source;
         public List<DataPoint> values;
         public string xAxisName;
         public string yAxisName;
-        public PlotData(PlotName _name, PlotCharacter _character, List<double> _values)
+        public PlotData(PlotName _name, PlotCharacter _character,Source _source, List<double> _values)
         {
             name = _name;
             character = _character;
+            source = _source;
             xAxisName = "time, sec";
             yAxisName = PlotWorker.SelectPlotName(_name) + ", " + PlotWorker.SelectPlotDimension(_name, character);
             values = new List<DataPoint>();
@@ -54,6 +120,12 @@ namespace MapApplication.Model
         DesiredTrack,
         ActualTrack
     }
+    public enum Source
+    {
+        INS,
+        GNSS,
+        KVS
+    }
     public enum PlotCharacter
     {
         Ideal,
@@ -63,7 +135,6 @@ namespace MapApplication.Model
         CorrectError,
         CorrectTrajectory,
         P,
-        CourseAir,
         None
     }
     public enum PlotName

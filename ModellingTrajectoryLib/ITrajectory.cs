@@ -13,17 +13,22 @@ namespace ModellingTrajectoryLib
 {
     public interface ITrajectory
     {
-        void Init(InputData input, InputAirData inputAirData, InputWindData inputWindData);
-        void Track(int wpNumber, double dt, ModellingFunctions functions);
+        void Init(Input input);
+        void Track(int wpNumber, ModellingFunctions functions);
         Action<IKalman> FillOutputsData { get; set; }
         PointSet OutPoints { get; set; }
         VelocitySet OutVelocities { get; set; }
         AnglesSet OutAngles { get; set; }
-        AirData OutAirData { get; set; }
         P_out OutCovar { get; set; }
+
+        PointSet GnssPoints { get; set; }
+        PointSet KvsPoints { get; set; }
+        VelocitySet GnssVelocities { get; set; }
+        VelocitySet KvsVelocities { get; set; }
     }
     public abstract class BaseTrajectory : ITrajectory
     {
+        
         public Action<IKalman> FillOutputsData { get; set; }
         protected Parameters parameters;
         protected IKalman kalmanModel;
@@ -38,6 +43,18 @@ namespace ModellingTrajectoryLib
                 OutPoints = value;
             }
         }
+        public PointSet gnssPoints;
+        public PointSet GnssPoints
+        {
+            get { return gnssPoints; }
+            set { gnssPoints = value; }
+        }
+        public PointSet kvsPoints;
+        public PointSet KvsPoints
+        {
+            get { return kvsPoints; }
+            set { kvsPoints = value; }
+        }
         public VelocitySet OutVelocities
         {
             get
@@ -48,6 +65,18 @@ namespace ModellingTrajectoryLib
             {
                 OutVelocities = value;
             }
+        }
+        public VelocitySet gnssVelocities;
+        public VelocitySet GnssVelocities
+        {
+            get { return gnssVelocities; }
+            set { gnssVelocities = value; }
+        }
+        public VelocitySet kvsVelocities;
+        public VelocitySet KvsVelocities
+        {
+            get { return kvsVelocities; }
+            set { KvsVelocities = value; }
         }
         public AnglesSet OutAngles
         {
@@ -60,17 +89,7 @@ namespace ModellingTrajectoryLib
                 OutAngles = value;
             }
         }
-        public AirData OutAirData
-        {
-            get
-            {
-                return parameters.airData;
-            }
-            set
-            {
-                OutAirData = value;
-            }
-        }
+       
         public P_out OutCovar
         {
             get
@@ -93,8 +112,8 @@ namespace ModellingTrajectoryLib
 
         int wayPointsCount;
 
-        private InputAirData inputAir;
-        private InputWindData inputWind;
+        Randomize randomize;
+        Input input;
         List<Parameters> localParams;
 
         CourseAirReckoning courseAir;
@@ -103,29 +122,30 @@ namespace ModellingTrajectoryLib
             get { return wayPointsCount; }
             private set { wayPointsCount = value; }
         }
+        protected virtual int RandomSeed { get; set; }
 
-        public void Init(InputData input, InputAirData inputAirData, InputWindData inputWindData)
+        public void Init(Input _input)
         {
-            Import.Init();
+            randomize = new Randomize();
+            randomize.Init(RandomSeed);
             localParams = new List<Parameters>();
-            parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.Radians);
+            parameters.point = new Point(_input.trajectory.latitude[0], _input.trajectory.longitude[0], _input.trajectory.altitude[0], Dimension.Radians);
             localParams.Add(parameters);
 
-            inputAir = inputAirData;
-            inputWind = inputWindData;
+            input = _input;
 
             courseAir = new CourseAirReckoning();
             courseAir.Init(parameters.point);
         }
-        public void Track(int wpNumber, double dt, ModellingFunctions functions)
+        public void Track(int wpNumber, ModellingFunctions functions)
         {
-            parameters.dt = dt;
+            parameters.dt = input.INS.dt;
 
             InitNextPoint(ref parameters, localParams);
 
             ComputeParametersData(wpNumber, functions);
 
-            courseAir.Model(ref parameters, inputWind, inputAir);
+            courseAir.Model(ref parameters, input.wind, input.air, randomize, ref kvsPoints, ref kvsVelocities);
 
             localParams.Add(parameters);
         }
@@ -150,14 +170,14 @@ namespace ModellingTrajectoryLib
 
         }
         
-        public void Estimation(IKalman kalman, InitErrors initErrors,InputAirData airData, ModellingFunctions functions, double dt)
+        public void Estimation(IKalman kalman, InsErrors initErrors,InputAirData airData, ModellingFunctions functions)
         {
             Matrix C = functions.CreateMatrixC(parameters);
             kalmanModel = kalman;
-            kalmanModel.Model(initErrors, airData, parameters, C, dt);
+            kalmanModel.Model(input, parameters,C, randomize, ref gnssPoints, ref gnssVelocities);
             FillOutputsData?.Invoke(kalman);
         }
-        protected void InitStartedPoint(ref Parameters parameters, InputData input)
+        protected void InitStartedPoint(ref Parameters parameters, TrajectoryInput input)
         {
             parameters.point = new Point(input.latitude[0], input.longitude[0], input.altitude[0], Dimension.Radians);
         }

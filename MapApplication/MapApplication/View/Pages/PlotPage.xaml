@@ -82,14 +82,18 @@
                         </ie:EventTrigger>
                     </ie:Interaction.Triggers>
                 </ComboBox>
+                <Button Content="Difference" Command="{Binding DifferenceClick}" Style="{StaticResource btn_Style2}"></Button>
             </StackPanel>
+            
         </Border>
-       
-       
+
+        
+        
         <v:Plot Grid.Column="1">
             <ContentControl Content="{Binding plot}"></ContentControl>
         </v:Plot>
 
+        
         <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>

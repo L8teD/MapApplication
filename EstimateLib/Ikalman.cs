@@ -15,7 +15,7 @@ namespace EstimateLib
         Vector X { get; set; }
         Vector X_estimate { get; set; }
         Matrix P { get; set; }
-        void Model(InitErrors initErrors,InputAirData inputAirData, Parameters parameters, Matrix C, double dt);
+        void Model(Input input, Parameters parameters, Matrix C, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities);
     }
     public abstract class BaseKalman : IKalman
     {
@@ -54,7 +54,7 @@ namespace EstimateLib
         private CoordAccuracy coordAccuracy;
         private VelocityAccuracy velocityAccuracy;
 
-        private void InitX(InitErrors initErrors, Point point, AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
+        private void InitX(InsErrors initErrors, Point point, AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
         {
             X_error = Vector.Zero(21);
 
@@ -141,9 +141,9 @@ namespace EstimateLib
             F[4, 8] = acceleration.H;
             F[4, 9] = -acceleration.N;
 
-            F[4, 16] = C[1, 1] * acceleration.X * (15 + airData.tempratureError);
-            F[4, 17] = C[1, 2] * acceleration.Y * (15 + airData.tempratureError);
-            F[4, 18] = C[1, 3] * acceleration.Z * (15 + airData.tempratureError);
+            F[4, 16] = C[1, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
+            F[4, 17] = C[1, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
+            F[4, 18] = C[1, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
             F[4, 19] = C[1, 1] * acceleration.X;
             F[4, 20] = C[1, 2] * acceleration.Y;
             F[4, 21] = C[1, 3] * acceleration.Z;
@@ -154,12 +154,14 @@ namespace EstimateLib
             F[5, 4] = -2 * absOmega.H;
             F[5, 6] = 2 * absOmega.E;
 
-            F[5, 7] = -acceleration.H;
-            F[5, 9] = acceleration.E;
+            //F[5, 7] = -acceleration.H;
+            F[5, 7] = acceleration.H;
+            //F[5, 9] = acceleration.E;
+            F[5, 9] = -acceleration.E;
 
-            F[5, 16] = C[2, 1] * acceleration.X * (15 + airData.tempratureError);
-            F[5, 17] = C[2, 2] * acceleration.Y * (15 + airData.tempratureError);
-            F[5, 18] = C[2, 3] * acceleration.Z * (15 + airData.tempratureError);
+            F[5, 16] = C[2, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
+            F[5, 17] = C[2, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
+            F[5, 18] = C[2, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
             F[5, 19] = C[2, 1] * acceleration.X;
             F[5, 20] = C[2, 2] * acceleration.Y;
             F[5, 21] = C[2, 3] * acceleration.Z;
@@ -173,9 +175,9 @@ namespace EstimateLib
             F[6, 7] = acceleration.N;
             F[6, 8] = acceleration.E;
 
-            F[6, 15] = C[3, 1] * acceleration.X * (15 + airData.tempratureError);
-            F[6, 16] = C[3, 2] * acceleration.Y * (15 + airData.tempratureError);
-            F[6, 17] = C[3, 3] * acceleration.Z * (15 + airData.tempratureError);
+            F[6, 15] = C[3, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
+            F[6, 16] = C[3, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
+            F[6, 17] = C[3, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
             F[6, 18] = C[3, 1] * acceleration.X;
             F[6, 19] = C[3, 2] * acceleration.Y;
             F[6, 20] = C[3, 3] * acceleration.Z;
@@ -183,9 +185,9 @@ namespace EstimateLib
             F[7, 8] = absOmega.H;
             F[7, 9] = -absOmega.N;
 
-            F[7, 10] = C[1, 1] * omegaGyro.X * (15 + airData.tempratureError);
-            F[7, 11] = C[1, 2] * omegaGyro.Y * (15 + airData.tempratureError);
-            F[7, 12] = C[1, 3] * omegaGyro.Z * (15 + airData.tempratureError);
+            F[7, 10] = C[1, 1] /** omegaGyro.X*/ * (15 + airData.tempratureError);
+            F[7, 11] = C[1, 2] /** omegaGyro.Y*/ * (15 + airData.tempratureError);
+            F[7, 12] = C[1, 3] /** omegaGyro.Z*/ * (15 + airData.tempratureError);
             F[7, 13] = C[1, 1] * omegaGyro.X;
             F[7, 14] = C[1, 2] * omegaGyro.Y;
             F[7, 15] = C[1, 3] * omegaGyro.Z;
@@ -193,9 +195,9 @@ namespace EstimateLib
             F[8, 7] = -absOmega.H;
             F[8, 9] = absOmega.E;
 
-            F[8, 10] = C[2, 1] * omegaGyro.X * (15 + airData.tempratureError);
-            F[8, 11] = C[2, 2] * omegaGyro.Y * (15 + airData.tempratureError);
-            F[8, 12] = C[2, 3] * omegaGyro.Z * (15 + airData.tempratureError);
+            F[8, 10] = C[2, 1] /** omegaGyro.X */* (15 + airData.tempratureError);
+            F[8, 11] = C[2, 2] /** omegaGyro.Y */* (15 + airData.tempratureError);
+            F[8, 12] = C[2, 3] /** omegaGyro.Z */* (15 + airData.tempratureError);
             F[8, 13] = C[2, 1] * omegaGyro.X;
             F[8, 14] = C[2, 2] * omegaGyro.Y;
             F[8, 15] = C[2, 3] * omegaGyro.Z;
@@ -203,9 +205,9 @@ namespace EstimateLib
             F[9, 7] = absOmega.N;
             F[9, 8] = -absOmega.E;
 
-            F[9, 10] = C[3, 1] * omegaGyro.X * (15 + airData.tempratureError);
-            F[9, 11] = C[3, 2] * omegaGyro.Y * (15 + airData.tempratureError);
-            F[9, 12] = C[3, 3] * omegaGyro.Z * (15 + airData.tempratureError);
+            F[9, 10] = C[3, 1] /** omegaGyro.X*/ * (15 + airData.tempratureError);
+            F[9, 11] = C[3, 2] /** omegaGyro.Y*/ * (15 + airData.tempratureError);
+            F[9, 12] = C[3, 3] /** omegaGyro.Z*/ * (15 + airData.tempratureError);
             F[9, 13] = C[3, 1] * omegaGyro.X;
             F[9, 14] = C[3, 2] * omegaGyro.Y;
             F[9, 15] = C[3, 3] * omegaGyro.Z;
@@ -237,18 +239,18 @@ namespace EstimateLib
             G[9, 2] = C[3, 2];
             G[9, 3] = C[3, 3];
         }
-        private void InitW(InitErrors initErrors)
+        private void InitW(InsErrors initErrors, Randomize randomize)
         {
             double gyro_noise = initErrors.gyroNoise;
             double acc_noise = initErrors.accNoise;
 
             W = Vector.Zero(6);
-            W[1] = gyro_noise * Import.GetRandom();
-            W[2] = gyro_noise * Import.GetRandom();
-            W[3] = gyro_noise * Import.GetRandom();
-            W[4] = acc_noise * Import.GetRandom();
-            W[5] = acc_noise * Import.GetRandom();
-            W[6] = acc_noise * Import.GetRandom();
+            W[1] = gyro_noise * randomize.GetRandom();
+            W[2] = gyro_noise * randomize.GetRandom();
+            W[3] = gyro_noise * randomize.GetRandom();
+            W[4] = acc_noise * randomize.GetRandom();
+            W[5] = acc_noise * randomize.GetRandom();
+            W[6] = acc_noise * randomize.GetRandom();
 
             W_withoutNoise = Vector.Zero(6);
             W_withoutNoise[1] = gyro_noise;
@@ -273,7 +275,7 @@ namespace EstimateLib
             H[6, 6] = 1.0;
 
         }
-        private void InitZ(Point point, Velocity velocity, EarthModel earth, InitErrors initErrors)
+        private void InitZ(Point point, Velocity velocity, EarthModel earth, GnssErrors gnssErrors, Randomize randomize, InsErrors insErrors, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
         {
             Z = Vector.Zero(6);
             Point _point = Converter.RadiansToMeters(point, earth);
@@ -288,31 +290,51 @@ namespace EstimateLib
             };
             Vector estimatedParams = new Vector(_estimatedParams);
             Vector Z_ins = estimatedParams + H * X;
-            double noise_sns = initErrors.snsNoise;
+            double noise_sns = gnssErrors.noise;
             double[] _snsErrors = new double[] {
-                noise_sns,
-                noise_sns,
-                noise_sns,
-                noise_sns / 50.0,
-                noise_sns / 50.0,
-                noise_sns / 50.0
+                noise_sns* randomize.GetRandom(),
+                noise_sns* randomize.GetRandom(),
+                noise_sns* randomize.GetRandom(),
+                noise_sns / 50.0* randomize.GetRandom(),
+                noise_sns / 50.0* randomize.GetRandom(),
+                noise_sns / 50.0* randomize.GetRandom()
             };
             Vector snsErrors = new Vector(_snsErrors);
             double[] _Z_sns = new double[]
             {
-                _point.lon + snsErrors[1] * Import.GetRandom(),
-                _point.lat + snsErrors[2] * Import.GetRandom(),
-                _point.alt + snsErrors[3] * Import.GetRandom(),
-                velocity.E + snsErrors[4] * Import.GetRandom(),
-                velocity.N + snsErrors[5] * Import.GetRandom(),
-                velocity.H + snsErrors[6] * Import.GetRandom()
+                _point.lon + snsErrors[1],
+                _point.lat + snsErrors[2],
+                _point.alt + snsErrors[3],
+                velocity.E + snsErrors[4],
+                velocity.N + snsErrors[5],
+                velocity.H + snsErrors[6]
             };
             Vector Z_sns = new Vector(_Z_sns);
             Z = Z_ins - Z_sns;
 
-            R = snsErrors.Diag() ^ 2 * (1.0 / initErrors.dt);
+            R = snsErrors.Diag() ^ 2 * (1.0 / insErrors.dt);
+
+            SetOutputData(ref gnssPoints, ref gnssVelocities, snsErrors, _point, velocity, earth);
         }
-        private void InitAnglesError(InitErrors initErrors)
+        private void SetOutputData(ref PointSet gnssPoints, ref VelocitySet gnssVelocities, Vector snsErrors, Point point, Velocity velocity, EarthModel earth)
+        {
+            gnssPoints = new PointSet();
+            gnssVelocities = new VelocitySet();
+
+            gnssPoints.Real = new PointValue(
+                new Point(point.lat + snsErrors[2], point.lon + snsErrors[1], point.alt + snsErrors[3], Dimension.Meters),
+                earth,
+                point.lat);
+
+            gnssPoints.Error = new PointValue(
+                new Point(snsErrors[2],snsErrors[1], snsErrors[3], Dimension.Meters),
+                earth,
+                point.lat);
+
+            gnssVelocities.Real = new VelocityValue(velocity.E + snsErrors[4], velocity.N + snsErrors[5], velocity.H + snsErrors[6]);
+            gnssVelocities.Error = new VelocityValue(snsErrors[4], snsErrors[5], snsErrors[6]);
+        }
+        private void InitAnglesError(InsErrors initErrors)
         {
             orientationAngles = Vector.Zero(3);
             anglesErrors = new Vector(Converter.DegToRad(initErrors.angleAccuracy.heading),
@@ -348,31 +370,31 @@ namespace EstimateLib
 
             X_previous = X_estimate.Dublicate();
         }
-        public void Model(InitErrors initErrors, InputAirData inputAirData, Parameters parameters, Matrix C, double dt)
+        public void Model(Input input, Parameters parameters, Matrix C, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
         {
             if (X == null)
             {
                 X_dot = Vector.Zero(21);
-                InitAnglesError(initErrors);
-                InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);
+                InitAnglesError(input.INS);
+                InitX(input.INS, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles, true);
             }
             else
             {
-                InitX(initErrors, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
+                InitX(input.INS, parameters.point, parameters.absOmega, parameters.earthModel, parameters.velocity, parameters.angles);
             }
 
 
-            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C, inputAirData);
+            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C, input.air);
             InitG(C);
-            InitW(initErrors);
+            InitW(input.INS, randomize);
 
 
             X_dot = F * X + G * W;
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
-            InitZ(parameters.point, parameters.velocity, parameters.earthModel, initErrors);
+            InitZ(parameters.point, parameters.velocity, parameters.earthModel, input.GNSS, randomize, input.INS, ref gnssPoints, ref gnssVelocities);
 
-            Kalman(dt);
+            Kalman(input.INS.dt);
 
         }
     }

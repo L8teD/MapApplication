@@ -19,21 +19,25 @@ namespace ModellingTrajectoryLib
         Point airPoint;
         List<Atmosphere> atmosphereData;
 
+        Dryden dryden;
+
         public void Init(Point _point)
         {
             atmosphereData = Atmosphere.Read();
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
             prevBaroAlt = default(double);
+            dryden = new Dryden();
+            dryden.Init();
         }
-        private Vector GetDrydenComponent(Velocity windSpeed, InputWindData windData, Velocity modellingAirspeed, Matrix C)
+        private Vector GetDrydenComponent(Randomize randomize, InputWindData windData, Velocity modellingAirspeed, Matrix C)
         {
-            DrydenOutput _randWind = Import.DrydenModel(windData, modellingAirspeed.module);
+            DrydenOutput _randWind = dryden.Model(windData, modellingAirspeed.module, randomize);
 
             Vector randWind = !C * new Vector(_randWind.windRand1, _randWind.windRand2, _randWind.windRand3);
 
             return randWind;
         }
-        public void Model(ref Parameters parameters, InputWindData windData, InputAirData airData)
+        public void Model(ref Parameters parameters, InputWindData windData, InputAirData airData, Randomize randomize, ref PointSet kvsPoints, ref VelocitySet kvsVelocities)
         {
             Point _point = parameters.point;
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
@@ -45,7 +49,7 @@ namespace ModellingTrajectoryLib
                 parameters.velocity.N - windSpeed.N,
                 parameters.velocity.H);
 
-            Vector randWind = GetDrydenComponent(windSpeed, windData, modellingAirSpeed, parameters.C);
+            Vector randWind = GetDrydenComponent(randomize, windData, modellingAirSpeed, parameters.C);
             //Vector randWind = Vector.Zero(3);
 
             modellingAirSpeed.E -= randWind[2];
@@ -81,10 +85,20 @@ namespace ModellingTrajectoryLib
 
             airPoint = Point.GetCoords(airPoint, absOmega, recountSpeed, parameters.dt);
             airPoint.alt = baroAltitude;
-            parameters.airData.point = Converter.RadToDeg(airPoint);
-            parameters.airData.airSpeed = recountSpeed;
-            parameters.airData.windSpeed = windSpeed;
-            parameters.airData.angles = parameters.angles;
+
+            kvsPoints = new PointSet();
+
+            kvsPoints.Real = new PointValue(airPoint, parameters.earthModel, airPoint.lat);
+            kvsPoints.Error = new PointValue(
+                new Point(airPoint.lat - parameters.point.lat, airPoint.lon - parameters.point.lon, airPoint.alt - parameters.point.alt, Dimension.Radians),
+                parameters.earthModel, airPoint.lat);
+
+            kvsVelocities = new VelocitySet();
+            kvsVelocities.Real = new VelocityValue(recountSpeed.E, recountSpeed.N, recountSpeed.H);
+            kvsVelocities.Error = new VelocityValue(
+                recountSpeed.E - parameters.velocity.E, 
+                recountSpeed.N - parameters.velocity.N, 
+                recountSpeed.H - parameters.velocity.H);
 
             prevBaroAlt = baroAltitude;
         }

@@ -19,11 +19,13 @@ namespace MapApplication.ViewModel
         public Dictionary<string, string[][]> cb_Data { get; set; }
         public List<LineSeries> IndicatedSeries { get; set; }
         public List<LineSeries> RemovedSeries { get; set; }
-        List<PlotData> desiredPlotData;
-        List<PlotData> actualPlotData;
+        DisplayGraphicData desiredPlotData;
+        DisplayGraphicData actualPlotData;
 
-        PlotName currentPlotName = PlotName.Longitude;
-        PlotCharacter currentCharacter = PlotCharacter.Ideal;
+        PlotName activeParameter = PlotName.Latitude;
+        PlotCharacter activeCharacter = PlotCharacter.Ideal;
+        Source activeSource = Source.INS;
+        string activeVerticalAxis = "";
 
         #region Commands
         private RelayCommand cmd_Home;
@@ -40,6 +42,44 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        private RelayCommand cmd_Difference;
+        public RelayCommand DifferenceClick
+        {
+            get
+            {
+                return cmd_Difference ??
+                (cmd_Difference = new RelayCommand(obj =>
+                {
+                    if (IndicatedSeries == null) return;
+
+                    string yAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
+                   
+                    if (IndicatedSeries.Count > 1)
+                    {
+                        LineSeries diffSerie = new LineSeries()
+                        {
+                            StrokeThickness = 2,
+                            MarkerSize = 0,
+                            LineStyle = LineStyle.Solid,
+                            MarkerType = MarkerType.None,
+                            Color = OxyColors.Green
+                        };
+                        for (int i = 0; i < IndicatedSeries[0].Points.Count; i++)
+                        {
+                            diffSerie.Points.Add(new DataPoint(
+                                i,
+                                IndicatedSeries[0].Points[i].Y - IndicatedSeries[1].Points[i].Y));
+                        }
+                        IndicatedSeries.Clear();
+                        IndicatedSeries.Add(diffSerie);
+                    }
+                    
+
+                    Plot("time, [sec]", PlotWorker.SelectPlotName(activeParameter) + " " + yAxis);
+                }));
+            }
+        }
+
         private RelayCommand cmd_ParamSelectionChanged;
         public RelayCommand ParamSelectionChanged
         {
@@ -54,12 +94,11 @@ namespace MapApplication.ViewModel
                     {
                         plot.ChangePlotTitle(paramName);
 
-                        currentPlotName = PlotWorker.SelectPlotName(paramName);
+                        activeParameter = PlotWorker.SelectPlotName(paramName);
 
-                        string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
+                        activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
 
-                        FillSeries(currentPlotName, currentCharacter);
-                        Plot("time, [sec]", paramName + " " + yAxis);
+                        RefreshPlot();
                     }
                     
                 }));
@@ -75,14 +114,11 @@ namespace MapApplication.ViewModel
                 {
                     string characterName = obj as string;
 
-                    currentCharacter = PlotWorker.SelectPlotCharacter(characterName);
+                    activeCharacter = PlotWorker.SelectPlotCharacter(characterName);
 
-                    string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
+                    activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
 
-                    FillSeries(currentPlotName, currentCharacter);
-                    Plot("time, [sec]", PlotWorker.SelectPlotName(currentPlotName) + " " + yAxis);
-
-
+                    RefreshPlot();
                 }));
             }
         }
@@ -96,14 +132,13 @@ namespace MapApplication.ViewModel
                 {
                     string sourceName = obj as string;
 
-                    //currentCharacter = PlotWorker.SelectPlotCharacter(characterName);
-
-                    //string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
-
-                    //FillSeries(currentPlotName, currentCharacter);
-                    //Plot("time, [sec]", yAxis);
+                    activeSource = PlotWorker.SelectSource(sourceName);
 
 
+                    desiredPlotData.SwitchSource(activeSource);
+                    actualPlotData.SwitchSource(activeSource);
+
+                    RefreshPlot();
                 }));
             }
         }
@@ -123,10 +158,10 @@ namespace MapApplication.ViewModel
         }
         public void RefreshPlot()
         {
-            string yAxis = PlotWorker.SelectPlotDimension(currentPlotName, currentCharacter);
+            activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
 
-            FillSeries(currentPlotName, currentCharacter);
-            Plot("time, [sec]", yAxis);
+            FillSeries(activeParameter, activeCharacter);
+            Plot("time, [sec]", PlotWorker.SelectPlotName(activeParameter) + " " + activeVerticalAxis);
         }
         private void SetComboBoxData()
         {
@@ -179,7 +214,7 @@ namespace MapApplication.ViewModel
             cb_Data.Add(paramNames[7], new string[][] { angleSources, angleCharacter });
             cb_Data.Add(paramNames[8], new string[][] { angleSources, angleCharacter });
         }
-        private void M_Model_SetPlotData(List<PlotData> arg1, List<PlotData> arg2)
+        private void M_Model_SetPlotData(DisplayGraphicData arg1, DisplayGraphicData arg2)
         {
             M_Model_SetDesiredData(arg1);
             M_Model_SetActualData(arg2);
@@ -190,19 +225,19 @@ namespace MapApplication.ViewModel
             RemovedSeries.Clear();
 
             IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, character, desiredPlotData), 
+                PlotWorker.SelectData(name, character, desiredPlotData.Display), 
                 "Desired Track"));
 
             IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, character, actualPlotData), 
+                PlotWorker.SelectData(name, character, actualPlotData.Display), 
                 "Actual Track"));
         }
 
-        private void M_Model_SetDesiredData(List<PlotData> obj)
+        private void M_Model_SetDesiredData(DisplayGraphicData obj)
         {
             desiredPlotData = obj;
         }
-        private void M_Model_SetActualData(List<PlotData> obj)
+        private void M_Model_SetActualData(DisplayGraphicData obj)
         {
             actualPlotData = obj;
         }
@@ -228,5 +263,6 @@ namespace MapApplication.ViewModel
                     legendControlVM.UpdateLegendElement(legendControlVM.legendBtns[i]);
             }
         }
+
     }
 }

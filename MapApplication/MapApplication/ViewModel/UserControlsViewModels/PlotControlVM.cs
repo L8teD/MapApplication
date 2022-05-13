@@ -122,7 +122,7 @@ namespace MapApplication.ViewModel
             switch (plotState)
             {
                 case ActivePlotState.Trajectory:
-                    RefreshPlot(PlotCharacter.Ideal, PlotCharacter.Real, PlotCharacter.CorrectTrajectory, PlotCharacter.CourseAir);
+                    RefreshPlot(PlotCharacter.Ideal, PlotCharacter.Real, PlotCharacter.CorrectTrajectory);
                     break;
                 case ActivePlotState.Error:
                     RefreshPlot(PlotCharacter.Error, PlotCharacter.Estimate, PlotCharacter.CorrectError);
@@ -140,9 +140,7 @@ namespace MapApplication.ViewModel
             string yAxisName = "";
             foreach (PlotCharacter character in characters)
             {
-                plotData = PlotWorker.SelectData(currentTitle, character, m_Model.indicatedListOfPlotData);
-
-                
+                plotData = PlotWorker.SelectData(currentTitle, character, m_Model.indicatedPlotData.Display);
 
                 if (plotData != null)
                 {

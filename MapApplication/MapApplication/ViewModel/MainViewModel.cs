@@ -319,37 +319,38 @@ namespace MapApplication.ViewModel
             Map.Layers.Add(airportsLayer);
         }
 
-        private void M_Model_UpdateTableData(OutputData outputData, int second)
+        private void M_Model_UpdateTableData(TrackData track, int second)
         {
-            IdealDataTable.LongitudeValueMessage(outputData.points[second].Ideal.Degrees.lat.ToString());
-            IdealDataTable.LatitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.lon.ToString());
-            IdealDataTable.AltitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.alt.ToString());
-            IdealDataTable.V_EastDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.E.ToString());
-            IdealDataTable.V_NorthDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.N.ToString());
-            IdealDataTable.V_VerticalDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.H.ToString());
-            IdealDataTable.HeadingDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.heading.ToString());
-            IdealDataTable.PitchDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.pitch.ToString());
-            IdealDataTable.RollDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.roll.ToString());
+            OutputData outputData = track.INS;
+            //IdealDataTable.LongitudeValueMessage(outputData.points[second].Ideal.Degrees.lat.ToString());
+            //IdealDataTable.LatitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.lon.ToString());
+            //IdealDataTable.AltitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.alt.ToString());
+            //IdealDataTable.V_EastDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.E.ToString());
+            //IdealDataTable.V_NorthDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.N.ToString());
+            //IdealDataTable.V_VerticalDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.H.ToString());
+            //IdealDataTable.HeadingDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.heading.ToString());
+            //IdealDataTable.PitchDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.pitch.ToString());
+            //IdealDataTable.RollDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.roll.ToString());
 
-            ErrorDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lat.ToString());
-            ErrorDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lon.ToString());
-            ErrorDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.alt.ToString());
-            ErrorDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.E.ToString());
-            ErrorDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.N.ToString());
-            ErrorDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.H.ToString());
-            ErrorDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.heading.ToString());
-            ErrorDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.pitch.ToString());
-            ErrorDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.roll.ToString());
+            //ErrorDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lat.ToString());
+            //ErrorDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lon.ToString());
+            //ErrorDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.alt.ToString());
+            //ErrorDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.E.ToString());
+            //ErrorDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.N.ToString());
+            //ErrorDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.H.ToString());
+            //ErrorDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.heading.ToString());
+            //ErrorDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.pitch.ToString());
+            //ErrorDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.roll.ToString());
 
-            EstimateDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lat.ToString());
-            EstimateDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lon.ToString());
-            EstimateDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.alt.ToString());
-            EstimateDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.E.ToString());
-            EstimateDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.N.ToString());
-            EstimateDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.H.ToString());
-            //EstimateDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.heading.ToString());
-            //EstimateDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.pitch.ToString());
-            //EstimateDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.roll.ToString());
+            //EstimateDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lat.ToString());
+            //EstimateDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lon.ToString());
+            //EstimateDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.alt.ToString());
+            //EstimateDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.E.ToString());
+            //EstimateDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.N.ToString());
+            //EstimateDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.H.ToString());
+            ////EstimateDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.heading.ToString());
+            ////EstimateDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.pitch.ToString());
+            ////EstimateDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.roll.ToString());
         }
 
         private async void SetMapView(Microsoft.Toolkit.Wpf.UI.Controls.MapControl Map)
