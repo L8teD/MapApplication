@@ -22,15 +22,15 @@ namespace MapApplication.ViewModel
 
         public PlotTableVM(MainModel m_Model)
         {
-            LongitudePlotControlVM = new PlotControlVM(PlotName.Longitude, m_Model);
-            LatitudePlotControlVM = new PlotControlVM(PlotName.Latitude, m_Model);
-            AltitudePlotControlVM = new PlotControlVM(PlotName.Altitude, m_Model);
-            V_EastPlotControlVM = new PlotControlVM(PlotName.VelocityEast, m_Model);
-            V_NorthPlotControlVM = new PlotControlVM(PlotName.VelocityNorth, m_Model);
-            V_VerticalPlotControlVM = new PlotControlVM(PlotName.VelocityH, m_Model);
-            HeadingPlotControlVM = new PlotControlVM(PlotName.Heading, m_Model);
-            RollPlotControlVM = new PlotControlVM(PlotName.Roll, m_Model);
-            PitchPlotControlVM = new PlotControlVM(PlotName.Pitch, m_Model);
+            LongitudePlotControlVM = new PlotControlVM(PlotName.Longitude,ActivePlotState.Error, m_Model);
+            LatitudePlotControlVM = new PlotControlVM(PlotName.Latitude, ActivePlotState.Error, m_Model);
+            AltitudePlotControlVM = new PlotControlVM(PlotName.Altitude, ActivePlotState.Error, m_Model);
+            V_EastPlotControlVM = new PlotControlVM(PlotName.VelocityEast, ActivePlotState.Error, m_Model);
+            V_NorthPlotControlVM = new PlotControlVM(PlotName.VelocityNorth, ActivePlotState.Error, m_Model);
+            V_VerticalPlotControlVM = new PlotControlVM(PlotName.VelocityH, ActivePlotState.Error, m_Model);
+            HeadingPlotControlVM = new PlotControlVM(PlotName.Heading, ActivePlotState.Error, m_Model);
+            RollPlotControlVM = new PlotControlVM(PlotName.Roll, ActivePlotState.Error, m_Model);
+            PitchPlotControlVM = new PlotControlVM(PlotName.Pitch, ActivePlotState.Error, m_Model);
 
             m_Model.RefreshLongitudePlot += M_Model_RefreshLongitudePlot;
             m_Model.RefreshLatitudePlot += M_Model_RefreshLatitudePlot;

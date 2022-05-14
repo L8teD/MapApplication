@@ -1,4 +1,5 @@
 ﻿using MapApplication.Model;
+using MapApplication.View;
 using OxyPlot;
 using OxyPlot.Series;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -21,13 +23,92 @@ namespace MapApplication.ViewModel
         public List<LineSeries> RemovedSeries { get; set; }
         DisplayGraphicData desiredPlotData;
         DisplayGraphicData actualPlotData;
+        private List<LineSeries> savedSeries;
 
+        string activePlotTitle;
         PlotName activeParameter = PlotName.Latitude;
         PlotCharacter activeCharacter = PlotCharacter.Ideal;
         Source activeSource = Source.INS;
         string activeVerticalAxis = "";
-
+        List<OxyColor> colors = new List<OxyColor>()
+        {
+            OxyColors.Green,
+            OxyColors.Red,
+            OxyColors.Blue,
+            OxyColors.Black,
+            OxyColors.Orange,
+            OxyColors.Purple,
+            OxyColors.Pink
+        };
+        int colorIndex = 0;
         #region Commands
+        private RelayCommand cmd_SavePlot;
+        public RelayCommand SavePlot
+        {
+            get
+            {
+                return cmd_SavePlot ??
+                (cmd_SavePlot = new RelayCommand(obj =>
+                {
+                    if (savedSeries == null)
+                        savedSeries = new List<LineSeries>();
+                    
+                    foreach (LineSeries series in IndicatedSeries)
+                    {
+                        if(series.Title == "Desired Track")
+                        {
+                            LineSeries newSeries = series;
+                            newSeries.Title = activePlotTitle;
+                            
+                            
+                            newSeries.Color = colors[colorIndex];
+                            colorIndex++;
+                            if (!savedSeries.Contains(newSeries))
+                                savedSeries.Add(newSeries);
+                        }
+                    }
+                    UpdateToolTipText();
+                    //savedSeries.AddRange(IndicatedSeries);
+                }));
+            }
+        }
+        private RelayCommand cmd_OpenSavedPlot;
+        public RelayCommand OpenSavedPlot
+        {
+            get
+            {
+                return cmd_OpenSavedPlot ??
+                (cmd_OpenSavedPlot = new RelayCommand(obj =>
+                {
+                    if (savedSeries == null) return;
+
+                    IndicatedSeries.Clear();
+                    RemovedSeries.Clear();
+
+                    IndicatedSeries.AddRange(savedSeries);
+
+                    activePlotTitle = "Merging Charts";
+                    RefreshPlot();
+
+                }));
+            }
+        }
+        private RelayCommand cmd_ClearSavedCharts;
+        public RelayCommand ClearSavedCharts
+        {
+            get
+            {
+                return cmd_ClearSavedCharts ??
+                (cmd_ClearSavedCharts = new RelayCommand(obj =>
+                {
+                    if (savedSeries == null) return;
+
+                    savedSeries.Clear();
+                    UpdateToolTipText();
+                    colorIndex = 0;
+                }));
+            }
+        }
         private RelayCommand cmd_Home;
         public RelayCommand Cmd_Home
         {
@@ -36,6 +117,7 @@ namespace MapApplication.ViewModel
                 return cmd_Home ??
                 (cmd_Home = new RelayCommand(obj =>
                 {
+                    FillSeries(activeParameter, activeCharacter);
                     RefreshPlot();
                     plot.Home();
 
@@ -53,8 +135,8 @@ namespace MapApplication.ViewModel
                     if (IndicatedSeries == null) return;
 
                     string yAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
-                   
-                    if (IndicatedSeries.Count > 1)
+
+                    if (IndicatedSeries.Count == 2 )
                     {
                         LineSeries diffSerie = new LineSeries()
                         {
@@ -62,7 +144,8 @@ namespace MapApplication.ViewModel
                             MarkerSize = 0,
                             LineStyle = LineStyle.Solid,
                             MarkerType = MarkerType.None,
-                            Color = OxyColors.Green
+                            Color = OxyColors.Green,
+                            Title = IndicatedSeries[0].Title + " - " + IndicatedSeries[1].Title
                         };
                         for (int i = 0; i < IndicatedSeries[0].Points.Count; i++)
                         {
@@ -92,12 +175,11 @@ namespace MapApplication.ViewModel
 
                     if(paramName != null)
                     {
-                        plot.ChangePlotTitle(paramName);
+                        
 
                         activeParameter = PlotWorker.SelectPlotName(paramName);
 
-                        activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
-
+                        FillSeries(activeParameter, activeCharacter);
                         RefreshPlot();
                     }
                     
@@ -118,6 +200,7 @@ namespace MapApplication.ViewModel
 
                     activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
 
+                    FillSeries(activeParameter, activeCharacter);
                     RefreshPlot();
                 }));
             }
@@ -138,12 +221,45 @@ namespace MapApplication.ViewModel
                     desiredPlotData.SwitchSource(activeSource);
                     actualPlotData.SwitchSource(activeSource);
 
+                    FillSeries(activeParameter, activeCharacter);
                     RefreshPlot();
                 }));
             }
         }
 
         #endregion
+
+        public string SavedSeriesNames
+        {
+            get { return (string)GetValue(SavedSeriesNamesProperty); }
+            set { SetValue(SavedSeriesNamesProperty, value); }
+        }
+        public static readonly DependencyProperty SavedSeriesNamesProperty =
+          DependencyProperty.Register("SavedSeriesNames", typeof(string), typeof(PlotPageVM), new PropertyMetadata(default(string)));
+
+
+        private void UpdateToolTipText()
+        {
+            
+            if (savedSeries != null)
+            {
+                string text = "";
+                for (int i = 0; i < savedSeries.Count; i++)
+                {
+                    text += savedSeries[i].Title;
+
+                    if (i != (savedSeries.Count - 1))
+                        text += "\n";
+                }
+
+                syncContext.Send(SendValueMessage, text);
+            }
+           
+        }
+        private void SendValueMessage(object text)
+        {
+            SavedSeriesNames = (string)text;
+        }
 
         public PlotPageVM(MainModel m_Model)
         {
@@ -158,9 +274,11 @@ namespace MapApplication.ViewModel
         }
         public void RefreshPlot()
         {
+            activePlotTitle = PlotWorker.SelectPlotName(activeParameter)
+                                            + " " + PlotWorker.SelectSource(activeSource)
+                                            + " " + PlotWorker.SelectPlotCharacter(activeCharacter);
+            plot.ChangePlotTitle(activePlotTitle);
             activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
-
-            FillSeries(activeParameter, activeCharacter);
             Plot("time, [sec]", PlotWorker.SelectPlotName(activeParameter) + " " + activeVerticalAxis);
         }
         private void SetComboBoxData()

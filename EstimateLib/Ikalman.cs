@@ -15,7 +15,7 @@ namespace EstimateLib
         Vector X { get; set; }
         Vector X_estimate { get; set; }
         Matrix P { get; set; }
-        void Model(Input input, Parameters parameters, Matrix C, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities);
+        void Model(Input input, Parameters parameters, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities);
     }
     public abstract class BaseKalman : IKalman
     {
@@ -155,9 +155,9 @@ namespace EstimateLib
             F[5, 6] = 2 * absOmega.E;
 
             //F[5, 7] = -acceleration.H;
-            F[5, 7] = acceleration.H;
+            F[5, 7] = -acceleration.H;
             //F[5, 9] = acceleration.E;
-            F[5, 9] = -acceleration.E;
+            F[5, 9] = acceleration.E;
 
             F[5, 16] = C[2, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
             F[5, 17] = C[2, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
@@ -289,8 +289,24 @@ namespace EstimateLib
                  velocity.H,
             };
             Vector estimatedParams = new Vector(_estimatedParams);
+
+
             Vector Z_ins = estimatedParams + H * X;
+
+
+
             double noise_sns = gnssErrors.noise;
+
+            double[] _snsErrorsSKO = new double[] {
+                noise_sns,
+                noise_sns,
+                noise_sns,
+                noise_sns / 50.0,
+                noise_sns / 50.0,
+                noise_sns / 50.0
+            };
+            Vector snsErrorsSKO = new Vector(_snsErrorsSKO);
+
             double[] _snsErrors = new double[] {
                 noise_sns* randomize.GetRandom(),
                 noise_sns* randomize.GetRandom(),
@@ -300,6 +316,7 @@ namespace EstimateLib
                 noise_sns / 50.0* randomize.GetRandom()
             };
             Vector snsErrors = new Vector(_snsErrors);
+
             double[] _Z_sns = new double[]
             {
                 _point.lon + snsErrors[1],
@@ -310,9 +327,10 @@ namespace EstimateLib
                 velocity.H + snsErrors[6]
             };
             Vector Z_sns = new Vector(_Z_sns);
+
             Z = Z_ins - Z_sns;
 
-            R = snsErrors.Diag() ^ 2 * (1.0 / insErrors.dt);
+            R = snsErrorsSKO.Diag() ^ 2 * (1.0 / insErrors.dt);
 
             SetOutputData(ref gnssPoints, ref gnssVelocities, snsErrors, _point, velocity, earth);
         }
@@ -370,7 +388,7 @@ namespace EstimateLib
 
             X_previous = X_estimate.Dublicate();
         }
-        public void Model(Input input, Parameters parameters, Matrix C, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
+        public void Model(Input input, Parameters parameters, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
         {
             if (X == null)
             {
@@ -384,8 +402,8 @@ namespace EstimateLib
             }
 
 
-            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, C, input.air);
-            InitG(C);
+            InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, parameters.C, input.air);
+            InitG(parameters.C);
             InitW(input.INS, randomize);
 
 

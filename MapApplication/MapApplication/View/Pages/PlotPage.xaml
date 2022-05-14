@@ -93,7 +93,21 @@
             <ContentControl Content="{Binding plot}"></ContentControl>
         </v:Plot>
 
-        
+        <Button Command="{Binding SavePlot}" Style="{StaticResource btn_Style}" Grid.Column="1"
+                MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/pen_with_notebook.png" Stretch="Fill" ></Image>
+            <Button.ToolTip>
+                <TextBlock Text="{Binding SavedSeriesNames}"></TextBlock>
+            </Button.ToolTip>
+        </Button>
+        <Button Command="{Binding OpenSavedPlot}" Style="{StaticResource btn_Style}" Grid.Column="1"
+                MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50, 0,0,0">
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/graph.png" Stretch="Fill" ></Image>
+        </Button>
+        <Button Command="{Binding ClearSavedCharts}" Style="{StaticResource btn_Style}" Grid.Column="1"
+                MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100, 0,0,0">
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/Stop.png" Stretch="Fill" ></Image>
+        </Button>
         <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>

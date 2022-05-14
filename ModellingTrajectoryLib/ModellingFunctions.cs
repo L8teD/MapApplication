@@ -127,8 +127,8 @@ namespace ModellingTrajectoryLib
             pitch[wpNumber] = Math.Atan2(dH[wpNumber], ortDist[wpNumber]);
             roll[wpNumber] = 0;
             heading[wpNumber] = ComputeHeading(lastPoint, startedPoints[wpNumber + 1], dLon[wpNumber]);
-            //heading[wpNumber] += heading[wpNumber] <= 0 ? 2 * Math.PI : 0;
-            //heading[wpNumber] -= heading[wpNumber] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
+            heading[wpNumber] += heading[wpNumber] <= 0 ? 2 * Math.PI : 0;
+            heading[wpNumber] -= heading[wpNumber] >= Converter.DegToRad(360) ? 2 * Math.PI : 0;
         }
         internal double GetLUR(int wpNumber, int limit)
         {

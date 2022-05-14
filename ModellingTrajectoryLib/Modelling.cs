@@ -80,10 +80,14 @@ namespace ModellingTrajectoryLib
                     double ortDistAngleCurrent = functions.ComputeOrtDistAngle(desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
 
-                    functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians,
+                    if (counterAddPlotDataDes % 20 == 0)
+                    {
+                        functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians,
                         new Velocity(desiredTrack.OutVelocities.Ideal.GetValueOrDefault().E,
                                     desiredTrack.OutVelocities.Ideal.GetValueOrDefault().N,
                                     desiredTrack.OutVelocities.Ideal.GetValueOrDefault().H).module);
+                    }
+                        
 
                     LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
                     if (PPM_DisctancePrev < PPM_Distance)
@@ -111,7 +115,7 @@ namespace ModellingTrajectoryLib
             desiredTrack.Estimation(DesiredKalman, input.INS, desiredAirData, functions);
             //desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, desiredAirData, functions, dt);
 
-            actualTrack.Estimation(ActualKalman, input.INS, input.air, functions);
+            //actualTrack.Estimation(ActualKalman, input.INS, input.air, functions);
             //actualTrack.Estimation(ActualFeedbackKalman, initErrors, inputAirData, functions, dt);
         }
         private int counterAddPlotDataDes = 0;

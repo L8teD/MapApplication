@@ -104,12 +104,12 @@ namespace MapApplication.Model.Helper
             insErrors.accelerationError.second = initData.sensorErrors[1].Value;
             insErrors.accelerationError.third = initData.sensorErrors[2].Value;
 
-            insErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value);
-            insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value);
-            insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value);
+            insErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value) / 3600;
+            insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value) / 3600;
+            insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value) / 3600;
 
             insErrors.accNoise = initData.sensorErrors[6].Value;
-            insErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value);
+            insErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
 
             insErrors.temperatureCoef = initData.sensorErrors[8].Value;
 

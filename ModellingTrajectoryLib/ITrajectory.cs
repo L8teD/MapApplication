@@ -172,9 +172,8 @@ namespace ModellingTrajectoryLib
         
         public void Estimation(IKalman kalman, InsErrors initErrors,InputAirData airData, ModellingFunctions functions)
         {
-            Matrix C = functions.CreateMatrixC(parameters);
             kalmanModel = kalman;
-            kalmanModel.Model(input, parameters,C, randomize, ref gnssPoints, ref gnssVelocities);
+            kalmanModel.Model(input, parameters, randomize, ref gnssPoints, ref gnssVelocities);
             FillOutputsData?.Invoke(kalman);
         }
         protected void InitStartedPoint(ref Parameters parameters, TrajectoryInput input)

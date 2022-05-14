@@ -381,7 +381,7 @@ namespace MapApplication.Model
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVn", Value = 0.5, Dimension = "[m/s]" });
             initData.insErrors.Add(new EquipmentData() { Name = "ΔVh", Value = 0.5, Dimension = "[m/s]" });
 
-            initData.insErrors.Add(new EquipmentData() { Name = "dt", Value = 0.25, Dimension = "" });
+            initData.insErrors.Add(new EquipmentData() { Name = "dt", Value = 0.5, Dimension = "" });
             #endregion
 
             #region SensorErrors

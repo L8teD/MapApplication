@@ -17,12 +17,17 @@ namespace MapApplication.ViewModel
         PlotVM plot { get; set; }
         List<LineSeries> IndicatedSeries { get; set; }
         List<LineSeries> RemovedSeries { get; set; }
+        void RefreshPlot();
     }
     public class BasePlotControl : IPlotControl
     {
         public PlotVM plot { get; set; }
         public List<LineSeries> IndicatedSeries { get; set; }
         public List<LineSeries> RemovedSeries { get; set; }
+        public void RefreshPlot()
+        {
+
+        }
     }
     public class PlotControlVM : BaseViewModel, IPlotControl
     {
@@ -57,7 +62,8 @@ namespace MapApplication.ViewModel
                 return cmd_Trajectory ??
                 (cmd_Trajectory = new RelayCommand(obj =>
                 {
-                    RefreshPlot(ActivePlotState.Trajectory);
+                    CurrentPlotState = ActivePlotState.Trajectory;
+                    RefreshPlot();
                 }));
             }
         }
@@ -69,7 +75,8 @@ namespace MapApplication.ViewModel
                 return cmd_Error ??
                 (cmd_Error = new RelayCommand(obj =>
                 {
-                    RefreshPlot(ActivePlotState.Error);
+                    CurrentPlotState = ActivePlotState.Error;
+                    RefreshPlot();
                 }));
             }
         }
@@ -81,7 +88,8 @@ namespace MapApplication.ViewModel
                 return cmd_Covar ??
                 (cmd_Covar = new RelayCommand(obj =>
                 {
-                    RefreshPlot(ActivePlotState.P);
+                    CurrentPlotState = ActivePlotState.P;
+                    RefreshPlot();
                 }));
             }
         }
@@ -97,7 +105,7 @@ namespace MapApplication.ViewModel
                     if (!isWindow)
                     {
                         PlotWindow plotWindow = new PlotWindow();
-                        plotWindow.DataContext = new PlotWindowVM(currentTitle, CurrentPlotState, this, m_Model);
+                        plotWindow.DataContext = new PlotWindowVM(currentTitle, this, m_Model);
                         plotWindow.Show();
                     }
                 }));
@@ -105,9 +113,10 @@ namespace MapApplication.ViewModel
         }
         #endregion
 
-        public PlotControlVM(PlotName plotName, MainModel model, bool fromWindow = false)
+        public PlotControlVM(PlotName plotName, ActivePlotState activePlotState, MainModel model, bool fromWindow = false)
         {
             m_Model = model;
+            CurrentPlotState = activePlotState;
             plot = new PlotVM(PlotWorker.SelectPlotName(plotName));
             currentTitle = plotName;
             legendControlVM = new LegendVM(this, plot);
@@ -116,10 +125,9 @@ namespace MapApplication.ViewModel
 
             isWindow = fromWindow;
         }
-        public void RefreshPlot(ActivePlotState plotState)
+        public void RefreshPlot()
         {
-            CurrentPlotState = plotState;
-            switch (plotState)
+            switch (CurrentPlotState)
             {
                 case ActivePlotState.Trajectory:
                     RefreshPlot(PlotCharacter.Ideal, PlotCharacter.Real, PlotCharacter.CorrectTrajectory);

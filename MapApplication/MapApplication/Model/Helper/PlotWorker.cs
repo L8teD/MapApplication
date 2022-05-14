@@ -406,6 +406,20 @@ namespace MapApplication.Model
                     return Source.INS;
             }
         }
+        public static string SelectSource(Source source)
+        {
+            switch (source)
+            {
+                case Source.INS:
+                    return "INS";
+                case Source.GNSS:
+                    return "GNSS";
+                case Source.KVS:
+                    return "SVS";
+                default:
+                    return "";
+            }
+        }
         public static PlotCharacter SelectPlotCharacter(string character)
         {
             switch (character)
