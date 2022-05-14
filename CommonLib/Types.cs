@@ -42,20 +42,24 @@ namespace CommonLib
         public AngleAccuracy angleAccuracy;
         public CoordAccuracy coordAccuracy;
         public VelocityAccuracy velocityAccuracy;
-        public GyroError gyroError;
-        public AccError accelerationError;
-        public double temperatureCoef;
-        public double accNoise;
-        public double gyroNoise;
+
+        public SensorError gyroError;
+        public SensorError accelerationError;
+        public SensorError accNoiseSKO;
+        public SensorError gyroNoiseSKO;
+        public SensorError accNoiseValue;
+        public SensorError gyroNoiseValue;
+        public SensorError temperatureKoef;
 
         public double dt; //вынести отсюда
     }
+
     public struct GnssErrors
     {
         public double noise;
 
-        public double sateliteErrorCoord;
-        public double sateliteErrorVelocity;
+        public double coord;
+        public double velocity;
     }
     public struct AngleAccuracy
     {
@@ -75,22 +79,31 @@ namespace CommonLib
         public double north { get; set; }
         public double H { get; set; }
     }
-    public struct GyroError
+    public struct SensorError
     {
         public double first { get; set; }
         public double second { get; set; }
         public double third { get; set; }
     }
-    public struct AccError
+   
+    #endregion
+
+    #endregion
+
+    public struct MeasurementsParams
     {
-        public double first { get; set; }
-        public double second { get; set; }
-        public double third { get; set; }
+        public double lat;
+        public double lon;
+        public double alt;
+        public double E;
+        public double N;
+        public double H;
     }
-    #endregion
-
-    #endregion
-
+    public struct MeasurementsErrors
+    {
+        public MeasurementsParams constant;
+        public MeasurementsParams noise;
+    }
     public struct MatlabOutData
     {
         public double baro_h;
@@ -186,8 +199,10 @@ namespace CommonLib
         public Point Degrees;
         public Point Radians;
         public Point Meters;
-        public PointValue(Point point, EarthModel earth, double latitude)
+        public PointValue(Point point, EarthModel earth, Point pointInRad)
         {
+            if (pointInRad.dimension != Dimension.Radians && point.dimension == Dimension.Meters)
+                throw new Exception("Dimension should be in radians for convert meters to degrees");
             switch (point.dimension)
             {
                 case Dimension.Degrees:
@@ -204,8 +219,8 @@ namespace CommonLib
 
                 case Dimension.Meters:
 
-                    Degrees = Converter.MetersToDegrees(point, latitude, earth);
-                    Radians = Converter.MetersToRadians(point, latitude, earth);
+                    Degrees = Converter.MetersToDegrees(point, pointInRad.lat, earth);
+                    Radians = Converter.MetersToRadians(point, pointInRad.lat, earth);
                     Meters = new Point(point.lat, point.lon, point.alt, Dimension.Meters);
                     break;
 
@@ -234,55 +249,55 @@ namespace CommonLib
                 estimate = Vector.Zero(3);
             if (ISChannel3)
             {
-                Ideal = new PointValue(idP, earth, idP.lat);
+                Ideal = new PointValue(idP, earth, idP);
                 Point errP = new Point(error[2], error[1], error[3], Dimension.Meters);
-                Error = new PointValue(errP, earth, idP.lat);
+                Error = new PointValue(errP, earth, idP);
                 Point realP = new Point(
                     Ideal.Value.Meters.lat + Error.Value.Meters.lat,
                     Ideal.Value.Meters.lon + Error.Value.Meters.lon,
                     Ideal.Value.Meters.alt + Error.Value.Meters.alt,
                     Dimension.Meters);
-                Real = new PointValue(realP, earth, idP.lat);
+                Real = new PointValue(realP, earth, idP);
                 Point estP = new Point(estimate[2], estimate[1], estimate[3], Dimension.Meters);
-                Estimate = new PointValue(estP, earth, idP.lat);
+                Estimate = new PointValue(estP, earth, idP);
                 Point corErrP = new Point(
                     Error.Value.Meters.lat - Estimate.Value.Meters.lat,
                     Error.Value.Meters.lon - Estimate.Value.Meters.lon,
                     Error.Value.Meters.alt - Estimate.Value.Meters.alt,
                     Dimension.Meters);
-                CorrectError = new PointValue(corErrP, earth, idP.lat);
+                CorrectError = new PointValue(corErrP, earth, idP);
                 Point corTrajP = new Point(
                     Ideal.Value.Meters.lat + CorrectError.Value.Meters.lat,
                     Ideal.Value.Meters.lon + CorrectError.Value.Meters.lon,
                     Ideal.Value.Meters.alt + CorrectError.Value.Meters.alt,
                     Dimension.Meters);
-                CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
+                CorrectTrajectory = new PointValue(corTrajP, earth, idP);
             }
             else
             {
-                Ideal = new PointValue(idP, earth, idP.lat);
+                Ideal = new PointValue(idP, earth, idP);
                 Point errP = new Point(error[2], error[1], 0, Dimension.Meters);
-                Error = new PointValue(errP, earth, idP.lat);
+                Error = new PointValue(errP, earth, idP);
                 Point realP = new Point(
                     Ideal.Value.Meters.lat + Error.Value.Meters.lat,
                     Ideal.Value.Meters.lon + Error.Value.Meters.lon,
                     Ideal.Value.Meters.alt + Error.Value.Meters.alt,
                     Dimension.Meters);
-                Real = new PointValue(realP, earth, idP.lat);
+                Real = new PointValue(realP, earth, idP);
                 Point estP = new Point(estimate[2], estimate[1], 0, Dimension.Meters);
-                Estimate = new PointValue(estP, earth, idP.lat);
+                Estimate = new PointValue(estP, earth, idP);
                 Point corErrP = new Point(
                     Error.Value.Meters.lat - Estimate.Value.Meters.lat,
                     Error.Value.Meters.lon - Estimate.Value.Meters.lon,
                     Error.Value.Meters.alt - Estimate.Value.Meters.alt,
                     Dimension.Meters);
-                CorrectError = new PointValue(corErrP, earth, idP.lat);
+                CorrectError = new PointValue(corErrP, earth, idP);
                 Point corTrajP = new Point(
                     Ideal.Value.Meters.lat + CorrectError.Value.Meters.lat,
                     Ideal.Value.Meters.lon + CorrectError.Value.Meters.lon,
                     Ideal.Value.Meters.alt + CorrectError.Value.Meters.alt,
                     Dimension.Meters);
-                CorrectTrajectory = new PointValue(corTrajP, earth, idP.lat);
+                CorrectTrajectory = new PointValue(corTrajP, earth, idP);
             }
 
         }

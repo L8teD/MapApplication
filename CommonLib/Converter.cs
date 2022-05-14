@@ -95,6 +95,26 @@ namespace CommonLib
         }
         public static Point MetersToRadians(Point inputPoint, double latitude, EarthModel earthModel)
         {
+            //Point pointInRad = null;
+            //if(_pointInRad.dimension != Dimension.Radians)
+            //{
+            //    switch (_pointInRad.dimension)
+            //    {
+            //        case Dimension.Radians:
+            //            pointInRad = _pointInRad;
+            //            break;
+            //        case Dimension.Degrees:
+            //            pointInRad = DegToRad(_pointInRad);
+            //            break;
+            //        case Dimension.Meters:
+            //            throw new Exception("Dimension should be in meters");
+            //        default:
+            //            pointInRad = _pointInRad;
+            //            break;
+            //    }
+            //}
+            //if (pointInRad == null) return null;
+
             Point outPoint = new Point(
                 inputPoint.lat / earthModel.R2,
                 inputPoint.lon / (earthModel.R1 * Math.Cos(latitude)),

@@ -46,20 +46,20 @@ namespace CommonLib
         {
             Dryden_initialize();
         }
-        public DrydenOutput Model(InputWindData windData, double airSpeed, Randomize randomize)
+        public DrydenOutput Model(InputWindData windData, double airSpeed, DrydenInput drydenInput)
         {
-            DrydenInput input = new DrydenInput();
-            input.rand1 = randomize.GetRandom();
-            input.rand2 = randomize.GetRandom();
-            input.rand3 = randomize.GetRandom();
+            //DrydenInput input = new DrydenInput();
+            //input.rand1 = randomize.GetRandom();
+            //input.rand2 = randomize.GetRandom();
+            //input.rand3 = randomize.GetRandom();
             DrydenLocal local = new DrydenLocal(windData, airSpeed);
 
-            SetInput(ref input, ref local);
-
-            for (int i = 0; i < 50; i++) //50 - эмпирически определено соответствие 1сек расчета симулинка
-            {
-                Dryden_step();
-            }
+            SetInput(ref drydenInput, ref local);
+            Dryden_step();
+            //for (int i = 0; i < 50; i++) //50 - эмпирически определено соответствие 1сек расчета симулинка
+            //{
+            //    Dryden_step();
+            //}
 
             DrydenOutput output = new DrydenOutput();
 
@@ -82,7 +82,7 @@ namespace CommonLib
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DrydenInput
+    public struct DrydenInput
     {
         public double rand1;
         public double rand2;

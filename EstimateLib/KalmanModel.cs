@@ -13,5 +13,10 @@ namespace EstimateLib
     public class KalmanModel : BaseKalman, IKalman
     {
 
+        //public new bool CorrectorIsGNSS
+        //{
+        //    get { return base.CorrectorIsGNSS; }
+        //    set { base.CorrectorIsGNSS = true; }
+        //}
     }
 }

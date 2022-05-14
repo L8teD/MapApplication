@@ -22,10 +22,6 @@ namespace MapApplication.Model.Helper
             SetInputs(initData, ref input);
             trajectoryModelling.Init(input);
         }
-        //private static void GetOutputs(ref OutputData threeChannelOutput, ref OutputData twoChannelOutput, ref OutputData feedbackOutput3, ref OutputData feedbackOutput2)
-        //{
-        //    trajectoryModelling.GetOutputs(ref threeChannelOutput, ref twoChannelOutput, ref feedbackOutput3, ref feedbackOutput2);
-        //}
         public static void CreateTrajectory(InitData initData, ref T_OutputFull Output)
         {
             Init(initData);
@@ -108,10 +104,17 @@ namespace MapApplication.Model.Helper
             insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value) / 3600;
             insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value) / 3600;
 
-            insErrors.accNoise = initData.sensorErrors[6].Value;
-            insErrors.gyroNoise = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
+            insErrors.accNoiseSKO.first = initData.sensorErrors[6].Value;
+            insErrors.accNoiseSKO.second = initData.sensorErrors[6].Value;
+            insErrors.accNoiseSKO.third = initData.sensorErrors[6].Value;
 
-            insErrors.temperatureCoef = initData.sensorErrors[8].Value;
+            insErrors.gyroNoiseSKO.first = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
+            insErrors.gyroNoiseSKO.second = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
+            insErrors.gyroNoiseSKO.third = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
+
+            insErrors.temperatureKoef.first = initData.sensorErrors[8].Value;
+            insErrors.temperatureKoef.second = initData.sensorErrors[8].Value;
+            insErrors.temperatureKoef.third = initData.sensorErrors[8].Value;
 
             return insErrors;
         }
@@ -119,8 +122,8 @@ namespace MapApplication.Model.Helper
         {
             GnssErrors gnss = new GnssErrors();
 
-            gnss.sateliteErrorCoord = initData.gnssErrors[0].Value;
-            gnss.sateliteErrorVelocity = initData.gnssErrors[1].Value;
+            gnss.coord = initData.gnssErrors[0].Value;
+            gnss.velocity = initData.gnssErrors[1].Value;
             gnss.noise = initData.gnssErrors[2].Value;
 
             return gnss;

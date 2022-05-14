@@ -24,6 +24,7 @@ namespace ModellingTrajectoryLib
 
         Input input;
 
+        Randomize randomize;
         ModellingFunctions functions;
         public void GetOutputs(ref T_OutputFull output)
         {
@@ -44,7 +45,8 @@ namespace ModellingTrajectoryLib
             CreateOutputData(ref Output.Default);
             CreateOutputData(ref Output.Feedback);
 
-
+            randomize = new Randomize();
+            randomize.Init(1);
             functions = new ModellingFunctions();
 
             DesiredFeedbackKalman = new KalmanFeedbackModel();
@@ -53,8 +55,20 @@ namespace ModellingTrajectoryLib
             ActualFeedbackKalman = new KalmanFeedbackModel();
             ActualKalman = new KalmanModel();
 
-            desiredTrack.Init(input);
-            actualTrack.Init(input);
+            InputAirData zeroInputAirData = input.air;
+            zeroInputAirData.tempratureError = 0;
+            zeroInputAirData.pressureError = 0;
+
+            InputWindData zeroInputWindData = input.wind;
+            zeroInputWindData.L_u = 200;
+            zeroInputWindData.L_v = 200;
+            zeroInputWindData.L_w = 50;
+            zeroInputWindData.sigma_u = 1.06;
+            zeroInputWindData.sigma_v = 1.06;
+            zeroInputWindData.sigma_w = 0.7;
+
+            desiredTrack.Init(input, zeroInputAirData, zeroInputWindData);
+            actualTrack.Init(input, input.air, input.wind);
 
             functions.InitStartedData(input.trajectory.latitude, input.trajectory.longitude, input.trajectory.altitude, input.trajectory.velocity);
             functions.InitParamsBetweenPPM();
@@ -72,8 +86,13 @@ namespace ModellingTrajectoryLib
                 double PPM_DisctancePrev;
                 while (LUR_Distance < PPM_Distance)
                 {
-                    desiredTrack.Track(wpNumber, functions);
-                    actualTrack.Track(wpNumber, functions);
+                    DrydenInput drydenInput = new DrydenInput();
+                    drydenInput.rand1 = randomize.GetRandom();
+                    drydenInput.rand2 = randomize.GetRandom();
+                    drydenInput.rand3 = randomize.GetRandom();
+
+                    desiredTrack.Track(wpNumber, functions, drydenInput);
+                    actualTrack.Track(wpNumber, functions, drydenInput);
                     Kalman();
 
                     PPM_DisctancePrev = PPM_Distance;
@@ -100,9 +119,13 @@ namespace ModellingTrajectoryLib
 
                     for (double j = 0; functions.TurnIsNotEnded(j); j += input.INS.dt)
                     {
+                        DrydenInput drydenInput = new DrydenInput();
+                        drydenInput.rand1 = randomize.GetRandom();
+                        drydenInput.rand2 = randomize.GetRandom();
+                        drydenInput.rand3 = randomize.GetRandom();
                         functions.SetTurnAngles(wpNumber, input.INS.dt, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians.alt);
-                        desiredTrack.Track(wpNumber, functions);
-                        actualTrack.Track(wpNumber, functions);
+                        desiredTrack.Track(wpNumber, functions, drydenInput);
+                        actualTrack.Track(wpNumber, functions, drydenInput);
                         Kalman();
                     }
                 }
@@ -110,12 +133,35 @@ namespace ModellingTrajectoryLib
         }
         private void Kalman()
         {
-            InputAirData desiredAirData = input.air;
-            desiredAirData.tempratureError = 0;
-            desiredTrack.Estimation(DesiredKalman, input.INS, desiredAirData, functions);
-            //desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, desiredAirData, functions, dt);
+            MeasurementsErrors gnssMeasurements = new MeasurementsErrors();
+            MeasurementsErrors svsMeasurements = new MeasurementsErrors();
 
-            //actualTrack.Estimation(ActualKalman, input.INS, input.air, functions);
+            gnssMeasurements.constant.lon = input.GNSS.coord;
+            gnssMeasurements.constant.lat = input.GNSS.coord;
+            gnssMeasurements.constant.alt = input.GNSS.coord;
+            gnssMeasurements.constant.E = input.GNSS.velocity;
+            gnssMeasurements.constant.N = input.GNSS.velocity;
+            gnssMeasurements.constant.H = input.GNSS.velocity;
+
+            gnssMeasurements.noise.lon = randomize.GetRandom();
+            gnssMeasurements.noise.lat = randomize.GetRandom();
+            gnssMeasurements.noise.alt = randomize.GetRandom();
+            gnssMeasurements.noise.E = randomize.GetRandom();
+            gnssMeasurements.noise.N = randomize.GetRandom();
+            gnssMeasurements.noise.H = randomize.GetRandom();
+            
+
+            input.INS.accNoiseValue.first = randomize.GetRandom();
+            input.INS.accNoiseValue.second = randomize.GetRandom();
+            input.INS.accNoiseValue.third = randomize.GetRandom();
+            input.INS.gyroNoiseValue.first = randomize.GetRandom();
+            input.INS.gyroNoiseValue.second = randomize.GetRandom();
+            input.INS.gyroNoiseValue.third = randomize.GetRandom();
+
+
+            desiredTrack.Estimation(DesiredKalman, true, gnssMeasurements, svsMeasurements, input.INS);
+            //desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, desiredAirData, functions, dt);
+            actualTrack.Estimation(ActualKalman, true, gnssMeasurements, svsMeasurements, input.INS);
             //actualTrack.Estimation(ActualFeedbackKalman, initErrors, inputAirData, functions, dt);
         }
         private int counterAddPlotDataDes = 0;

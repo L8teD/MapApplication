@@ -15,7 +15,8 @@ namespace EstimateLib
         Vector X { get; set; }
         Vector X_estimate { get; set; }
         Matrix P { get; set; }
-        void Model(Input input, Parameters parameters, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities);
+        bool CorrectorIsGNSS { get; set; }
+        void Model(Input input, Parameters parameters, MeasurementsErrors gnssMeasurments, MeasurementsErrors svsMeasurements);
     }
     public abstract class BaseKalman : IKalman
     {
@@ -54,6 +55,7 @@ namespace EstimateLib
         private CoordAccuracy coordAccuracy;
         private VelocityAccuracy velocityAccuracy;
 
+        public bool CorrectorIsGNSS { get; set; }
         private void InitX(InsErrors initErrors, Point point, AbsoluteOmega absOmega, EarthModel earthModel, Velocity velocity, Angles angles, bool Init = false)
         {
             X_error = Vector.Zero(21);
@@ -112,17 +114,17 @@ namespace EstimateLib
             X_error[11] = initErrors.gyroError.second;
             X_error[12] = initErrors.gyroError.third;
 
-            X_error[13] = initErrors.temperatureCoef;
-            X_error[14] = initErrors.temperatureCoef;
-            X_error[15] = initErrors.temperatureCoef;
+            X_error[13] = initErrors.temperatureKoef.first;
+            X_error[14] = initErrors.temperatureKoef.second;
+            X_error[15] = initErrors.temperatureKoef.third;
 
             X_error[16] = initErrors.accelerationError.first;
             X_error[17] = initErrors.accelerationError.second;
             X_error[18] = initErrors.accelerationError.third;
 
-            X_error[19] = 9.81 * initErrors.temperatureCoef;
-            X_error[20] = 9.81 * initErrors.temperatureCoef;
-            X_error[21] = 9.81 * initErrors.temperatureCoef;
+            X_error[19] = 9.81 * initErrors.temperatureKoef.first;
+            X_error[20] = 9.81 * initErrors.temperatureKoef.second;
+            X_error[21] = 9.81 * initErrors.temperatureKoef.third;
         }
         private void InitF(OmegaGyro omegaGyro, AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C, InputAirData airData)
         {
@@ -239,26 +241,23 @@ namespace EstimateLib
             G[9, 2] = C[3, 2];
             G[9, 3] = C[3, 3];
         }
-        private void InitW(InsErrors initErrors, Randomize randomize)
+        private void InitW(InsErrors insErrors)
         {
-            double gyro_noise = initErrors.gyroNoise;
-            double acc_noise = initErrors.accNoise;
-
             W = Vector.Zero(6);
-            W[1] = gyro_noise * randomize.GetRandom();
-            W[2] = gyro_noise * randomize.GetRandom();
-            W[3] = gyro_noise * randomize.GetRandom();
-            W[4] = acc_noise * randomize.GetRandom();
-            W[5] = acc_noise * randomize.GetRandom();
-            W[6] = acc_noise * randomize.GetRandom();
+            W[1] = insErrors.gyroNoiseSKO.first * insErrors.gyroNoiseValue.first;
+            W[2] = insErrors.gyroNoiseSKO.second * insErrors.gyroNoiseValue.second;
+            W[3] = insErrors.gyroNoiseSKO.third * insErrors.gyroNoiseValue.third;
+            W[4] = insErrors.accNoiseSKO.first * insErrors.accNoiseValue.first;
+            W[5] = insErrors.accNoiseSKO.second * insErrors.accNoiseValue.second;
+            W[6] = insErrors.accNoiseSKO.third * insErrors.accNoiseSKO.third;
 
             W_withoutNoise = Vector.Zero(6);
-            W_withoutNoise[1] = gyro_noise;
-            W_withoutNoise[2] = gyro_noise;
-            W_withoutNoise[3] = gyro_noise;
-            W_withoutNoise[4] = acc_noise;
-            W_withoutNoise[5] = acc_noise;
-            W_withoutNoise[6] = acc_noise;
+            W_withoutNoise[1] = insErrors.gyroNoiseSKO.first;
+            W_withoutNoise[2] = insErrors.gyroNoiseSKO.second;
+            W_withoutNoise[3] = insErrors.gyroNoiseSKO.third;
+            W_withoutNoise[4] = insErrors.accNoiseSKO.first;
+            W_withoutNoise[5] = insErrors.accNoiseSKO.second;
+            W_withoutNoise[6] = insErrors.accNoiseSKO.third;
         }
         private void InitH(Point point, EarthModel earth, AbsoluteOmega absOmega, Velocity velocity)
         {
@@ -267,15 +266,15 @@ namespace EstimateLib
             H[1, 1] = 1.0;
             H[2, 2] = 1.0;
             H[3, 3] = 1.0;
-            H[4, 1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
-            H[4, 2] = -absOmega.H;
+            H[4, 1] = 0.0;//-velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
+            H[4, 2] = 0.0;//-absOmega.H;
             H[4, 4] = 1.0;
-            H[5, 1] = -velocity.H / earth.R1;
+            H[5, 1] = 0.0;//-velocity.H / earth.R1;
             H[5, 5] = 1.0;
             H[6, 6] = 1.0;
 
         }
-        private void InitZ(Point point, Velocity velocity, EarthModel earth, GnssErrors gnssErrors, Randomize randomize, InsErrors insErrors, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
+        private void InitZ(Point point, Velocity velocity, EarthModel earth, InsErrors insErrors, MeasurementsErrors gnssMeasurements)
         {
             Z = Vector.Zero(6);
             Point _point = Converter.RadiansToMeters(point, earth);
@@ -293,27 +292,25 @@ namespace EstimateLib
 
             Vector Z_ins = estimatedParams + H * X;
 
-
-
-            double noise_sns = gnssErrors.noise;
-
             double[] _snsErrorsSKO = new double[] {
-                noise_sns,
-                noise_sns,
-                noise_sns,
-                noise_sns / 50.0,
-                noise_sns / 50.0,
-                noise_sns / 50.0
+                gnssMeasurements.constant.lon,
+                gnssMeasurements.constant.lat,
+                gnssMeasurements.constant.alt,
+                gnssMeasurements.constant.E,
+                gnssMeasurements.constant.N,
+                gnssMeasurements.constant.H
             };
             Vector snsErrorsSKO = new Vector(_snsErrorsSKO);
-
+            
+            
+            
             double[] _snsErrors = new double[] {
-                noise_sns* randomize.GetRandom(),
-                noise_sns* randomize.GetRandom(),
-                noise_sns* randomize.GetRandom(),
-                noise_sns / 50.0* randomize.GetRandom(),
-                noise_sns / 50.0* randomize.GetRandom(),
-                noise_sns / 50.0* randomize.GetRandom()
+                gnssMeasurements.constant.lon * gnssMeasurements.noise.lon,
+                gnssMeasurements.constant.lat * gnssMeasurements.noise.lat,
+                gnssMeasurements.constant.alt * gnssMeasurements.noise.alt,
+                gnssMeasurements.constant.E * gnssMeasurements.noise.E,
+                gnssMeasurements.constant.N * gnssMeasurements.noise.N,
+                gnssMeasurements.constant.H * gnssMeasurements.noise.H
             };
             Vector snsErrors = new Vector(_snsErrors);
 
@@ -332,26 +329,63 @@ namespace EstimateLib
 
             R = snsErrorsSKO.Diag() ^ 2 * (1.0 / insErrors.dt);
 
-            SetOutputData(ref gnssPoints, ref gnssVelocities, snsErrors, _point, velocity, earth);
+
+            //correctorIsGNSS = false;
         }
-        private void SetOutputData(ref PointSet gnssPoints, ref VelocitySet gnssVelocities, Vector snsErrors, Point point, Velocity velocity, EarthModel earth)
+        private void InitZ(Point point, Velocity velocity, EarthModel earth, InsErrors insErrors, MeasurementsErrors svsMeasurements, int x = 1)
         {
-            gnssPoints = new PointSet();
-            gnssVelocities = new VelocitySet();
+            Z = Vector.Zero(6);
+            Point _point = null;
 
-            gnssPoints.Real = new PointValue(
-                new Point(point.lat + snsErrors[2], point.lon + snsErrors[1], point.alt + snsErrors[3], Dimension.Meters),
-                earth,
-                point.lat);
+            if (point.dimension != Dimension.Meters)
+                _point = Converter.RadiansToMeters(point, earth);
 
-            gnssPoints.Error = new PointValue(
-                new Point(snsErrors[2],snsErrors[1], snsErrors[3], Dimension.Meters),
-                earth,
-                point.lat);
+            double[] _estimatedParams = new double[]
+            {
+                 _point.lon,
+                 _point.lat,
+                 _point.alt,
+                 velocity.E,
+                 velocity.N,
+                 velocity.H,
+            };
+            Vector estimatedParams = new Vector(_estimatedParams);
 
-            gnssVelocities.Real = new VelocityValue(velocity.E + snsErrors[4], velocity.N + snsErrors[5], velocity.H + snsErrors[6]);
-            gnssVelocities.Error = new VelocityValue(snsErrors[4], snsErrors[5], snsErrors[6]);
+
+            Vector Z_ins = estimatedParams + H * X;
+
+            double[] _svsErrors = new double[]
+            {
+                svsMeasurements.constant.lon,
+                svsMeasurements.constant.lat,
+                svsMeasurements.constant.alt,
+                svsMeasurements.constant.E,
+                svsMeasurements.constant.N,
+                svsMeasurements.constant.H
+            };
+
+            Vector svsErrors = new Vector(_svsErrors);
+
+            double[] _Z_svs = new double[]
+            {
+                _point.lon + svsErrors[1],
+                _point.lat + svsErrors[2],
+                _point.alt + svsErrors[3],
+                velocity.E + svsErrors[4],
+                velocity.N + svsErrors[5],
+                velocity.H + svsErrors[6]
+            };
+            Vector Z_svs = new Vector(_Z_svs);
+
+            Z = Z_ins - Z_svs;
+
+            //R = svsErrors.Diag() ^ 2 * (1.0 / insErrors.dt);
+            Vector svsErrorsSKO = new Vector(new double[] { 1, 1, 1, 1, 1, 1 });
+            R = svsErrorsSKO.Diag() ^ 2 * (1.0 / insErrors.dt);
+
+            //correctorIsGNSS = true;
         }
+    
         private void InitAnglesError(InsErrors initErrors)
         {
             orientationAngles = Vector.Zero(3);
@@ -388,7 +422,7 @@ namespace EstimateLib
 
             X_previous = X_estimate.Dublicate();
         }
-        public void Model(Input input, Parameters parameters, Randomize randomize, ref PointSet gnssPoints, ref VelocitySet gnssVelocities)
+        public void Model(Input input, Parameters parameters, MeasurementsErrors gnssMeasurments, MeasurementsErrors svsMeasurements)
         {
             if (X == null)
             {
@@ -404,13 +438,18 @@ namespace EstimateLib
 
             InitF(parameters.omegaGyro, parameters.absOmega, parameters.earthModel, parameters.acceleration, parameters.C, input.air);
             InitG(parameters.C);
-            InitW(input.INS, randomize);
+            InitW(input.INS);
 
 
             X_dot = F * X + G * W;
 
             InitH(parameters.point, parameters.earthModel, parameters.absOmega, parameters.velocity);
-            InitZ(parameters.point, parameters.velocity, parameters.earthModel, input.GNSS, randomize, input.INS, ref gnssPoints, ref gnssVelocities);
+            
+            if(CorrectorIsGNSS)
+                InitZ(parameters.point, parameters.velocity, parameters.earthModel, input.INS, gnssMeasurments);
+            else
+                InitZ(parameters.point, parameters.velocity, parameters.earthModel, input.INS, svsMeasurements, 1);
+
 
             Kalman(input.INS.dt);
 

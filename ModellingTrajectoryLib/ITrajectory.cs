@@ -13,8 +13,8 @@ namespace ModellingTrajectoryLib
 {
     public interface ITrajectory
     {
-        void Init(Input input);
-        void Track(int wpNumber, ModellingFunctions functions);
+        void Init(Input input, InputAirData air, InputWindData wind);
+        void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput);
         Action<IKalman> FillOutputsData { get; set; }
         PointSet OutPoints { get; set; }
         VelocitySet OutVelocities { get; set; }
@@ -112,7 +112,6 @@ namespace ModellingTrajectoryLib
 
         int wayPointsCount;
 
-        Randomize randomize;
         Input input;
         List<Parameters> localParams;
 
@@ -124,20 +123,19 @@ namespace ModellingTrajectoryLib
         }
         protected virtual int RandomSeed { get; set; }
 
-        public void Init(Input _input)
+        public void Init(Input _input, InputAirData air, InputWindData wind)
         {
-            randomize = new Randomize();
-            randomize.Init(RandomSeed);
             localParams = new List<Parameters>();
             parameters.point = new Point(_input.trajectory.latitude[0], _input.trajectory.longitude[0], _input.trajectory.altitude[0], Dimension.Radians);
             localParams.Add(parameters);
 
             input = _input;
-
+            input.air = air;
+            input.wind = wind;
             courseAir = new CourseAirReckoning();
             courseAir.Init(parameters.point);
         }
-        public void Track(int wpNumber, ModellingFunctions functions)
+        public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput)
         {
             parameters.dt = input.INS.dt;
 
@@ -145,7 +143,7 @@ namespace ModellingTrajectoryLib
 
             ComputeParametersData(wpNumber, functions);
 
-            courseAir.Model(ref parameters, input.wind, input.air, randomize, ref kvsPoints, ref kvsVelocities);
+            courseAir.Model(ref parameters, input.wind, input.air, drydenInput, ref kvsPoints, ref kvsVelocities);
 
             localParams.Add(parameters);
         }
@@ -167,13 +165,57 @@ namespace ModellingTrajectoryLib
             parameters.omegaGyro = new OmegaGyro(parameters);
 
             parameters.point = Point.GetCoords(parameters);
-
         }
         
-        public void Estimation(IKalman kalman, InsErrors initErrors,InputAirData airData, ModellingFunctions functions)
+        public void Estimation(IKalman kalman, bool correctorIsGNSS, MeasurementsErrors gnssMeasurments, MeasurementsErrors svsMeasurements, InsErrors insErrors)
         {
+            gnssPoints = new PointSet();
+            gnssVelocities = new VelocitySet();
+
+            Point _point = Converter.RadiansToMeters(parameters.point, parameters.earthModel);
+
+            gnssPoints.Error = new PointValue(
+              new Point(
+                  gnssMeasurments.constant.lon * gnssMeasurments.noise.lon,
+                  gnssMeasurments.constant.lat * gnssMeasurments.noise.lat,
+                  gnssMeasurments.constant.alt * gnssMeasurments.noise.alt,
+                  Dimension.Meters),
+              parameters.earthModel,
+              parameters.point);
+
+            gnssPoints.Real = new PointValue(
+                new Point(parameters.point.lat + gnssPoints.Error.Value.Meters.lat, 
+                          parameters.point.lon + gnssPoints.Error.Value.Meters.lon,
+                          parameters.point.alt + gnssPoints.Error.Value.Meters.alt, 
+                          Dimension.Meters),
+                parameters.earthModel,
+                parameters.point);
+
+            
+
+
+            gnssVelocities.Error = new VelocityValue(
+                gnssMeasurments.constant.E * gnssMeasurments.noise.E, 
+                gnssMeasurments.constant.N * gnssMeasurments.noise.N,
+                gnssMeasurments.constant.H * gnssMeasurments.noise.H);
+
+            gnssVelocities.Real = new VelocityValue(
+                parameters.velocity.E + gnssVelocities.Error.Value.E,
+                parameters.velocity.N + gnssVelocities.Error.Value.N, 
+                parameters.velocity.H + gnssVelocities.Error.Value.H);
+
+            svsMeasurements.constant.lat = kvsPoints.Error.Value.Meters.lat;
+            svsMeasurements.constant.lon = kvsPoints.Error.Value.Meters.lon;
+            svsMeasurements.constant.alt = kvsPoints.Error.Value.Meters.alt;
+            svsMeasurements.constant.E = KvsVelocities.Error.Value.E;
+            svsMeasurements.constant.N = KvsVelocities.Error.Value.N;
+            svsMeasurements.constant.H = KvsVelocities.Error.Value.H;
+
+
+            input.INS = insErrors;
             kalmanModel = kalman;
-            kalmanModel.Model(input, parameters, randomize, ref gnssPoints, ref gnssVelocities);
+            kalman.CorrectorIsGNSS = correctorIsGNSS;
+            kalmanModel.Model(input, parameters, gnssMeasurments, svsMeasurements);
             FillOutputsData?.Invoke(kalman);
         }
         protected void InitStartedPoint(ref Parameters parameters, TrajectoryInput input)
