@@ -55,17 +55,21 @@ namespace MapApplication.ViewModel
                     
                     foreach (LineSeries series in IndicatedSeries)
                     {
-                        if(series.Title == "Desired Track")
+                        LineSeries newSeries = new LineSeries()
                         {
-                            LineSeries newSeries = series;
-                            newSeries.Title = activePlotTitle;
-                            
-                            
-                            newSeries.Color = colors[colorIndex];
-                            colorIndex++;
-                            if (!savedSeries.Contains(newSeries))
-                                savedSeries.Add(newSeries);
-                        }
+                            StrokeThickness = 2,
+                            MarkerSize = 0,
+                            LineStyle = LineStyle.Solid,
+                            MarkerType = MarkerType.None,
+                            Color = colors[colorIndex],
+                            Title = activePlotTitle + " | " + series.Title
+                        };
+                        newSeries.Points.AddRange(series.Points);
+                        colorIndex++;
+                        
+                        if (!savedSeries.Contains(newSeries))
+                            savedSeries.Add(newSeries);
+
                     }
                     UpdateToolTipText();
                     //savedSeries.AddRange(IndicatedSeries);
@@ -106,6 +110,18 @@ namespace MapApplication.ViewModel
                     savedSeries.Clear();
                     UpdateToolTipText();
                     colorIndex = 0;
+                }));
+            }
+        }
+        private RelayCommand cmd_SaveToClipBoard;
+        public RelayCommand SaveToClipBoard
+        {
+            get
+            {
+                return cmd_SaveToClipBoard ??
+                (cmd_SaveToClipBoard = new RelayCommand(obj =>
+                {
+                    plot.SaveToClipBoard();
                 }));
             }
         }
@@ -151,7 +167,7 @@ namespace MapApplication.ViewModel
                         {
                             diffSerie.Points.Add(new DataPoint(
                                 i,
-                                IndicatedSeries[0].Points[i].Y - IndicatedSeries[1].Points[i].Y));
+                                IndicatedSeries[1].Points[i].Y - IndicatedSeries[0].Points[i].Y));
                         }
                         IndicatedSeries.Clear();
                         IndicatedSeries.Add(diffSerie);

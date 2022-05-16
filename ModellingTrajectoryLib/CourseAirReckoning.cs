@@ -37,10 +37,12 @@ namespace ModellingTrajectoryLib
 
             return randWind;
         }
-        public void Model(ref Parameters parameters, InputWindData windData, InputAirData airData, DrydenInput drydenInput, ref PointSet kvsPoints, ref VelocitySet kvsVelocities)
+        public void Model(ref Parameters parameters, InputWindData windData,ref InputAirData airData, DrydenInput drydenInput, ref PointSet kvsPoints, ref VelocitySet kvsVelocities)
         {
             Point _point = parameters.point;
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, _point.alt));
+
+            airData.temperatureCelcius = atmosphere.temperature.celcius;
 
             Velocity windSpeed = new Velocity(windData.wind_e, windData.wind_n, windData.wind_d);
 
@@ -63,10 +65,9 @@ namespace ModellingTrajectoryLib
 
 
             //Velocity airSpeed = new Velocity(_airSpeed, parameters.angles, parameters.dt);
-            Velocity airSpeed = modellingAirSpeed;
-            double baroAltitude = GetBaroAltitude(parameters.point.alt, atmosphere, M, airData);
+            double baroAltitude = GetBaroAltitude(atmosphere, M, airData);
 
-            
+            Velocity airSpeed = modellingAirSpeed;
             double verticalSpeed;
             if (prevBaroAlt == default(double))
                 verticalSpeed = 0.0;
@@ -75,11 +76,12 @@ namespace ModellingTrajectoryLib
                 verticalSpeed = baroAltitude - prevBaroAlt;
                 airSpeed.H = verticalSpeed;
             }
+            
 
 
             Velocity recountSpeed = new Velocity(airSpeed.E + windSpeed.E,
                                                 airSpeed.N  + windSpeed.N,
-                                                airSpeed.H + windSpeed.H);
+                                                airSpeed.H /*+ windSpeed.H*/);
 
             AbsoluteOmega absOmega = new AbsoluteOmega(recountSpeed, parameters.earthModel, airPoint);
 
@@ -126,7 +128,7 @@ namespace ModellingTrajectoryLib
             double machFunction = c * M / Math.Sqrt(1 + 0.2 * ksi * Math.Pow(M, 2));
             return machFunction * Math.Sqrt(atm.temperature.kelvin);
         }
-        private double GetBaroAltitude(double m_Altitude, Atmosphere atm, double M, InputAirData airData)
+        private double GetBaroAltitude(Atmosphere atm, double M, InputAirData airData)
         {
             double middleTemp;
             double ksi = 1.0;
@@ -135,8 +137,9 @@ namespace ModellingTrajectoryLib
             Atmosphere atmZero = atmosphereData.Find(item => item.altitude.geometric == airData.relativeAltitude);
             //if (m_Altitude < 11000)
             middleTemp = ((atmZero.temperature.kelvin + airData.tempratureError) + Tn) / 2.0;
-            double baroAlt = gaseConst * middleTemp * Math.Log((atmZero.pressure.pascal + airData.pressureError) / atm.pressure.pascal);
-            return baroAlt + airData.relativeAltitude;
+            double baroAlt = gaseConst * middleTemp * Math.Log((atmZero.pressure.pascal) / atm.pressure.pascal);
+            double baroAltError = -gaseConst * atmZero.temperature.kelvin * airData.pressureError / atmZero.pressure.pascal;
+            return baroAlt + baroAltError + airData.relativeAltitude;
 
         }
         private bool CompareAltitude(double alt1, double alt2)

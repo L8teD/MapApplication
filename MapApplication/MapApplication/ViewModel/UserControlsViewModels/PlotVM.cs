@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using OxyPlot;
 using OxyPlot.Axes;
+using OxyPlot.Legends;
 using OxyPlot.Series;
+using OxyPlot.Wpf;
 
 namespace MapApplication.ViewModel
 {
@@ -26,6 +29,24 @@ namespace MapApplication.ViewModel
 
             MyPlotModel.Title = title;
 
+        }
+        public void SaveToClipBoard()
+        {
+            var pngExporter = new PngExporter { Width = 1460, Height = 900};
+            MyPlotModel.Background = OxyColors.White;
+            MyPlotModel.Legends.Add(new Legend
+            {
+                LegendPosition = LegendPosition.RightTop,
+                LegendBorder = OxyColors.Black,
+                LegendSize = new OxySize(1000, 800),
+                LegendBorderThickness = 2,
+                LegendFontWeight = 12,
+                LegendFontSize = 16
+            });
+
+            var bitmap = pngExporter.ExportToBitmap(MyPlotModel);
+            Clipboard.SetImage(bitmap);
+            MyPlotModel.Legends.Clear();
         }
         public void ChangePlotTitle(string plotName)
         {

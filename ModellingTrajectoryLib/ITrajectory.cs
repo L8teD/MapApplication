@@ -143,7 +143,7 @@ namespace ModellingTrajectoryLib
 
             ComputeParametersData(wpNumber, functions);
 
-            courseAir.Model(ref parameters, input.wind, input.air, drydenInput, ref kvsPoints, ref kvsVelocities);
+            courseAir.Model(ref parameters, input.wind, ref input.air, drydenInput, ref kvsPoints, ref kvsVelocities);
 
             localParams.Add(parameters);
         }
@@ -190,8 +190,6 @@ namespace ModellingTrajectoryLib
                           Dimension.Meters),
                 parameters.earthModel,
                 parameters.point);
-
-            
 
 
             gnssVelocities.Error = new VelocityValue(

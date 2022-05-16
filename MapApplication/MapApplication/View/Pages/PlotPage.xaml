@@ -95,7 +95,7 @@
 
         <Button Command="{Binding SavePlot}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Image Source="pack://application:,,,/../AnotherFiles/Images/pen_with_notebook.png" Stretch="Fill" ></Image>
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/Note.png" Stretch="Fill" ></Image>
             <Button.ToolTip>
                 <TextBlock Text="{Binding SavedSeriesNames}"></TextBlock>
             </Button.ToolTip>
@@ -106,7 +106,11 @@
         </Button>
         <Button Command="{Binding ClearSavedCharts}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100, 0,0,0">
-            <Image Source="pack://application:,,,/../AnotherFiles/Images/Stop.png" Stretch="Fill" ></Image>
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/Clear.png" Stretch="Fill" ></Image>
+        </Button>
+        <Button Command="{Binding SaveToClipBoard}" Style="{StaticResource btn_Style}" Grid.Column="1"
+                MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150, 0,0,0">
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/Save.png" Stretch="Fill" ></Image>
         </Button>
         <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Right" VerticalAlignment="Top">

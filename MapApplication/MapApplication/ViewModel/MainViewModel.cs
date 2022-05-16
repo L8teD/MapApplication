@@ -12,6 +12,7 @@ using Windows.Devices.Geolocation;
 using Windows.UI.Xaml.Controls.Maps;
 using CommonLib;
 using OxyPlot;
+using System.Windows.Input;
 
 namespace MapApplication.ViewModel
 {
@@ -22,6 +23,7 @@ namespace MapApplication.ViewModel
         public PlotTableVM PlotTable { get; set; }
 
         private MapElementsLayer airportsLayer;
+        private MapElementsLayer elementsRunningAdded;
         private MainModel m_Model;
 
         private WayPoint waypoint;
@@ -294,7 +296,7 @@ namespace MapApplication.ViewModel
             m_Model.SetTemplateRoute(initData.wayPointList);
 
             plotPageVM = new PlotPageVM(m_Model);
-           
+
             SetMapView(Map);
 
             Waypoint = m_Model.SetWayPoint();
@@ -313,12 +315,43 @@ namespace MapApplication.ViewModel
 
             MapElementWorker.AddAirportsOnMap();
             airportsLayer = new MapElementsLayer() { MapElements = MapElementWorker.airportsMapElements };
-            airportsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
-            airportsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;
-            airportsLayer.MapElementClick += AirportsLayer_MapElementClick;
+            //airportsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
+            //airportsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;
+            //airportsLayer.MapElementClick += AirportsLayer_MapElementClick;
+
+            AddMapElementEvents(airportsLayer);
+
+            elementsRunningAdded = new MapElementsLayer() { MapElements = MapElementWorker.doubleClickElements };
+
             Map.Layers.Add(airportsLayer);
+
+            map.MapRightTapped += Map_MapRightTapped;
         }
 
+        private void Map_MapRightTapped(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.MapRightTappedEventArgs e)
+        {
+            if (MapElementWorker.doubleClickElements == null) MapElementWorker.doubleClickElements = new List<MapElement>();
+            MapElementWorker.AddElement(MapElementWorker.doubleClickElements, e.Location.Position.Latitude, e.Location.Position.Longitude);
+
+            //Map.Layers.Clear();
+            if (Map.Layers.Contains(elementsRunningAdded))
+                Map.Layers.Remove(elementsRunningAdded);
+
+            elementsRunningAdded = new MapElementsLayer() { MapElements = MapElementWorker.doubleClickElements };
+            AddMapElementEvents(elementsRunningAdded);
+            Map.Layers.Add(elementsRunningAdded);
+        }
+
+        private void Map_MapDoubleTapped(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.MapInputEventArgs e)
+        {
+
+        }
+        private void AddMapElementEvents(MapElementsLayer elementsLayer)
+        {
+            elementsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
+            elementsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;
+            elementsLayer.MapElementClick += AirportsLayer_MapElementClick;
+        }
         private void M_Model_UpdateTableData(TrackData track, int second)
         {
             OutputData outputData = track.INS;
@@ -361,7 +394,12 @@ namespace MapApplication.ViewModel
         #region MapElement Events
         private void AirportsLayer_MapElementClick(MapElementsLayer sender, MapElementsLayerClickEventArgs args)
         {
-            UpdateMapElementOnClick(args.MapElements[0]);
+            if(sender.Equals(airportsLayer))
+                UpdateMapElementOnClick(args.MapElements[0]);
+            else
+            {
+                UpdateMapElementOnClick(args.MapElements[0]);
+            }
         }
 
         private void AirportsLayer_MapElementPointerExited(MapElementsLayer sender, MapElementsLayerPointerExitedEventArgs args)
@@ -397,7 +435,9 @@ namespace MapApplication.ViewModel
                 mapElement.MapStyleSheetEntryState = "";
                 mapElement.MapStyleSheetEntry = MapStyleSheetEntries.Forest;
 
-                int id = initData.wayPointList.Where(item => item.AirportName == myclickedIcon.Title).FirstOrDefault().ID;
+                int id = initData.wayPointList.Where(item => 
+                item.Latitude == myclickedIcon.Location.Position.Latitude &&
+                item.Longitude == myclickedIcon.Location.Position.Longitude).FirstOrDefault().ID;
 
                 ListViewWorker.RemoveElement(initData.wayPointList, id);
 
@@ -406,14 +446,14 @@ namespace MapApplication.ViewModel
             {
                 mapElement.MapStyleSheetEntryState = MapStyleSheetEntryStates.Selected;
 
-                WayPoint RTP = new WayPoint();
-                RTP.AirportName = myclickedIcon.Title;
-                RTP.Longitude = myclickedIcon.Location.Position.Longitude;
-                RTP.Latitude = myclickedIcon.Location.Position.Latitude;
-                RTP.Velocity = 130;
-                RTP.Altitude = 1000;
+                WayPoint wayPoint = new WayPoint();
+                wayPoint.AirportName = myclickedIcon.Title;
+                wayPoint.Longitude = myclickedIcon.Location.Position.Longitude;
+                wayPoint.Latitude = myclickedIcon.Location.Position.Latitude;
+                wayPoint.Velocity = 80;
+                wayPoint.Altitude = 600;
 
-                ListViewWorker.UpdateData(initData.wayPointList, RTP);
+                ListViewWorker.UpdateData(initData.wayPointList, wayPoint);
             }
         }
 

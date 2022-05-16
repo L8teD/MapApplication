@@ -24,7 +24,7 @@ namespace ModellingTrajectoryLib
         double[] dH;
         double[] roll;
 
-        double rollTarget = Converter.DegToRad(-20);
+        double rollTarget = Converter.DegToRad(-10);
         double UR;
         double radiusTurn;
         double timeTurn;
@@ -140,6 +140,7 @@ namespace ModellingTrajectoryLib
         }
         private void ComputeLUR(int k)
         {
+            rollTarget = Converter.DegToRad(-10);
             UR = heading[k + 1] - heading[k];
             UR -= UR >= Converter.DegToRad(180) ? Converter.DegToRad(360) : 0;
             UR += UR <= Converter.DegToRad(-180) ? Converter.DegToRad(360) : 0;

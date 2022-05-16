@@ -74,6 +74,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -328,6 +329,11 @@
   <ItemGroup>
     <Resource Include="AnotherFiles\Images\MAI_logo.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="AnotherFiles\Images\Clear.png" />
+    <Resource Include="AnotherFiles\Images\FillNote.png" />
+    <Resource Include="AnotherFiles\Images\Note.png" />
+    <Resource Include="AnotherFiles\Images\Save.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

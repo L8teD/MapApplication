@@ -13,6 +13,7 @@ namespace MapApplication.Model
     {
         public static List<Airport> airportsData;
         public static List<MapElement> airportsMapElements;
+        public static List<MapElement> doubleClickElements;
 
         public static void AddAirportsOnMap()
         {
@@ -29,6 +30,26 @@ namespace MapApplication.Model
                     });
             }
         }
+        public static void AddElement(List<MapElement> mapElements, double latitude, double longitude)
+        {
+            if(mapElements == null) mapElements = new List<MapElement>();
+            mapElements.Add(new MapIcon
+            {
+                Location = new Geopoint(new BasicGeoposition { Latitude = latitude, Longitude = longitude }),
+                //Title = airport.name,
+                MapStyleSheetEntry = MapStyleSheetEntries.Forest
+            });
+        }
 
+        internal static void AddElement(IList<MapElement> mapElements, double latitude, double longitude)
+        {
+            if (mapElements == null) mapElements = new List<MapElement>();
+            mapElements.Add(new MapIcon
+            {
+                Location = new Geopoint(new BasicGeoposition { Latitude = latitude, Longitude = longitude }),
+                //Title = airport.name,
+                MapStyleSheetEntry = MapStyleSheetEntries.Forest
+            });
+        }
     }
 }

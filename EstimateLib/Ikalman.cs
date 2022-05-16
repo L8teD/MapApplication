@@ -128,6 +128,8 @@ namespace EstimateLib
         }
         private void InitF(OmegaGyro omegaGyro, AbsoluteOmega absOmega, EarthModel earthModel, Acceleration acceleration, Matrix C, InputAirData airData)
         {
+            double resultTemperature = airData.temperatureCelcius + airData.tempratureError;
+
             F = Matrix.Zero(21);
 
             F[1, 4] = 1;
@@ -143,9 +145,9 @@ namespace EstimateLib
             F[4, 8] = acceleration.H;
             F[4, 9] = -acceleration.N;
 
-            F[4, 16] = C[1, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
-            F[4, 17] = C[1, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
-            F[4, 18] = C[1, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
+            F[4, 16] = C[1, 1] /** acceleration.X*/ * resultTemperature;
+            F[4, 17] = C[1, 2] /** acceleration.Y*/ * resultTemperature;
+            F[4, 18] = C[1, 3] /** acceleration.Z*/ * resultTemperature;
             F[4, 19] = C[1, 1] * acceleration.X;
             F[4, 20] = C[1, 2] * acceleration.Y;
             F[4, 21] = C[1, 3] * acceleration.Z;
@@ -161,9 +163,9 @@ namespace EstimateLib
             //F[5, 9] = acceleration.E;
             F[5, 9] = acceleration.E;
 
-            F[5, 16] = C[2, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
-            F[5, 17] = C[2, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
-            F[5, 18] = C[2, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
+            F[5, 16] = C[2, 1] /** acceleration.X*/ * resultTemperature;
+            F[5, 17] = C[2, 2] /** acceleration.Y*/ * resultTemperature;
+            F[5, 18] = C[2, 3] /** acceleration.Z*/ * resultTemperature;
             F[5, 19] = C[2, 1] * acceleration.X;
             F[5, 20] = C[2, 2] * acceleration.Y;
             F[5, 21] = C[2, 3] * acceleration.Z;
@@ -177,9 +179,9 @@ namespace EstimateLib
             F[6, 7] = acceleration.N;
             F[6, 8] = acceleration.E;
 
-            F[6, 15] = C[3, 1] /** acceleration.X*/ * (15 + airData.tempratureError);
-            F[6, 16] = C[3, 2] /** acceleration.Y*/ * (15 + airData.tempratureError);
-            F[6, 17] = C[3, 3] /** acceleration.Z*/ * (15 + airData.tempratureError);
+            F[6, 15] = C[3, 1] /** acceleration.X*/ * resultTemperature;
+            F[6, 16] = C[3, 2] /** acceleration.Y*/ * resultTemperature;
+            F[6, 17] = C[3, 3] /** acceleration.Z*/ * resultTemperature;
             F[6, 18] = C[3, 1] * acceleration.X;
             F[6, 19] = C[3, 2] * acceleration.Y;
             F[6, 20] = C[3, 3] * acceleration.Z;
@@ -187,9 +189,9 @@ namespace EstimateLib
             F[7, 8] = absOmega.H;
             F[7, 9] = -absOmega.N;
 
-            F[7, 10] = C[1, 1] /** omegaGyro.X*/ * (15 + airData.tempratureError);
-            F[7, 11] = C[1, 2] /** omegaGyro.Y*/ * (15 + airData.tempratureError);
-            F[7, 12] = C[1, 3] /** omegaGyro.Z*/ * (15 + airData.tempratureError);
+            F[7, 10] = C[1, 1] /** omegaGyro.X*/ * resultTemperature;
+            F[7, 11] = C[1, 2] /** omegaGyro.Y*/ * resultTemperature;
+            F[7, 12] = C[1, 3] /** omegaGyro.Z*/ * resultTemperature;
             F[7, 13] = C[1, 1] * omegaGyro.X;
             F[7, 14] = C[1, 2] * omegaGyro.Y;
             F[7, 15] = C[1, 3] * omegaGyro.Z;
@@ -197,9 +199,9 @@ namespace EstimateLib
             F[8, 7] = -absOmega.H;
             F[8, 9] = absOmega.E;
 
-            F[8, 10] = C[2, 1] /** omegaGyro.X */* (15 + airData.tempratureError);
-            F[8, 11] = C[2, 2] /** omegaGyro.Y */* (15 + airData.tempratureError);
-            F[8, 12] = C[2, 3] /** omegaGyro.Z */* (15 + airData.tempratureError);
+            F[8, 10] = C[2, 1] /** omegaGyro.X */* resultTemperature;
+            F[8, 11] = C[2, 2] /** omegaGyro.Y */* resultTemperature;
+            F[8, 12] = C[2, 3] /** omegaGyro.Z */* resultTemperature;
             F[8, 13] = C[2, 1] * omegaGyro.X;
             F[8, 14] = C[2, 2] * omegaGyro.Y;
             F[8, 15] = C[2, 3] * omegaGyro.Z;
@@ -207,9 +209,9 @@ namespace EstimateLib
             F[9, 7] = absOmega.N;
             F[9, 8] = -absOmega.E;
 
-            F[9, 10] = C[3, 1] /** omegaGyro.X*/ * (15 + airData.tempratureError);
-            F[9, 11] = C[3, 2] /** omegaGyro.Y*/ * (15 + airData.tempratureError);
-            F[9, 12] = C[3, 3] /** omegaGyro.Z*/ * (15 + airData.tempratureError);
+            F[9, 10] = C[3, 1] /** omegaGyro.X*/ * resultTemperature;
+            F[9, 11] = C[3, 2] /** omegaGyro.Y*/ * resultTemperature;
+            F[9, 12] = C[3, 3] /** omegaGyro.Z*/ * resultTemperature;
             F[9, 13] = C[3, 1] * omegaGyro.X;
             F[9, 14] = C[3, 2] * omegaGyro.Y;
             F[9, 15] = C[3, 3] * omegaGyro.Z;
@@ -244,20 +246,21 @@ namespace EstimateLib
         private void InitW(InsErrors insErrors)
         {
             W = Vector.Zero(6);
-            W[1] = insErrors.gyroNoiseSKO.first * insErrors.gyroNoiseValue.first;
-            W[2] = insErrors.gyroNoiseSKO.second * insErrors.gyroNoiseValue.second;
-            W[3] = insErrors.gyroNoiseSKO.third * insErrors.gyroNoiseValue.third;
-            W[4] = insErrors.accNoiseSKO.first * insErrors.accNoiseValue.first;
-            W[5] = insErrors.accNoiseSKO.second * insErrors.accNoiseValue.second;
-            W[6] = insErrors.accNoiseSKO.third * insErrors.accNoiseSKO.third;
+            W[1] = insErrors.accNoiseSKO.first * insErrors.accNoiseValue.first;
+            W[2] = insErrors.accNoiseSKO.second * insErrors.accNoiseValue.second;
+            W[3] = insErrors.accNoiseSKO.third * insErrors.accNoiseSKO.third;
+            W[4] = insErrors.gyroNoiseSKO.first * insErrors.gyroNoiseValue.first;
+            W[5] = insErrors.gyroNoiseSKO.second * insErrors.gyroNoiseValue.second;
+            W[6] = insErrors.gyroNoiseSKO.third * insErrors.gyroNoiseValue.third;
+
 
             W_withoutNoise = Vector.Zero(6);
-            W_withoutNoise[1] = insErrors.gyroNoiseSKO.first;
-            W_withoutNoise[2] = insErrors.gyroNoiseSKO.second;
-            W_withoutNoise[3] = insErrors.gyroNoiseSKO.third;
-            W_withoutNoise[4] = insErrors.accNoiseSKO.first;
-            W_withoutNoise[5] = insErrors.accNoiseSKO.second;
-            W_withoutNoise[6] = insErrors.accNoiseSKO.third;
+            W_withoutNoise[1] = insErrors.accNoiseSKO.first;
+            W_withoutNoise[2] = insErrors.accNoiseSKO.second;
+            W_withoutNoise[3] = insErrors.accNoiseSKO.third;
+            W_withoutNoise[4] = insErrors.gyroNoiseSKO.first;
+            W_withoutNoise[5] = insErrors.gyroNoiseSKO.second;
+            W_withoutNoise[6] = insErrors.gyroNoiseSKO.third;
         }
         private void InitH(Point point, EarthModel earth, AbsoluteOmega absOmega, Velocity velocity)
         {
@@ -266,10 +269,10 @@ namespace EstimateLib
             H[1, 1] = 1.0;
             H[2, 2] = 1.0;
             H[3, 3] = 1.0;
-            H[4, 1] = 0.0;//-velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
-            H[4, 2] = 0.0;//-absOmega.H;
+            H[4, 1] = -velocity.H / earth.R2 + absOmega.E * Math.Tan(point.lat);
+            H[4, 2] = -absOmega.H;
             H[4, 4] = 1.0;
-            H[5, 1] = 0.0;//-velocity.H / earth.R1;
+            H[5, 1] = -velocity.H / earth.R1;
             H[5, 5] = 1.0;
             H[6, 6] = 1.0;
 
@@ -380,7 +383,7 @@ namespace EstimateLib
             Z = Z_ins - Z_svs;
 
             //R = svsErrors.Diag() ^ 2 * (1.0 / insErrors.dt);
-            Vector svsErrorsSKO = new Vector(new double[] { 1, 1, 1, 1, 1, 1 });
+            Vector svsErrorsSKO = new Vector(new double[] { 100, 100, 100, 1, 1, 1 });
             R = svsErrorsSKO.Diag() ^ 2 * (1.0 / insErrors.dt);
 
             //correctorIsGNSS = true;

@@ -35,6 +35,7 @@ namespace CommonLib
         public double relativeAltitude;
         public double pressureError;
         public double tempratureError;
+        public double temperatureCelcius;
     }
     #region InitErrors Struct
     public struct InsErrors
