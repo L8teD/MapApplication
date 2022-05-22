@@ -20,11 +20,11 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Border Style="{StaticResource Border_Style_outside}" Background="#FFC3D8DC">
+        <Border Style="{StaticResource Border_Style_outside}" Background="#FFC3D8DC" Grid.RowSpan="2">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0.65*"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="0.4*"></RowDefinition>
+                    <RowDefinition Height="0.5*"></RowDefinition>
                     <RowDefinition Height="2*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -35,7 +35,7 @@
                 <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="Black" Margin="100,15" CornerRadius="10">
                     <TextBlock Text="STRAPDOWN INERTIAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBlack" FontSize="22" FontFamily="Segoe UI Light"></TextBlock>
                 </Border>
-                <Grid Grid.Column="1" Grid.Row="1">
+                <Grid Grid.Column="0" Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
@@ -84,7 +84,7 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ListView Margin="5" ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="1" Grid.Row="2" Background="#FFE3EADF"
+                <ListView Margin="5" ItemsSource="{Binding Path=initData.sensorErrors}" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Background="#FFE3EADF"
                           HorizontalAlignment="Stretch" BorderThickness="3" BorderBrush="LightGray">
                     <ListView.View>
                         <GridView  ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
@@ -129,7 +129,7 @@
                           HorizontalAlignment="Stretch" BorderThickness="3" BorderBrush="LightGray">
                     <ListView.View>
                         <GridView  ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
-                            <GridViewColumn Width="50">Name
+                            <GridViewColumn Width="70">Name
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Path=Name}" HorizontalAlignment="Right" FontSize="16" FontFamily="Segoe UI Light" Foreground="Black"></TextBlock>
@@ -195,18 +195,16 @@
                 </ListView>
             </Grid>
         </Border>
-        <Border Style="{StaticResource Border_Style_outside}" Grid.ColumnSpan="3" Grid.Row="1">
+        <Border Style="{StaticResource Border_Style_outside}" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="2*"></ColumnDefinition>
-                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.2*"></ColumnDefinition>
                     <ColumnDefinition Width="2*"></ColumnDefinition>
                     <ColumnDefinition Width="2*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Border  BorderThickness="1" BorderBrush="Black" CornerRadius="10" Margin="20,40" >
                     <TextBlock  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBlack" FontSize="22" FontFamily="Segoe UI Light">
-                        <Run Text="WEATHER"/><LineBreak/><Run Text="SETTING"/><LineBreak/><Run Text="CONTROL"/>
+                        <Run Text="WEATHER"/><LineBreak/><Run Text=" SETTING"/><LineBreak/><Run Text="CONTROL"/>
                     </TextBlock>
                 </Border>
                 <ListView Margin="5" ItemsSource="{Binding Path=initData.windInfo}" Grid.Column="1" Background="#FFE3EADF"

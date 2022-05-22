@@ -1,6 +1,6 @@
 function [X_k_list, X_full_list, X_m_list, Pk_list, Zk_list] = Kalman(lam,fi, psi_list,gam_list, V_e, V_n, R1, R2, aw_e, aw_n, aw_h, alfa, betta, gamma, acc_E, acc_N, acc_H, w_x, w_y, w_z,n_X, n_Y,n_Z,omega_Z_dot)
 X_out=zeros(19,1);
-dt = 1;
+dt = 0.5;
 w0 = 1.25e-3;
 V_H = 0;
 q=0.00346775; % отношение центробежной силы, возникающей вследствие вращени€ «емли, к силе т€жести на экваторе

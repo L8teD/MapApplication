@@ -26,6 +26,10 @@ namespace ModellingTrajectoryLib
 
         Randomize randomize;
         ModellingFunctions functions;
+
+        MeasurementsErrors gnssMeasurements;
+        MeasurementsErrors svsMeasurements;
+
         public void GetOutputs(ref T_OutputFull output)
         {
             Model();
@@ -46,7 +50,7 @@ namespace ModellingTrajectoryLib
             CreateOutputData(ref Output.Feedback);
 
             randomize = new Randomize();
-            randomize.Init(1);
+            randomize.Init();
             functions = new ModellingFunctions();
 
             DesiredFeedbackKalman = new KalmanFeedbackModel();
@@ -56,19 +60,11 @@ namespace ModellingTrajectoryLib
             ActualKalman = new KalmanModel();
 
             InputAirData zeroInputAirData = input.air;
-            zeroInputAirData.tempratureError = 0;
-            zeroInputAirData.pressureError = 0;
-
             InputWindData zeroInputWindData = input.wind;
-            zeroInputWindData.L_u = 200;
-            zeroInputWindData.L_v = 200;
-            zeroInputWindData.L_w = 50;
-            zeroInputWindData.sigma_u = 1.06;
-            zeroInputWindData.sigma_v = 1.06;
-            zeroInputWindData.sigma_w = 0.7;
-
-            desiredTrack.Init(input, zeroInputAirData, zeroInputWindData);
-            actualTrack.Init(input, input.air, input.wind);
+            InsErrors zeroInsError = input.INS;
+            SetZeroInputs(ref zeroInputAirData, ref zeroInputWindData, ref zeroInsError);
+            desiredTrack.Init(input, zeroInputAirData, zeroInputWindData, zeroInsError);
+            actualTrack.Init(input, input.air, input.wind, input.INS);
 
             functions.InitStartedData(input.trajectory.latitude, input.trajectory.longitude, input.trajectory.altitude, input.trajectory.velocity);
             functions.InitParamsBetweenPPM();
@@ -91,15 +87,16 @@ namespace ModellingTrajectoryLib
                     drydenInput.rand2 = randomize.GetRandom();
                     drydenInput.rand3 = randomize.GetRandom();
 
-                    desiredTrack.Track(wpNumber, functions, drydenInput);
-                    actualTrack.Track(wpNumber, functions, drydenInput);
+                    SetMeasurements();
+                    desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
+                    actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
                     Kalman();
 
                     PPM_DisctancePrev = PPM_Distance;
                     double ortDistAngleCurrent = functions.ComputeOrtDistAngle(desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
 
-                    if (counterAddPlotDataDes % 20 == 0)
+                    if (counterAddPlotDataDes % 1 == 0)
                     {
                         functions.CheckParamsBetweenPPM(wpNumber, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians,
                         new Velocity(desiredTrack.OutVelocities.Ideal.GetValueOrDefault().E,
@@ -109,7 +106,7 @@ namespace ModellingTrajectoryLib
                         
 
                     LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
-                    if (PPM_DisctancePrev < PPM_Distance)
+                    if (PPM_DisctancePrev <= PPM_Distance)
                         break;
 
                 }
@@ -123,25 +120,34 @@ namespace ModellingTrajectoryLib
                         drydenInput.rand1 = randomize.GetRandom();
                         drydenInput.rand2 = randomize.GetRandom();
                         drydenInput.rand3 = randomize.GetRandom();
+                        SetMeasurements();
                         functions.SetTurnAngles(wpNumber, input.INS.dt, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians.alt);
-                        desiredTrack.Track(wpNumber, functions, drydenInput);
-                        actualTrack.Track(wpNumber, functions, drydenInput);
+                        desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
+                        actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
                         Kalman();
                     }
                 }
             }
         }
-        private void Kalman()
+        private void SetMeasurements()
         {
-            MeasurementsErrors gnssMeasurements = new MeasurementsErrors();
-            MeasurementsErrors svsMeasurements = new MeasurementsErrors();
+            gnssMeasurements = new MeasurementsErrors();
+            svsMeasurements = new MeasurementsErrors();
 
-            gnssMeasurements.constant.lon = input.GNSS.coord;
-            gnssMeasurements.constant.lat = input.GNSS.coord;
-            gnssMeasurements.constant.alt = input.GNSS.coord;
-            gnssMeasurements.constant.E = input.GNSS.velocity;
-            gnssMeasurements.constant.N = input.GNSS.velocity;
-            gnssMeasurements.constant.H = input.GNSS.velocity;
+            gnssMeasurements.constant.lon = 0;
+            gnssMeasurements.constant.lat = 0;
+            gnssMeasurements.constant.alt = 0;
+            gnssMeasurements.constant.E = 0;
+            gnssMeasurements.constant.N = 0;
+            gnssMeasurements.constant.H = 0;
+
+            gnssMeasurements.SKO.lat = input.GNSS.coord;
+            gnssMeasurements.SKO.lon = input.GNSS.coord;
+            gnssMeasurements.SKO.alt = input.GNSS.coord;
+            gnssMeasurements.SKO.E = input.GNSS.velocity;
+            gnssMeasurements.SKO.N = input.GNSS.velocity;
+            gnssMeasurements.SKO.H = input.GNSS.velocity;
+
 
             gnssMeasurements.noise.lon = randomize.GetRandom();
             gnssMeasurements.noise.lat = randomize.GetRandom();
@@ -149,8 +155,66 @@ namespace ModellingTrajectoryLib
             gnssMeasurements.noise.E = randomize.GetRandom();
             gnssMeasurements.noise.N = randomize.GetRandom();
             gnssMeasurements.noise.H = randomize.GetRandom();
-            
 
+
+            svsMeasurements.SKO.lat = input.air.coordSKO;
+            svsMeasurements.SKO.lon = input.air.coordSKO;
+            svsMeasurements.SKO.alt = input.air.coordSKO;
+            svsMeasurements.SKO.E = input.air.velSKO;
+            svsMeasurements.SKO.N = input.air.velSKO;
+            svsMeasurements.SKO.H = input.air.velSKO;
+
+            svsMeasurements.noise.lat = randomize.GetRandom();
+            svsMeasurements.noise.lon = randomize.GetRandom();
+            svsMeasurements.noise.alt = randomize.GetRandom();
+            svsMeasurements.noise.E = randomize.GetRandom();
+            svsMeasurements.noise.N = randomize.GetRandom();
+            svsMeasurements.noise.H = randomize.GetRandom();
+
+        }
+        private void SetZeroInputs(ref InputAirData airZero, ref InputWindData windZero, ref InsErrors insZero)
+        {
+            airZero.tempratureError = 0.1;
+            airZero.pressureError = 5;
+            airZero.coordSKO = 2.5;
+            airZero.velSKO = 0.3;
+            airZero.pressureError = 5;
+            airZero.tempratureError = 0.1;
+
+            windZero.L_u = 200;
+            windZero.L_v = 200;
+            windZero.L_w = 50;
+            windZero.sigma_u = 1.06;
+            windZero.sigma_v = 1.06;
+            windZero.sigma_w = 0.7;
+
+            insZero.accelerationError.first = 0.02 * insZero.dt;
+            insZero.accelerationError.second = 0.02 * insZero.dt;
+            insZero.accelerationError.third = 0.02 * insZero.dt;
+
+            insZero.accNoiseSKO.first = 0.005 * insZero.dt;
+            insZero.accNoiseSKO.second = 0.005 * insZero.dt;
+            insZero.accNoiseSKO.third = 0.005 * insZero.dt;
+
+            insZero.gyroError.first = Converter.DegToRad(1) / 3600 * insZero.dt;
+            insZero.gyroError.second = Converter.DegToRad(1) / 3600 * insZero.dt;
+            insZero.gyroError.third = Converter.DegToRad(1) / 3600 * insZero.dt;
+
+            insZero.gyroNoiseSKO.first = Converter.DegToRad(0.25) / 3600 * insZero.dt;
+            insZero.gyroNoiseSKO.second = Converter.DegToRad(0.25) / 3600 * insZero.dt;
+            insZero.gyroNoiseSKO.third = Converter.DegToRad(0.25) / 3600 * insZero.dt;
+
+            insZero.accTemperatureKoef.first = 0.008;
+            insZero.accTemperatureKoef.second = 0.008;
+            insZero.accTemperatureKoef.third = 0.008;
+
+            insZero.gyroTemperatureKoef.first = 0.03;
+            insZero.gyroTemperatureKoef.second = 0.03;
+            insZero.gyroTemperatureKoef.third = 0.03;
+        }
+        int correctorCounter = 0;
+        private void Kalman()
+        {
             input.INS.accNoiseValue.first = randomize.GetRandom();
             input.INS.accNoiseValue.second = randomize.GetRandom();
             input.INS.accNoiseValue.third = randomize.GetRandom();
@@ -158,11 +222,19 @@ namespace ModellingTrajectoryLib
             input.INS.gyroNoiseValue.second = randomize.GetRandom();
             input.INS.gyroNoiseValue.third = randomize.GetRandom();
 
-
-            desiredTrack.Estimation(DesiredKalman, true, gnssMeasurements, svsMeasurements, input.INS);
-            //desiredTrack.Estimation(DesiredFeedbackKalman, initErrors, desiredAirData, functions, dt);
-            actualTrack.Estimation(ActualKalman, true, gnssMeasurements, svsMeasurements, input.INS);
-            //actualTrack.Estimation(ActualFeedbackKalman, initErrors, inputAirData, functions, dt);
+            
+            bool isGardenRoad = false;
+            if (desiredTrack.kalmanModel != null )
+            {
+                isGardenRoad = Common.IsGardenRingRoad(desiredTrack.OutPoints.Ideal.GetValueOrDefault().Degrees.lat,
+                                                                desiredTrack.OutPoints.Ideal.GetValueOrDefault().Degrees.lon);
+            }
+                
+            desiredTrack.Estimation(DesiredKalman, !isGardenRoad/*correctorCounter % 2 == 0*/, gnssMeasurements, svsMeasurements, input.INS);
+            desiredTrack.Estimation(DesiredFeedbackKalman, !isGardenRoad, gnssMeasurements, svsMeasurements, input.INS);
+            //actualTrack.Estimation(ActualKalman, !isGardenRoad/*correctorCounter % 2 == 0*/, gnssMeasurements, svsMeasurements, input.INS);
+            //actualTrack.Estimation(ActualFeedbackKalman, correctorCounter % 2 == 0, gnssMeasurements, svsMeasurements, input.INS);
+            correctorCounter++;
         }
         private int counterAddPlotDataDes = 0;
         private int counterAddPlotDataAct = 0;

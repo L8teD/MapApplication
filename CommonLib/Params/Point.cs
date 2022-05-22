@@ -9,8 +9,8 @@ namespace CommonLib.Params
     public class Point
     {
         public Dimension dimension;
-        public double lat { get; private set; }
-        public double lon { get; private set; }
+        public double lat { get; set; }
+        public double lon { get; set; }
         public double alt { get; set; }
         public Point(double _lat, double _lon, double _alt, Dimension dim)
         {

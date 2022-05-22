@@ -79,42 +79,12 @@ namespace CommonLib
             }
             return (latArray, lonArray, altArray);
         }
-        public static double[][] MetersToRadians(double[][] input, double latitude, EarthModel earthModel)
-        {
-            double[][] output = new double[input.Length][];
-
-            output[0] = new double[] { input[0][0] / (earthModel.R2 * Math.Cos(latitude)) };
-            output[1] = new double[1];
-            output[2] = new double[] { input[2][0] / earthModel.R1 };
-            output[3] = new double[1];
-            return output;
-        }
         public static Point MetersToDegrees(Point inputPointInMeters, double latitude, EarthModel earthModel)
         {
             return RadToDeg(MetersToRadians(inputPointInMeters, latitude, earthModel));
         }
         public static Point MetersToRadians(Point inputPoint, double latitude, EarthModel earthModel)
         {
-            //Point pointInRad = null;
-            //if(_pointInRad.dimension != Dimension.Radians)
-            //{
-            //    switch (_pointInRad.dimension)
-            //    {
-            //        case Dimension.Radians:
-            //            pointInRad = _pointInRad;
-            //            break;
-            //        case Dimension.Degrees:
-            //            pointInRad = DegToRad(_pointInRad);
-            //            break;
-            //        case Dimension.Meters:
-            //            throw new Exception("Dimension should be in meters");
-            //        default:
-            //            pointInRad = _pointInRad;
-            //            break;
-            //    }
-            //}
-            //if (pointInRad == null) return null;
-
             Point outPoint = new Point(
                 inputPoint.lat / earthModel.R2,
                 inputPoint.lon / (earthModel.R1 * Math.Cos(latitude)),

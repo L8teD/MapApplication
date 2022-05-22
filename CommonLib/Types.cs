@@ -32,10 +32,13 @@ namespace CommonLib
     }
     public struct InputAirData
     {
+        public double pressureIndicatorError;
         public double relativeAltitude;
         public double pressureError;
         public double tempratureError;
         public double temperatureCelcius;
+        public double coordSKO;
+        public double velSKO;
     }
     #region InitErrors Struct
     public struct InsErrors
@@ -50,7 +53,8 @@ namespace CommonLib
         public SensorError gyroNoiseSKO;
         public SensorError accNoiseValue;
         public SensorError gyroNoiseValue;
-        public SensorError temperatureKoef;
+        public SensorError accTemperatureKoef;
+        public SensorError gyroTemperatureKoef;
 
         public double dt; //вынести отсюда
     }
@@ -103,6 +107,7 @@ namespace CommonLib
     public struct MeasurementsErrors
     {
         public MeasurementsParams constant;
+        public MeasurementsParams SKO;
         public MeasurementsParams noise;
     }
     public struct MatlabOutData

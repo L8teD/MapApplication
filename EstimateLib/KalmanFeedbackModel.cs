@@ -22,5 +22,30 @@ namespace EstimateLib
                 X = value;
             } 
         }
+        protected new Vector X_previous
+        {
+            get
+            {
+                if (base.X_estimate == null)
+                {
+                    return X.Dublicate();
+                }
+                else
+                {
+                    Vector _ = base.X_estimate.Dublicate();
+                    _[1] = 0;
+                    _[2] = 0;
+                    _[3] = 0;
+                    _[4] = 0;
+                    _[5] = 0;
+                    _[6] = 0;
+                    return _;
+                }
+            }
+            set
+            {
+                X_previous = value;
+            }
+        }
     }
 }

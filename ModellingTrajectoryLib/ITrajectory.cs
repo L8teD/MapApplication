@@ -13,8 +13,8 @@ namespace ModellingTrajectoryLib
 {
     public interface ITrajectory
     {
-        void Init(Input input, InputAirData air, InputWindData wind);
-        void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput);
+        void Init(Input input, InputAirData air, InputWindData wind, InsErrors ins);
+        void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements);
         Action<IKalman> FillOutputsData { get; set; }
         PointSet OutPoints { get; set; }
         VelocitySet OutVelocities { get; set; }
@@ -31,7 +31,7 @@ namespace ModellingTrajectoryLib
         
         public Action<IKalman> FillOutputsData { get; set; }
         protected Parameters parameters;
-        protected IKalman kalmanModel;
+        public IKalman kalmanModel;
         public PointSet OutPoints
         {
             get
@@ -121,9 +121,7 @@ namespace ModellingTrajectoryLib
             get { return wayPointsCount; }
             private set { wayPointsCount = value; }
         }
-        protected virtual int RandomSeed { get; set; }
-
-        public void Init(Input _input, InputAirData air, InputWindData wind)
+        public void Init(Input _input, InputAirData air, InputWindData wind, InsErrors INS)
         {
             localParams = new List<Parameters>();
             parameters.point = new Point(_input.trajectory.latitude[0], _input.trajectory.longitude[0], _input.trajectory.altitude[0], Dimension.Radians);
@@ -132,10 +130,11 @@ namespace ModellingTrajectoryLib
             input = _input;
             input.air = air;
             input.wind = wind;
+            input.INS = INS;
             courseAir = new CourseAirReckoning();
-            courseAir.Init(parameters.point);
+            courseAir.Init(parameters.point, input.trajectory.altitude, air.relativeAltitude);
         }
-        public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput)
+        public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements)
         {
             parameters.dt = input.INS.dt;
 
@@ -143,7 +142,7 @@ namespace ModellingTrajectoryLib
 
             ComputeParametersData(wpNumber, functions);
 
-            courseAir.Model(ref parameters, input.wind, ref input.air, drydenInput, ref kvsPoints, ref kvsVelocities);
+            courseAir.Model(parameters, input.wind, ref input.air, drydenInput, ref kvsPoints, ref kvsVelocities, ref measurements);
 
             localParams.Add(parameters);
         }
@@ -176,9 +175,9 @@ namespace ModellingTrajectoryLib
 
             gnssPoints.Error = new PointValue(
               new Point(
-                  gnssMeasurments.constant.lon * gnssMeasurments.noise.lon,
-                  gnssMeasurments.constant.lat * gnssMeasurments.noise.lat,
-                  gnssMeasurments.constant.alt * gnssMeasurments.noise.alt,
+                  gnssMeasurments.SKO.lon * gnssMeasurments.noise.lon,
+                  gnssMeasurments.SKO.lat * gnssMeasurments.noise.lat,
+                  gnssMeasurments.SKO.alt * gnssMeasurments.noise.alt,
                   Dimension.Meters),
               parameters.earthModel,
               parameters.point);
@@ -193,9 +192,9 @@ namespace ModellingTrajectoryLib
 
 
             gnssVelocities.Error = new VelocityValue(
-                gnssMeasurments.constant.E * gnssMeasurments.noise.E, 
-                gnssMeasurments.constant.N * gnssMeasurments.noise.N,
-                gnssMeasurments.constant.H * gnssMeasurments.noise.H);
+                gnssMeasurments.SKO.E * gnssMeasurments.noise.E, 
+                gnssMeasurments.SKO.N * gnssMeasurments.noise.N,
+                gnssMeasurments.SKO.H * gnssMeasurments.noise.H);
 
             gnssVelocities.Real = new VelocityValue(
                 parameters.velocity.E + gnssVelocities.Error.Value.E,
@@ -210,7 +209,8 @@ namespace ModellingTrajectoryLib
             svsMeasurements.constant.H = KvsVelocities.Error.Value.H;
 
 
-            input.INS = insErrors;
+            input.INS.gyroNoiseValue = insErrors.gyroNoiseValue;
+            input.INS.accNoiseValue = insErrors.accNoiseValue;
             kalmanModel = kalman;
             kalman.CorrectorIsGNSS = correctorIsGNSS;
             kalmanModel.Model(input, parameters, gnssMeasurments, svsMeasurements);

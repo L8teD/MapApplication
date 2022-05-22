@@ -57,6 +57,7 @@ namespace MapApplication.Model
             copy.INS = PlotWorker.DublicatePlotData(INS);
             copy.GNSS = PlotWorker.DublicatePlotData(GNSS);
             copy.KVS = PlotWorker.DublicatePlotData(KVS);
+            copy.SwitchSource(activeSource);
             return copy;
         }
         public DisplayGraphicData()

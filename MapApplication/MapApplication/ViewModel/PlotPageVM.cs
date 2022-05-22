@@ -91,8 +91,7 @@ namespace MapApplication.ViewModel
 
                     IndicatedSeries.AddRange(savedSeries);
 
-                    activePlotTitle = "Merging Charts";
-                    RefreshPlot();
+                    RefreshPlot(true);
 
                 }));
             }
@@ -288,14 +287,20 @@ namespace MapApplication.ViewModel
             IndicatedSeries = new List<LineSeries>();
             RemovedSeries = new List<LineSeries>();
         }
-        public void RefreshPlot()
+        public void RefreshPlot(bool isMerge = false)
         {
-            activePlotTitle = PlotWorker.SelectPlotName(activeParameter)
+            if (isMerge)
+                activePlotTitle = "Merging Charts";
+            else
+            {
+                activePlotTitle = PlotWorker.SelectPlotName(activeParameter)
                                             + " " + PlotWorker.SelectSource(activeSource)
                                             + " " + PlotWorker.SelectPlotCharacter(activeCharacter);
-            plot.ChangePlotTitle(activePlotTitle);
+            }
+           
             activeVerticalAxis = PlotWorker.SelectPlotDimension(activeParameter, activeCharacter);
             Plot("time, [sec]", PlotWorker.SelectPlotName(activeParameter) + " " + activeVerticalAxis);
+            plot.ChangePlotTitle(activePlotTitle);
         }
         private void SetComboBoxData()
         {
@@ -363,7 +368,7 @@ namespace MapApplication.ViewModel
                 "Desired Track"));
 
             IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, character, actualPlotData.Display), 
+                PlotWorker.SelectData(name, character, actualPlotData.Display),
                 "Actual Track"));
         }
 

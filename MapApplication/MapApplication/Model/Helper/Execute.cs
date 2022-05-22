@@ -56,8 +56,14 @@ namespace MapApplication.Model.Helper
             InputAirData airData = new InputAirData();
 
             airData.relativeAltitude = initData.airInfo[0].Value;
+            airData.pressureIndicatorError = initData.airInfo[1].Value;
+            airData.coordSKO = initData.airInfo[2].Value;
+            airData.velSKO = initData.airInfo[3].Value;
+
+
             airData.pressureError = initData.windInfo[3].Value;
             airData.tempratureError = initData.windInfo[4].Value;
+
 
             return airData;
         }
@@ -96,25 +102,29 @@ namespace MapApplication.Model.Helper
 
             insErrors.dt = initData.insErrors[9].Value;
 
-            insErrors.accelerationError.first = initData.sensorErrors[0].Value;
-            insErrors.accelerationError.second = initData.sensorErrors[1].Value;
-            insErrors.accelerationError.third = initData.sensorErrors[2].Value;
+            insErrors.accelerationError.first = initData.sensorErrors[0].Value * insErrors.dt;
+            insErrors.accelerationError.second = initData.sensorErrors[1].Value * insErrors.dt;
+            insErrors.accelerationError.third = initData.sensorErrors[2].Value * insErrors.dt;
 
-            insErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value) / 3600;
-            insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value) / 3600;
-            insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value) / 3600;
+            insErrors.gyroError.first = Converter.DegToRad(initData.sensorErrors[3].Value) / 3600 * insErrors.dt;
+            insErrors.gyroError.second = Converter.DegToRad(initData.sensorErrors[4].Value) / 3600 * insErrors.dt;
+            insErrors.gyroError.third = Converter.DegToRad(initData.sensorErrors[5].Value) / 3600 * insErrors.dt;
 
-            insErrors.accNoiseSKO.first = initData.sensorErrors[6].Value;
-            insErrors.accNoiseSKO.second = initData.sensorErrors[6].Value;
-            insErrors.accNoiseSKO.third = initData.sensorErrors[6].Value;
+            insErrors.accNoiseSKO.first = initData.sensorErrors[6].Value * insErrors.dt;
+            insErrors.accNoiseSKO.second = initData.sensorErrors[7].Value * insErrors.dt;
+            insErrors.accNoiseSKO.third = initData.sensorErrors[8].Value * insErrors.dt;
 
-            insErrors.gyroNoiseSKO.first = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
-            insErrors.gyroNoiseSKO.second = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
-            insErrors.gyroNoiseSKO.third = Converter.DegToRad(initData.sensorErrors[7].Value) / 3600;
+            insErrors.gyroNoiseSKO.first = Converter.DegToRad(initData.sensorErrors[9].Value) / 3600 * insErrors.dt;
+            insErrors.gyroNoiseSKO.second = Converter.DegToRad(initData.sensorErrors[10].Value) / 3600 * insErrors.dt;
+            insErrors.gyroNoiseSKO.third = Converter.DegToRad(initData.sensorErrors[11].Value) / 3600 * insErrors.dt;
 
-            insErrors.temperatureKoef.first = initData.sensorErrors[8].Value;
-            insErrors.temperatureKoef.second = initData.sensorErrors[8].Value;
-            insErrors.temperatureKoef.third = initData.sensorErrors[8].Value;
+            insErrors.accTemperatureKoef.first = initData.sensorErrors[12].Value;
+            insErrors.accTemperatureKoef.second = initData.sensorErrors[13].Value;
+            insErrors.accTemperatureKoef.third = initData.sensorErrors[14].Value;
+
+            insErrors.gyroTemperatureKoef.first = initData.sensorErrors[15].Value;
+            insErrors.gyroTemperatureKoef.second = initData.sensorErrors[16].Value;
+            insErrors.gyroTemperatureKoef.third = initData.sensorErrors[17].Value;
 
             return insErrors;
         }
@@ -124,7 +134,6 @@ namespace MapApplication.Model.Helper
 
             gnss.coord = initData.gnssErrors[0].Value;
             gnss.velocity = initData.gnssErrors[1].Value;
-            gnss.noise = initData.gnssErrors[2].Value;
 
             return gnss;
         }

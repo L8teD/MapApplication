@@ -27,7 +27,7 @@ namespace MapApplication.ViewModel
         private MainModel m_Model;
 
         private WayPoint waypoint;
-        MapPolyline trajectoryLine;
+        //MapPolyline trajectoryLine;
         List<BasicGeoposition> trajectoryPoints = new List<BasicGeoposition>();
 
         public DataTableWithChangesVM IdealDataTable { get; set; }
@@ -283,6 +283,25 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        int lat = 55;
+        int lon = 37;
+        private RelayCommand cmd_None;
+        public RelayCommand Cmd_None
+        {
+            get
+            {
+                return cmd_None ??
+                (cmd_None = new RelayCommand(obj =>
+                {
+                    trajectoryPoints = new List<BasicGeoposition>();
+                    trajectoryPoints.Add(new BasicGeoposition() { Latitude = lat, Longitude = lon });
+                    trajectoryPoints.Add(new BasicGeoposition() { Latitude = lat+5, Longitude = lon });
+                    DrawLine(trajectoryPoints, 0);
+                    lat++;
+                    lon++;
+                }));
+            }
+        }
         #endregion
 
         public MainViewModel(Microsoft.Toolkit.Wpf.UI.Controls.MapControl map)
@@ -450,33 +469,38 @@ namespace MapApplication.ViewModel
                 wayPoint.AirportName = myclickedIcon.Title;
                 wayPoint.Longitude = myclickedIcon.Location.Position.Longitude;
                 wayPoint.Latitude = myclickedIcon.Location.Position.Latitude;
-                wayPoint.Velocity = 80;
-                wayPoint.Altitude = 600;
+                wayPoint.Velocity = 100;
+                wayPoint.Altitude = 100;
 
                 ListViewWorker.UpdateData(initData.wayPointList, wayPoint);
             }
         }
 
         #endregion
-
+        
         private async void DrawLine(List<BasicGeoposition> trajectoryPoints, int trChar)
         {
             try
-            {
+            { 
+
                 await Dispatcher.InvokeAsync(new Action(delegate ()
                 {
-                    Map.MapElements.Clear();
+                    //Map.MapElements.Clear();
+                    MapPolyline trajectoryLine = new MapPolyline();
+                    trajectoryLine.StrokeThickness = 3; 
                     if (trajectoryLine == null)
                     {
                         trajectoryLine = new MapPolyline();
-                        trajectoryLine.StrokeColor = Windows.UI.Colors.Red;
+                        trajectoryLine.StrokeColor = Windows.UI.Colors.Blue;
                         trajectoryLine.StrokeThickness = 2;
                     }
                     if (trChar == 1)
                         trajectoryLine.StrokeColor = Windows.UI.Colors.Red;
                     else
-                        trajectoryLine.StrokeColor = Windows.UI.Colors.Black;
-                    trajectoryLine.Path = new Geopath(trajectoryPoints);
+                        trajectoryLine.StrokeColor = Windows.UI.Colors.Blue;
+                    List<BasicGeoposition> geopositions = new List<BasicGeoposition>();
+                    geopositions.AddRange(trajectoryPoints);
+                    trajectoryLine.Path = new Geopath(geopositions);
                     Map.MapElements.Add(trajectoryLine);
                     
                 }));

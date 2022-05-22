@@ -17,14 +17,14 @@ namespace MapApplication.ViewModel
         PlotVM plot { get; set; }
         List<LineSeries> IndicatedSeries { get; set; }
         List<LineSeries> RemovedSeries { get; set; }
-        void RefreshPlot();
+        void RefreshPlot(bool IsMerge = false);
     }
     public class BasePlotControl : IPlotControl
     {
         public PlotVM plot { get; set; }
         public List<LineSeries> IndicatedSeries { get; set; }
         public List<LineSeries> RemovedSeries { get; set; }
-        public void RefreshPlot()
+        public void RefreshPlot(bool IsMerge = false)
         {
 
         }
@@ -125,7 +125,7 @@ namespace MapApplication.ViewModel
 
             isWindow = fromWindow;
         }
-        public void RefreshPlot()
+        public void RefreshPlot(bool IsMerge = false)
         {
             switch (CurrentPlotState)
             {

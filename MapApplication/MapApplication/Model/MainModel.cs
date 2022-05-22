@@ -69,19 +69,20 @@ namespace MapApplication.Model
                     indicatedData = DublicateTrackData(OutputData.Default.ActualTrack);
                     break;
                 case DataSource.twoChannel:
-                    indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
+                    //indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
                     break;
                 case DataSource.threeChannelFeedback:
                     indicatedData = DublicateTrackData(OutputData.Feedback.ActualTrack);
                     break;
                 case DataSource.twoChannelFeedback:
-                    indicatedData = DublicateTrackData(OutputData.Feedback.DesiredTrack);
+                    //indicatedData = DublicateTrackData(OutputData.Feedback.DesiredTrack);
                     break;
             }
         }
         public void DrawFullTrajctory()
         {
             RefreshDrawingTrajectoryParams();
+            bool dataSended = false;
             while (second < indicatedData.INS.points.Count)
             {
                 trajectoryPoints.Add(new BasicGeoposition()
@@ -89,16 +90,28 @@ namespace MapApplication.Model
                     Latitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lat,
                     Longitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lon,
                     Altitude = indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.alt
-                    //Latitude = indicatedData.airData[second].point.lat,
-                    //Longitude = indicatedData.airData[second].point.lon,
-                    //Altitude = indicatedData.airData[second].point.alt
                 });
-                
+                bool isGardenRoad =  Common.IsGardenRingRoad(indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lat,
+                                                                 indicatedData.INS.points[second].CorrectTrajectory.GetValueOrDefault().Degrees.lon);
+
+                if (isGardenRoad && !dataSended)
+                {
+                    DrawTrajectoryAction?.Invoke(trajectoryPoints, 0);
+                    trajectoryPoints = new List<BasicGeoposition>();
+                    dataSended = true;
+                }
+                else if(!isGardenRoad && dataSended)
+                {
+                    DrawTrajectoryAction?.Invoke(trajectoryPoints, 1);
+                    trajectoryPoints = new List<BasicGeoposition>();
+                    dataSended = false;
+                }
                 MathTransformation.IncrementValue(ref second);
             }
 
-            DrawTrajectoryAction?.Invoke(trajectoryPoints, 1);
+            DrawTrajectoryAction?.Invoke(trajectoryPoints, 0);
         }
+        
         private void RefreshDrawingTrajectoryParams()
         {
             second = 1;
@@ -226,12 +239,14 @@ namespace MapApplication.Model
             {
                 case DataSource.threeChannel:
                     indicatedPlotData = actualPlotData.Copy();
+                    SetPlotData.Invoke(desiredPlotData, actualPlotData);
                     break;
                 case DataSource.twoChannel:
                     indicatedPlotData = desiredPlotData.Copy();
                     break;
                 case DataSource.threeChannelFeedback:
                     indicatedPlotData = actualFeedbackPlotData.Copy();
+                    SetPlotData.Invoke(desiredFeedbackPlotData, actualFeedbackPlotData);
                     break;
                 case DataSource.twoChannelFeedback:
                     indicatedPlotData = desiredFeedbackPlotData.Copy();
@@ -275,63 +290,63 @@ namespace MapApplication.Model
 
 
             #region Report Data
-            #region wp#1
-            wayPoint.Latitude = 62.022;
-            wayPoint.Longitude = 88.576;
-            wayPoint.Altitude = 80;
-            wayPoint.Velocity = 90;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-
-            #region wp#2
-            wayPoint.Latitude = 62.123;
-            wayPoint.Longitude = 89;
-            wayPoint.Altitude = 150;
-            wayPoint.Velocity = 110;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-
-            #region wp#3
-            wayPoint.Latitude = 61.835;
-            wayPoint.Longitude = 88.964;
-            wayPoint.Altitude = 300;
-            wayPoint.Velocity = 110;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-
-            #region wp#4
-            wayPoint.Latitude = 61.94;
-            wayPoint.Longitude = 89.223;
-            wayPoint.Altitude = 120;
-            wayPoint.Velocity = 110;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-
-            #region wp#5
-            wayPoint.Latitude = 62.022;
-            wayPoint.Longitude = 88.576;
-            wayPoint.Altitude = 60;
-            wayPoint.Velocity = 100;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-            #endregion
-
-            #region Test Data
             //#region wp#1
-            //wayPoint.Latitude = 55;
-            //wayPoint.Longitude = 37;
-            //wayPoint.Altitude = 600;
-            //wayPoint.Velocity = 80;
+            //wayPoint.Latitude = 62.022;
+            //wayPoint.Longitude = 88.576;
+            //wayPoint.Altitude = 50;
+            //wayPoint.Velocity = 90;
             //AddWayPoint(wayPointList, wayPoint);
             //#endregion
 
             //#region wp#2
-            //wayPoint.Latitude = 55.5;
-            //wayPoint.Longitude = 37.5;
-            //wayPoint.Altitude = 600;
-            //wayPoint.Velocity = 80;
+            //wayPoint.Latitude = 62.123;
+            //wayPoint.Longitude = 89;
+            //wayPoint.Altitude = 120;
+            //wayPoint.Velocity = 110;
             //AddWayPoint(wayPointList, wayPoint);
             //#endregion
+
+            //#region wp#3
+            //wayPoint.Latitude = 61.835;
+            //wayPoint.Longitude = 88.964;
+            //wayPoint.Altitude = 180;
+            //wayPoint.Velocity = 110;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
+
+            //#region wp#4
+            //wayPoint.Latitude = 61.94;
+            //wayPoint.Longitude = 89.223;
+            //wayPoint.Altitude = 100;
+            //wayPoint.Velocity = 110;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
+
+            //#region wp#5
+            //wayPoint.Latitude = 62.022;
+            //wayPoint.Longitude = 88.576;
+            //wayPoint.Altitude = 60;
+            //wayPoint.Velocity = 100;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
+            #endregion
+
+            #region Test Data
+            #region wp#1
+            wayPoint.Latitude = 55;
+            wayPoint.Longitude = 37;
+            wayPoint.Altitude = 100;
+            wayPoint.Velocity = 100;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #region wp#2
+            wayPoint.Latitude = 56;
+            wayPoint.Longitude = 38;
+            wayPoint.Altitude = 150;
+            wayPoint.Velocity = 100;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
 
             //#region wp#3
             //wayPoint.Latitude = 55.2;
@@ -431,22 +446,36 @@ namespace MapApplication.Model
             #endregion
 
             #region SensorErrors
-            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn1", Value = 0.005, Dimension = "[g]" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn2", Value = 0.005, Dimension = "[g]" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn3", Value = 0.005, Dimension = "[g]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn1", Value = 0.02, Dimension = "[m/s^2]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn2", Value = 0.02, Dimension = "[m/s^2]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Δn3", Value = 0.02, Dimension = "[m/s^2]" });
 
-            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ1", Value = 0.1, Dimension = "[deg/h]" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ2", Value = 0.1, Dimension = "[deg/h]" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ3", Value = 0.1, Dimension = "[deg/h]" });
-            
-            initData.sensorErrors.Add(new EquipmentData() { Name = "acc SKO", Value = 0.002, Dimension = "" });
-            initData.sensorErrors.Add(new EquipmentData() { Name = "gyro SKO", Value = 0.01, Dimension = "" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ1", Value = 1, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ2", Value = 1, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "ΔΩ3", Value = 1, Dimension = "[deg/h]" });
+           
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δn1", Value = 0.005, Dimension = "[m/s^2]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δn2", Value = 0.005, Dimension = "[m/s^2]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δn3", Value = 0.005, Dimension = "[m/s^2]" });
 
-            initData.sensorErrors.Add(new EquipmentData() { Name = "Kt", Value = 1.2E-5, Dimension = "1/◦C" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δΩ1", Value = 0.25, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δΩ2", Value = 0.25, Dimension = "[deg/h]" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "δΩ3", Value = 0.25, Dimension = "[deg/h]" });
+
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Ktn1", Value = 0.008, Dimension = "1/◦C" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Ktn2", Value = 0.008, Dimension = "1/◦C" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "Ktn3", Value = 0.008, Dimension = "1/◦C" });
+
+            initData.sensorErrors.Add(new EquipmentData() { Name = "KtΩ1", Value = 0.03, Dimension = "1/◦C" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "KtΩ2", Value = 0.03, Dimension = "1/◦C" });
+            initData.sensorErrors.Add(new EquipmentData() { Name = "KtΩ3", Value = 0.03, Dimension = "1/◦C" });
             #endregion
 
             #region AirInfo
             initData.airInfo.Add(new EquipmentData() { Name = "H0", Value = 0, Dimension = "[m]" });
+            initData.airInfo.Add(new EquipmentData() { Name = "ΔX_ПВД", Value = 0.05, Dimension = "[m]" });
+            initData.airInfo.Add(new EquipmentData() { Name = "δH", Value = 2.5, Dimension = "[m]" });
+            initData.airInfo.Add(new EquipmentData() { Name = "δV", Value = 0.3, Dimension = "[m/s]" });
             #endregion
 
             #region WindInfo
@@ -454,8 +483,8 @@ namespace MapApplication.Model
             initData.windInfo.Add(new EquipmentData() { Name = "wind_N", Value = 2, Dimension = "[m/s]" });
             initData.windInfo.Add(new EquipmentData() { Name = "wind_H", Value = 1, Dimension = "[m/s]" });
 
-            initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 0, Dimension = "[P]" });
-            initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0, Dimension = "[K]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 10, Dimension = "[P]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0.5, Dimension = "[K]" });
 
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_u", Value = 1.06, Dimension = "[m/s]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_v", Value = 1.06, Dimension = "[m/s]" });
@@ -468,9 +497,8 @@ namespace MapApplication.Model
 
 
             #region GnssInfo
-            initData.gnssErrors.Add(new EquipmentData() { Name = "ΔXc", Value = 2, Dimension = "[m]" });
-            initData.gnssErrors.Add(new EquipmentData() { Name = "ΔVc", Value = 0.25, Dimension = "[m/s]" });
-            initData.gnssErrors.Add(new EquipmentData() { Name = "noise", Value = 1, Dimension = "" });
+            initData.gnssErrors.Add(new EquipmentData() { Name = "δXc", Value = 2, Dimension = "[m]" });
+            initData.gnssErrors.Add(new EquipmentData() { Name = "δVc", Value = 0.25, Dimension = "[m/s]" });
             #endregion
 
 
