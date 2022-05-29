@@ -1,0 +1,8 @@
+LIBRARY	"Random"
+
+EXPORTS
+	AproximateModel_initialize			@1		PRIVATE
+	AproximateModel_step				@2		PRIVATE
+	AproximateModel_terminate			@3		PRIVATE
+	SetInput							@4		PRIVATE
+	GetOutput							@5		PRIVATE

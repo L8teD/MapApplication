@@ -10,20 +10,80 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="FlightData">
 
-    <Grid Background="#FF72BEFF">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.1*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <v:DataTable>
-            <ContentControl Content="{Binding IdealDataTable}"></ContentControl>
-        </v:DataTable>
-        <v:DataTable Grid.Column="1">
-            <ContentControl Content="{Binding ErrorDataTable}"></ContentControl>
-        </v:DataTable>
-        <v:DataTable Grid.Column="2">
-            <ContentControl Content="{Binding EstimateDataTable}"></ContentControl>
-        </v:DataTable>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="10*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <ComboBox x:Name="cb_ParamType" ItemsSource="{Binding plotPageVM.cb_Data}" DisplayMemberPath="Key" Visibility="Hidden"
+                Grid.Column="0" SelectedIndex="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0" Padding="0" 
+                FontFamily="Segoe UI Light" FontSize="1" MinWidth="0">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Margin" Value="1"></Setter>
+                            <Setter Property="BorderThickness" Value="0.5" />
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="Control.HorizontalAlignment" Value="Stretch"></Setter>
+                            <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+                            <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+                <TextBlock Style="{StaticResource newTblockStyle}" Margin="5,0,10,5 " VerticalAlignment="Center"  FontSize="18">Source</TextBlock>
+                <ComboBox x:Name="cb_SourceType" ItemsSource="{Binding ElementName= cb_ParamType,Path=SelectedItem.Value[0]}"
+                          Grid.Column="0" SelectedIndex="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5,10" Padding="20,10"
+                          FontFamily="Segoe UI Light" FontSize="18" MinWidth="155">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Margin" Value="1"></Setter>
+                            <Setter Property="BorderThickness" Value="0.5" />
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="Control.HorizontalAlignment" Value="Stretch"></Setter>
+                            <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+                            <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+
+                </ComboBox>
+                <TextBlock Style="{StaticResource newTblockStyle}" Margin="25,0,10,5 "  FontSize="18">Data type</TextBlock>
+                <ComboBox x:Name="cb_CharacterType" ItemsSource="{Binding ElementName=cb_ParamType,Path=SelectedItem.Value[1]}"
+                          Grid.Column="0" SelectedIndex="0" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="5,10" Padding="20,10"
+                          FontFamily="Segoe UI Light" FontSize="18" MinWidth="155">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Margin" Value="1"></Setter>
+                            <Setter Property="BorderThickness" Value="0.5" />
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="Control.VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="Control.HorizontalAlignment" Value="Stretch"></Setter>
+                            <Setter Property="ItemsControl.FontSize" Value="16"></Setter>
+                            <Setter Property="ItemsControl.FontFamily" Value="Segoe UI Light"></Setter>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                <Button Content="Save as .db" Style="{StaticResource btn_Style2}" HorizontalAlignment="Right"
+                    MinHeight="32" MaxHeight="45" MinWidth="100" Margin="10,5,10,5" FontSize="18" FontFamily="Segoe UI Light"></Button>
+                <Button Content="Save as .csv" Style="{StaticResource btn_Style2}" HorizontalAlignment="Right"
+                    MinHeight="32" MaxHeight="45" MinWidth="100" Margin="10,5" FontSize="18" FontFamily="Segoe UI Light"></Button>
+                <Button Content="Save in azure cloud" Style="{StaticResource btn_Style2}" HorizontalAlignment="Right"
+                    MinHeight="32" MaxHeight="45" MinWidth="100" Margin="10,5" FontSize="18" FontFamily="Segoe UI Light"></Button>
+            </StackPanel>
+        </Grid>
+
+        <DataGrid ItemsSource="{Binding tableParameters}" Grid.Row="1" FontSize="16" FontFamily="Segoe UI Light" Foreground="Black"
+                  Background="LightGray" RowBackground="LightYellow" AlternatingRowBackground="LightBlue"  
+                  ColumnWidth="150" RowHeight="40" Margin="5" >
+        </DataGrid>
     </Grid>
 </Page>

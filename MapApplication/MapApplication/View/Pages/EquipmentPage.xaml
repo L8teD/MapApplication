@@ -47,9 +47,9 @@
                     </Grid.RowDefinitions>
                     <TextBlock Text="2 Channel" Margin="40,0,15,5" FontSize="18" FontFamily="Segoe UI Light" Foreground="Black"></TextBlock>
                     <TextBlock Text="3 Channel" Grid.Column="1" Margin="40,0,15,5" FontSize="18" FontFamily="Segoe UI Light" Foreground="Black"></TextBlock>
-                    <RadioButton Margin="15,0,15,5" Content="Default"  Grid.Column="0" Grid.Row="1" Style="{StaticResource rb_Style}"
+                    <RadioButton Margin="15,0,15,5" Content="Autonomous"  Grid.Column="0" Grid.Row="1" Style="{StaticResource rb_Style}"
                             Command="{Binding Cmd_Channel2}"></RadioButton>
-                    <RadioButton Margin="15,0,15,5" Content="Default" Grid.Column="1" Grid.Row="1" Style="{StaticResource rb_Style}"
+                    <RadioButton Margin="15,0,15,5" Content="Autonomous" Grid.Column="1" Grid.Row="1" Style="{StaticResource rb_Style}"
                             Command="{Binding Cmd_Channel3}"></RadioButton>
                     <RadioButton Margin="15,0,15,5" Content="Feedback"  Grid.Column="0" Grid.Row="2" Style="{StaticResource rb_Style}"
                             Command="{Binding Cmd_FeedbackChannel2}"></RadioButton>
@@ -120,12 +120,24 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="0.7*"></RowDefinition>
                     <RowDefinition Height="4.2*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="Black" Margin="60,20" CornerRadius="10">
                     <TextBlock Text="AIR SIGNAL SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBlack" FontSize="22" FontFamily="Segoe UI Light"></TextBlock>
                 </Border>
-                <ListView Margin="5" ItemsSource="{Binding Path=initData.airInfo}" Grid.Column="1" Grid.Row="1" Background="#FFE3EADF"
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource newTblockStyle}" Text="Compensation" FontSize="18" Margin="5"></TextBlock>
+                    <RadioButton Margin="1,5,13,5" Content="On"  Grid.Column="1" Style="{StaticResource rb_Style}"></RadioButton>
+                    <RadioButton Margin="3,5,15,5" Content="Off" Grid.Column="2" Style="{StaticResource rb_Style}"></RadioButton>
+                </Grid>
+               
+                <ListView Margin="5" ItemsSource="{Binding Path=initData.airInfo}" Grid.Row="2" Background="#FFE3EADF"
                           HorizontalAlignment="Stretch" BorderThickness="3" BorderBrush="LightGray">
                     <ListView.View>
                         <GridView  ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">
@@ -159,13 +171,26 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="0.7*"></RowDefinition>
                     <RowDefinition Height="4.2*"></RowDefinition>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="Black" Margin="60,20" CornerRadius="10">
+                <Border Grid.Row="0" BorderThickness="1" BorderBrush="Black" Margin="60,20" CornerRadius="10">
                     <TextBlock Text="GLOBAL POSITION SYSTEM"  HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBlack" FontSize="22" FontFamily="Segoe UI Light"></TextBlock>
                 </Border>
-                <ListView Margin="5" ItemsSource="{Binding Path=initData.gnssErrors}" Grid.Column="1" Grid.Row="1" Background="#FFE3EADF"
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource newTblockStyle}" Text="Mode" FontSize="18" Margin="5"></TextBlock>
+                    <RadioButton Margin="1,5,13,5" Content="Absolute"  Grid.Column="1" Style="{StaticResource rb_Style}"></RadioButton>
+                    <RadioButton Margin="3,5,15,5" Content="Phase" Grid.Column="2" Style="{StaticResource rb_Style}"></RadioButton>
+                    <RadioButton Margin="3,5,15,5" Content="RTK" Grid.Column="3" Style="{StaticResource rb_Style}"></RadioButton>
+                </Grid>
+                <ListView Margin="5" ItemsSource="{Binding Path=initData.gnssErrors}"  Grid.Row="2" Background="#FFE3EADF"
                           HorizontalAlignment="Stretch" BorderThickness="3" BorderBrush="LightGray">
                     <ListView.View>
                         <GridView  ColumnHeaderContainerStyle="{StaticResource gvc_Style1}">

@@ -17,16 +17,4 @@
     <DataTemplate DataType="{x:Type vm:LegendVM}">
         <v:Legend></v:Legend>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type vm:DataRowVM}">
-        <v:DataRow></v:DataRow>
-    </DataTemplate>
-    <DataTemplate DataType="{x:Type vm:DataTableVM}">
-        <v:DataTable></v:DataTable>
-    </DataTemplate>
-    <DataTemplate DataType="{x:Type vm:DataRowWithChangesVM}">
-        <v:DataRowWithChange></v:DataRowWithChange>
-    </DataTemplate>
-    <DataTemplate DataType="{x:Type vm:DataTableWithChangesVM}">
-        <v:DataTableWithChanges></v:DataTableWithChanges>
-    </DataTemplate>
 </ResourceDictionary>

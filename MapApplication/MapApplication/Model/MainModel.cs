@@ -31,6 +31,7 @@ namespace MapApplication.Model
         public DisplayGraphicData indicatedPlotData;
         private DisplayGraphicData desiredPlotData;
         private DisplayGraphicData actualPlotData;
+        //private DisplayGraphicData additionalPlotData;
         private DisplayGraphicData desiredFeedbackPlotData;
         private DisplayGraphicData actualFeedbackPlotData;
 
@@ -46,9 +47,8 @@ namespace MapApplication.Model
         public event Action<string, string, List<LineSeries>> RefreshPitchPlot;
         public event Action<string, string, List<LineSeries>> RefreshRollPlot;
 
-        public event Action<DisplayGraphicData, DisplayGraphicData> SetPlotData;
-
-        public event Action<TrackData, int> UpdateTableData;
+        public event Action<DisplayGraphicData, DisplayGraphicData/*, DisplayGraphicData*/> SetPlotData;
+        public event Action<TrackData> SetTableData;
 
         public event Action<List<BasicGeoposition>, int> DrawTrajectoryAction;
 
@@ -67,12 +67,14 @@ namespace MapApplication.Model
             {
                 case DataSource.threeChannel:
                     indicatedData = DublicateTrackData(OutputData.Default.ActualTrack);
+                    SetTableData(indicatedData);
                     break;
                 case DataSource.twoChannel:
                     //indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
                     break;
                 case DataSource.threeChannelFeedback:
                     indicatedData = DublicateTrackData(OutputData.Feedback.ActualTrack);
+                    SetTableData(indicatedData);
                     break;
                 case DataSource.twoChannelFeedback:
                     //indicatedData = DublicateTrackData(OutputData.Feedback.DesiredTrack);
@@ -138,8 +140,6 @@ namespace MapApplication.Model
                 MathTransformation.IncrementValue(ref second);
 
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("ru-RU");
-
-                UpdateTableData?.Invoke(indicatedData, second - 1);
             }
             else
                 timerTrajectory.Enabled = false;
@@ -181,6 +181,7 @@ namespace MapApplication.Model
             {
                 Execute.CreateTrajectory(initData, ref OutputData);
                 indicatedData = DublicateTrackData(OutputData.Default.DesiredTrack);
+                SetTableData.Invoke(indicatedData);
                 CreatePlotData();
                 RefreshPlots();
             }
@@ -228,9 +229,9 @@ namespace MapApplication.Model
             PlotWorker.CreatePlotData(ref desiredFeedbackPlotData, OutputData.Feedback.DesiredTrack);
             PlotWorker.CreatePlotData(ref actualPlotData, OutputData.Default.ActualTrack);
             PlotWorker.CreatePlotData(ref actualFeedbackPlotData, OutputData.Feedback.ActualTrack);
+            //PlotWorker.CreatePlotData(ref additionalPlotData, OutputData.Default.AdditionalTrack);
 
-
-            SetPlotData.Invoke(desiredPlotData, actualPlotData);
+            SetPlotData.Invoke(desiredPlotData, actualPlotData/*, additionalPlotData*/);
         }
         public void SwitchPlotData(DataSource source)
         {
@@ -239,14 +240,14 @@ namespace MapApplication.Model
             {
                 case DataSource.threeChannel:
                     indicatedPlotData = actualPlotData.Copy();
-                    SetPlotData.Invoke(desiredPlotData, actualPlotData);
+                    SetPlotData.Invoke(desiredPlotData, actualPlotData/*, additionalPlotData*/);
                     break;
                 case DataSource.twoChannel:
                     indicatedPlotData = desiredPlotData.Copy();
                     break;
                 case DataSource.threeChannelFeedback:
                     indicatedPlotData = actualFeedbackPlotData.Copy();
-                    SetPlotData.Invoke(desiredFeedbackPlotData, actualFeedbackPlotData);
+                    SetPlotData.Invoke(desiredFeedbackPlotData, actualFeedbackPlotData/*, additionalPlotData*/);
                     break;
                 case DataSource.twoChannelFeedback:
                     indicatedPlotData = desiredFeedbackPlotData.Copy();
@@ -287,9 +288,67 @@ namespace MapApplication.Model
         public void SetTemplateRoute(ObservableCollection<WayPoint> wayPointList)
         {
             WayPoint wayPoint = new WayPoint();
-
-
             #region Report Data
+            #region wp#1
+            wayPoint.Latitude = 62.9591433666676;
+            wayPoint.Longitude = 91.2700864986695;
+            wayPoint.Altitude = 30;
+            wayPoint.Velocity = 50;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#2
+            wayPoint.Latitude = 62.9222592337647;
+            wayPoint.Longitude = 91.371765298521;
+            wayPoint.Altitude = 50;
+            wayPoint.Velocity = 55;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#3
+            wayPoint.Latitude = 62.865839621037;
+            wayPoint.Longitude = 91.3280244734366;
+            wayPoint.Altitude = 50;
+            wayPoint.Velocity = 65;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#4
+            wayPoint.Latitude = 62.8207900360936;
+            wayPoint.Longitude = 91.3519291018104;
+            wayPoint.Altitude = 70;
+            wayPoint.Velocity = 50;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#5
+            wayPoint.Latitude = 62.8014115778896;
+            wayPoint.Longitude = 91.2413854372366;
+            wayPoint.Altitude = 65;
+            wayPoint.Velocity = 75;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#6
+            wayPoint.Latitude = 62.8700769498838;
+            wayPoint.Longitude = 91.239128868378;
+            wayPoint.Altitude = 50;
+            wayPoint.Velocity = 80;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#7
+            wayPoint.Latitude = 62.9285457008314;
+            wayPoint.Longitude = 91.1965771661605;
+            wayPoint.Altitude = 40;
+            wayPoint.Velocity = 75;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+            #region wp#8
+            wayPoint.Latitude = 62.9591433666676;
+            wayPoint.Longitude = 91.2700864986695;
+            wayPoint.Altitude = 20;
+            wayPoint.Velocity = 45;
+            AddWayPoint(wayPointList, wayPoint);
+            #endregion
+
+            #endregion
+
+            #region Report Data 2
             //#region wp#1
             //wayPoint.Latitude = 62.022;
             //wayPoint.Longitude = 88.576;
@@ -302,6 +361,14 @@ namespace MapApplication.Model
             //wayPoint.Latitude = 62.123;
             //wayPoint.Longitude = 89;
             //wayPoint.Altitude = 120;
+            //wayPoint.Velocity = 100;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
+
+            //#region wp#4
+            //wayPoint.Latitude = 61.94;
+            //wayPoint.Longitude = 89.223;
+            //wayPoint.Altitude = 100;
             //wayPoint.Velocity = 110;
             //AddWayPoint(wayPointList, wayPoint);
             //#endregion
@@ -310,14 +377,6 @@ namespace MapApplication.Model
             //wayPoint.Latitude = 61.835;
             //wayPoint.Longitude = 88.964;
             //wayPoint.Altitude = 180;
-            //wayPoint.Velocity = 110;
-            //AddWayPoint(wayPointList, wayPoint);
-            //#endregion
-
-            //#region wp#4
-            //wayPoint.Latitude = 61.94;
-            //wayPoint.Longitude = 89.223;
-            //wayPoint.Altitude = 100;
             //wayPoint.Velocity = 110;
             //AddWayPoint(wayPointList, wayPoint);
             //#endregion
@@ -332,21 +391,21 @@ namespace MapApplication.Model
             #endregion
 
             #region Test Data
-            #region wp#1
-            wayPoint.Latitude = 55;
-            wayPoint.Longitude = 37;
-            wayPoint.Altitude = 100;
-            wayPoint.Velocity = 100;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#1
+            //wayPoint.Latitude = 55;
+            //wayPoint.Longitude = 37;
+            //wayPoint.Altitude = 100;
+            //wayPoint.Velocity = 100;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
 
-            #region wp#2
-            wayPoint.Latitude = 56;
-            wayPoint.Longitude = 38;
-            wayPoint.Altitude = 150;
-            wayPoint.Velocity = 100;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#2
+            //wayPoint.Latitude = 55.3;
+            //wayPoint.Longitude = 37.3;
+            //wayPoint.Altitude = 150;
+            //wayPoint.Velocity = 100;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
 
             //#region wp#3
             //wayPoint.Latitude = 55.2;
@@ -373,6 +432,7 @@ namespace MapApplication.Model
             //#endregion
             #endregion
         }
+
         public void SetDataFromLogger(LogInfo info, ObservableCollection<WayPoint> wayPointList)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
@@ -417,7 +477,7 @@ namespace MapApplication.Model
         }
         public WayPoint SetWayPoint()
         {
-            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 1000, Velocity = 130 };
+            return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 200, Velocity = 100 };
         }
         public InitData SetInputErrors(InitData initData)
         {
@@ -473,7 +533,7 @@ namespace MapApplication.Model
 
             #region AirInfo
             initData.airInfo.Add(new EquipmentData() { Name = "H0", Value = 0, Dimension = "[m]" });
-            initData.airInfo.Add(new EquipmentData() { Name = "ΔX_ПВД", Value = 0.05, Dimension = "[m]" });
+            initData.airInfo.Add(new EquipmentData() { Name = "ΔX_ПВД", Value = 0.1, Dimension = "[Pa]" });
             initData.airInfo.Add(new EquipmentData() { Name = "δH", Value = 2.5, Dimension = "[m]" });
             initData.airInfo.Add(new EquipmentData() { Name = "δV", Value = 0.3, Dimension = "[m/s]" });
             #endregion
@@ -483,8 +543,8 @@ namespace MapApplication.Model
             initData.windInfo.Add(new EquipmentData() { Name = "wind_N", Value = 2, Dimension = "[m/s]" });
             initData.windInfo.Add(new EquipmentData() { Name = "wind_H", Value = 1, Dimension = "[m/s]" });
 
-            initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 10, Dimension = "[P]" });
-            initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0.5, Dimension = "[K]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 5, Dimension = "[P]" });
+            initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0.2, Dimension = "[K]" });
 
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_u", Value = 1.06, Dimension = "[m/s]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_v", Value = 1.06, Dimension = "[m/s]" });

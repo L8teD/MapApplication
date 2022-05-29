@@ -23,6 +23,7 @@ namespace MapApplication.ViewModel
         public List<LineSeries> RemovedSeries { get; set; }
         DisplayGraphicData desiredPlotData;
         DisplayGraphicData actualPlotData;
+        //DisplayGraphicData additionalPlotData;
         private List<LineSeries> savedSeries;
 
         string activePlotTitle;
@@ -232,9 +233,9 @@ namespace MapApplication.ViewModel
 
                     activeSource = PlotWorker.SelectSource(sourceName);
 
-
                     desiredPlotData.SwitchSource(activeSource);
                     actualPlotData.SwitchSource(activeSource);
+                    //additionalPlotData.SwitchSource(activeSource);
 
                     FillSeries(activeParameter, activeCharacter);
                     RefreshPlot();
@@ -266,10 +267,8 @@ namespace MapApplication.ViewModel
                     if (i != (savedSeries.Count - 1))
                         text += "\n";
                 }
-
                 syncContext.Send(SendValueMessage, text);
             }
-           
         }
         private void SendValueMessage(object text)
         {
@@ -353,23 +352,37 @@ namespace MapApplication.ViewModel
             cb_Data.Add(paramNames[7], new string[][] { angleSources, angleCharacter });
             cb_Data.Add(paramNames[8], new string[][] { angleSources, angleCharacter });
         }
-        private void M_Model_SetPlotData(DisplayGraphicData arg1, DisplayGraphicData arg2)
+        private void M_Model_SetPlotData(DisplayGraphicData arg1, DisplayGraphicData arg2/*, DisplayGraphicData arg3*/)
         {
             M_Model_SetDesiredData(arg1);
             M_Model_SetActualData(arg2);
+            //M_Model_SetAdditionalData(arg3);
         }
         private void FillSeries(PlotName name, PlotCharacter character)
         {
             IndicatedSeries.Clear();
             RemovedSeries.Clear();
 
-            IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, character, desiredPlotData.Display), 
-                "Desired Track"));
+            if (desiredPlotData != null)
+            {
+                IndicatedSeries.Add(PlotWorker.CreateLineSeries(
+                    PlotWorker.SelectData(name, character, desiredPlotData.Display),
+                    "Desired Track"));
+            }
 
-            IndicatedSeries.Add(PlotWorker.CreateLineSeries(
-                PlotWorker.SelectData(name, character, actualPlotData.Display),
-                "Actual Track"));
+            if(actualPlotData != null)
+            {
+                IndicatedSeries.Add(PlotWorker.CreateLineSeries(
+                    PlotWorker.SelectData(name, character, actualPlotData.Display),
+                    "Actual Track"));
+            }
+            //if(additionalPlotData != null)
+            //{
+            //    IndicatedSeries.Add(PlotWorker.CreateLineSeries(
+            //       PlotWorker.SelectData(name, character, additionalPlotData.Display),
+            //       "Additional Track"));
+            //}
+
         }
 
         private void M_Model_SetDesiredData(DisplayGraphicData obj)
@@ -379,6 +392,10 @@ namespace MapApplication.ViewModel
         private void M_Model_SetActualData(DisplayGraphicData obj)
         {
             actualPlotData = obj;
+        }
+        private void M_Model_SetAdditionalData(DisplayGraphicData obj)
+        {
+            //additionalPlotData = obj;
         }
 
         public void Plot(string xAxisName, string yAxisName)

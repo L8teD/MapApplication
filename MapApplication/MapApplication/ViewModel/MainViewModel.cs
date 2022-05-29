@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Controls.Maps;
 using CommonLib;
 using OxyPlot;
 using System.Windows.Input;
+using System.Diagnostics;
+using System.IO;
 
 namespace MapApplication.ViewModel
 {
@@ -27,12 +29,11 @@ namespace MapApplication.ViewModel
         private MainModel m_Model;
 
         private WayPoint waypoint;
+        private Process process;
+
         //MapPolyline trajectoryLine;
         List<BasicGeoposition> trajectoryPoints = new List<BasicGeoposition>();
 
-        public DataTableWithChangesVM IdealDataTable { get; set; }
-        public DataTableVM ErrorDataTable { get; set; }
-        public DataTableVM EstimateDataTable { get; set; }
 
         public PlotPageVM plotPageVM{ get; set; }
 
@@ -46,6 +47,8 @@ namespace MapApplication.ViewModel
             }
         }
         public ObservableCollection<LogInfo> loggerInfoList { get; set; }
+        public ObservableCollection<TableParameter> tableParameters { get; set; } = new ObservableCollection<TableParameter>();
+
 
         #region Commands
         
@@ -283,22 +286,35 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
-        int lat = 55;
-        int lon = 37;
-        private RelayCommand cmd_None;
-        public RelayCommand Cmd_None
+        private RelayCommand cmd_ExecuteNdDisplay;
+        public RelayCommand ExecuteNdDisplay
         {
             get
             {
-                return cmd_None ??
-                (cmd_None = new RelayCommand(obj =>
+                return cmd_ExecuteNdDisplay ??
+                (cmd_ExecuteNdDisplay = new RelayCommand(obj =>
                 {
-                    trajectoryPoints = new List<BasicGeoposition>();
-                    trajectoryPoints.Add(new BasicGeoposition() { Latitude = lat, Longitude = lon });
-                    trajectoryPoints.Add(new BasicGeoposition() { Latitude = lat+5, Longitude = lon });
-                    DrawLine(trajectoryPoints, 0);
-                    lat++;
-                    lon++;
+                    string exePath = @"B:\Projects\GosNIIAS\Pages Model\studentsProject\CallingProgram\bin\Debug\";
+                    string fileName = "CallingProgram.exe";
+                    process = new Process();
+                    process.StartInfo.FileName = Path.Combine(exePath, fileName);
+                    process.StartInfo.WorkingDirectory = new FileInfo(exePath).DirectoryName;
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                    process.Start();
+                }));
+            }
+        }
+        private RelayCommand cmd_KillNdDisplay;
+        public RelayCommand KillNdDisplay
+        {
+            get
+            {
+                return cmd_KillNdDisplay ??
+                (cmd_KillNdDisplay = new RelayCommand(obj =>
+                {
+                    
+                    if (!process.HasExited)
+                        process.Kill();
                 }));
             }
         }
@@ -322,16 +338,13 @@ namespace MapApplication.ViewModel
 
             m_Model.DrawTrajectoryAction += DrawLine;
 
-            m_Model.UpdateTableData += M_Model_UpdateTableData;
+            m_Model.SetTableData += M_Model_SetTableData;
 
 
             initData = m_Model.SetInputErrors(initData);
             loggerInfoList = m_Model.GetInfoFromLogger();
 
-            IdealDataTable = new DataTableWithChangesVM(PlotCharacter.Ideal);
-            ErrorDataTable = new DataTableVM(PlotCharacter.Error);
-            EstimateDataTable = new DataTableVM(PlotCharacter.Estimate);
-
+           
             MapElementWorker.AddAirportsOnMap();
             airportsLayer = new MapElementsLayer() { MapElements = MapElementWorker.airportsMapElements };
             //airportsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
@@ -345,6 +358,32 @@ namespace MapApplication.ViewModel
             Map.Layers.Add(airportsLayer);
 
             map.MapRightTapped += Map_MapRightTapped;
+        }
+
+        private void M_Model_SetTableData(TrackData obj)
+        {
+            if (tableParameters == null)
+                tableParameters = new ObservableCollection<TableParameter>();
+            for (int i = 0; i < obj.INS.points.Count; i++)
+            {
+                TableParameter param = new TableParameter();
+
+                param.Latitude = obj.INS.points[i].Ideal.Value.Degrees.lat;
+                param.Longitude = obj.INS.points[i].Ideal.Value.Degrees.lon;
+                param.Altitude = obj.INS.points[i].Ideal.Value.Degrees.alt;
+
+                param.EastVelocity = obj.INS.velocities[i].Ideal.Value.E;
+                param.NorthVelocity = obj.INS.velocities[i].Ideal.Value.N;
+                param.VerticalVelocity = obj.INS.velocities[i].Ideal.Value.H;
+
+                param.Heading = obj.INS.angles[i].Ideal.Value.Degrees.heading;
+                param.Pitch = obj.INS.angles[i].Ideal.Value.Degrees.pitch;
+                param.Roll = obj.INS.angles[i].Ideal.Value.Degrees.roll;
+
+                tableParameters.Add(param);
+            }
+
+
         }
 
         private void Map_MapRightTapped(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.MapRightTappedEventArgs e)
@@ -361,54 +400,17 @@ namespace MapApplication.ViewModel
             Map.Layers.Add(elementsRunningAdded);
         }
 
-        private void Map_MapDoubleTapped(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.MapInputEventArgs e)
-        {
-
-        }
         private void AddMapElementEvents(MapElementsLayer elementsLayer)
         {
             elementsLayer.MapElementPointerEntered += AirportsLayer_MapElementPointerEntered;
             elementsLayer.MapElementPointerExited += AirportsLayer_MapElementPointerExited;
             elementsLayer.MapElementClick += AirportsLayer_MapElementClick;
         }
-        private void M_Model_UpdateTableData(TrackData track, int second)
-        {
-            OutputData outputData = track.INS;
-            //IdealDataTable.LongitudeValueMessage(outputData.points[second].Ideal.Degrees.lat.ToString());
-            //IdealDataTable.LatitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.lon.ToString());
-            //IdealDataTable.AltitudeDataRowWithChangesVM.UpdateValueMessage(outputData.points[second].Ideal.Degrees.alt.ToString());
-            //IdealDataTable.V_EastDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.E.ToString());
-            //IdealDataTable.V_NorthDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.N.ToString());
-            //IdealDataTable.V_VerticalDataRowWithChangesVM.UpdateValueMessage(outputData.velocities[second].Ideal.H.ToString());
-            //IdealDataTable.HeadingDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.heading.ToString());
-            //IdealDataTable.PitchDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.pitch.ToString());
-            //IdealDataTable.RollDataRowWithChangesVM.UpdateValueMessage(outputData.angles[second].Ideal.Degrees.roll.ToString());
-
-            //ErrorDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lat.ToString());
-            //ErrorDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.lon.ToString());
-            //ErrorDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Error.Meters.alt.ToString());
-            //ErrorDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.E.ToString());
-            //ErrorDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.N.ToString());
-            //ErrorDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Error.H.ToString());
-            //ErrorDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.heading.ToString());
-            //ErrorDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.pitch.ToString());
-            //ErrorDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Degrees.roll.ToString());
-
-            //EstimateDataTable.LongitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lat.ToString());
-            //EstimateDataTable.LatitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.lon.ToString());
-            //EstimateDataTable.AltitudeDataRowVM.UpdateValueMessage(outputData.points[second].Estimate.Meters.alt.ToString());
-            //EstimateDataTable.V_EastDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.E.ToString());
-            //EstimateDataTable.V_NorthDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.N.ToString());
-            //EstimateDataTable.V_VerticalDataRowVM.UpdateValueMessage(outputData.velocities[second].Estimate.H.ToString());
-            ////EstimateDataTable.HeadingDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.heading.ToString());
-            ////EstimateDataTable.PitchDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.pitch.ToString());
-            ////EstimateDataTable.RollDataRowVM.UpdateValueMessage(outputData.angles[second].Error.Estimate.roll.ToString());
-        }
-
+       
         private async void SetMapView(Microsoft.Toolkit.Wpf.UI.Controls.MapControl Map)
         {
-            Geopoint maiLocation = new Geopoint(new BasicGeoposition() { Latitude = 55.811685, Longitude = 37.502471 });
-            await Map.TrySetViewAsync(maiLocation, 6);
+            Geopoint maiLocation = new Geopoint(new BasicGeoposition() { Latitude = 62.9/*55.811685*/, Longitude = 91.2/*37.502471*/ });
+            await Map.TrySetViewAsync(maiLocation, 10);
         }
         #region MapElement Events
         private void AirportsLayer_MapElementClick(MapElementsLayer sender, MapElementsLayerClickEventArgs args)

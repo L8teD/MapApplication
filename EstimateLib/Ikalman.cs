@@ -397,12 +397,12 @@ namespace EstimateLib
 
             double[] _svsErrors = new double[]
             {
-                svsMeasurements.constant.lat,
-                svsMeasurements.constant.lon,
+                svsMeasurements.constant.lon,// + svsMeasurements.SKO.lon * svsMeasurements.noise.lon,
+                svsMeasurements.constant.lat,// + svsMeasurements.SKO.lat * svsMeasurements.noise.lat,
                 svsMeasurements.constant.alt,
-                svsMeasurements.SKO.E * svsMeasurements.noise.E + svsMeasurements.constant.E,
-                svsMeasurements.SKO.N * svsMeasurements.noise.N + svsMeasurements.constant.N,
-                svsMeasurements.SKO.H * svsMeasurements.noise.H + svsMeasurements.constant.H
+                /*svsMeasurements.SKO.E * svsMeasurements.noise.E + */svsMeasurements.constant.E,
+                /*svsMeasurements.SKO.N * svsMeasurements.noise.N + */svsMeasurements.constant.N,
+                /*svsMeasurements.SKO.H * svsMeasurements.noise.H + */svsMeasurements.constant.H
             };
             Vector svsErrors = new Vector(_svsErrors);
             double[] _Z_svs = new double[]
@@ -441,6 +441,19 @@ namespace EstimateLib
             else
             {
                 P = (eyeMatrix - K * H) * S;
+                
+                //if(P[1,1] < 25)
+                //    P[1,1] = 25;
+                //if(P[2,2] < 25)
+                //    P[2,2] = 25;                
+                //if(P[3,3] < 25)
+                //    P[3,3] = 25;
+                //if(P[4,4] < 4)
+                //    P[4,4] = 4;
+                //if(P[5,5] < 4)
+                //    P[5,5] = 4;                
+                //if(P[6,6] < 4)
+                //    P[6,6] = 4;
             }
 
             G_discrete = F_discrete * G * dt; //(eyeMatrix + F*dt * 0.5 + (F*dt ^ 2) * (1.0 / 6.0)) * G*dt;

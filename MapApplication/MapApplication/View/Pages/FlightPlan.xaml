@@ -72,6 +72,22 @@
                 <Border Margin="2,5" BorderBrush="Black" BorderThickness="2" CornerRadius="4" MinHeight="50" MaxHeight="100">
                     <Button Content="Draw Full Trajectory" Style="{StaticResource btn_Style}" Command="{Binding Cmd_drawFull}"></Button>
                 </Border>
+                <Border Margin="2" BorderBrush="Black" BorderThickness="2" CornerRadius="4">
+                    <Grid MinHeight="50">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Border Margin="2,2" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Grid.Column="0">
+                            <Button Content="Start Flight Mode" Style="{StaticResource btn_Style}" Command="{Binding ExecuteNdDisplay}"></Button>
+                        </Border>
+                        <Border Margin="2,2" BorderBrush="Black" BorderThickness="2" CornerRadius="4" Grid.Column="1">
+                            <Button Content="Stop Flight Mode" Style="{StaticResource btn_Style}" Command="{Binding KillNdDisplay}"></Button>
+                        </Border>
+                    </Grid>
+                   
+                </Border>
+               
                 <Border Margin="2,10" BorderBrush="Black" BorderThickness="1" CornerRadius="4" MinHeight="250" MaxHeight="100">
                     <Grid>
                         <StackPanel Orientation="Vertical">

@@ -20,16 +20,28 @@ namespace ModellingTrajectoryLib
         List<Atmosphere> atmosphereData;
 
         Dryden dryden;
+        List<double> velocitiesE;
+        List<double> velocitiesN;
 
-        public void Init(Point _point, double[] altitudeArray, double relativeAltitude)
+        public void Init(Point _point, double[] altitudeArray, InputAirData airData)
         {
             atmosphereData = Atmosphere.ReadMAT(AltitudeMin(altitudeArray) - 0.1 * AltitudeMin(altitudeArray), 
-                AltitudeMax(altitudeArray) + 0.1 * AltitudeMax(altitudeArray), relativeAltitude);
+                AltitudeMax(altitudeArray) + 0.1 * AltitudeMax(altitudeArray), airData.relativeAltitude);
 
             airPoint = new Point(_point.lat, _point.lon, _point.alt, _point.dimension);
             prevBaroAlt = airPoint.alt;
             dryden = new Dryden();
             dryden.Init();
+
+            foreach (Atmosphere atm in atmosphereData)
+            {
+                atm.pressure.pascal += airData.pressureError;
+                atm.temperature.kelvin += airData.tempratureError;
+                atm.temperature.celcius += airData.tempratureError;
+            }
+
+            velocitiesE = new List<double>();
+            velocitiesN = new List<double>();
         }
         public Vector GetDrydenComponent(InputWindData windData, Velocity modellingAirspeed, Matrix C, DrydenInput drydenInput)
         {
@@ -42,10 +54,11 @@ namespace ModellingTrajectoryLib
         public void Model(Parameters parameters, InputWindData windData, ref InputAirData airData, DrydenInput drydenInput,
                             ref PointSet kvsPoints, ref VelocitySet kvsVelocities, ref MeasurementsErrors measurements)
         {
-            Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));
-            airData.temperatureCelcius = atmosphere.temperature.celcius;
+            Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));          
             double relativeAltitude = airData.relativeAltitude;
             Atmosphere atmZero = atmosphereData.Find(item => item.altitude.geometric == relativeAltitude);
+
+            airData.temperatureCelcius = atmosphere.temperature.celcius;
             Velocity windSpeed = new Velocity(windData.wind_e, windData.wind_n, windData.wind_d);
 
             Velocity modellingAirSpeed = new Velocity(
@@ -53,13 +66,13 @@ namespace ModellingTrajectoryLib
                                             parameters.velocity.N - windSpeed.N,
                                             parameters.velocity.H - windSpeed.H);
 
-            Vector randWind = /*Vector.Zero(3);*/GetDrydenComponent(windData, modellingAirSpeed, parameters.C, drydenInput);
+            Vector randWind = Vector.Zero(3); //GetDrydenComponent(windData, modellingAirSpeed, parameters.C, drydenInput);
 
             modellingAirSpeed.E += randWind[2];
             modellingAirSpeed.N += randWind[1];
             modellingAirSpeed.H += randWind[3];
 
-            double Pd = GetDynamicPressure(atmosphere, modellingAirSpeed, parameters.gravAcceleration, airData.pressureError);
+            double Pd = GetDynamicPressure(atmosphere, modellingAirSpeed, parameters.gravAcceleration);
            
             double M = GetM(Pd, atmosphere);
 
@@ -72,6 +85,7 @@ namespace ModellingTrajectoryLib
 
             double baroAltitudeWithoutError = GetBaroAltitude(atmosphere, atmZero, airData);
             double baroAltitude = baroAltitudeWithoutError + baroAltError;
+
             Velocity error_AirspeedConstant = new Velocity(error_AirspeedConstantValue, parameters.angles, parameters.dt);
             modellingAirSpeed.E += error_AirspeedConstant.E + measurements.SKO.E * measurements.noise.E;
             modellingAirSpeed.N += error_AirspeedConstant.N + measurements.SKO.N * measurements.noise.N;
@@ -81,17 +95,11 @@ namespace ModellingTrajectoryLib
                                                 modellingAirSpeed.N + windSpeed.N,
                                                 modellingAirSpeed.H + windSpeed.H);
 
-            AbsoluteOmega absOmega = new AbsoluteOmega(recountSpeed, parameters.earthModel, airPoint);
+            //double errorE = recountSpeed.E - parameters.velocity.E;
+            //double errorN = recountSpeed.N - parameters.velocity.N;
+            //double errorH = recountSpeed.H - parameters.velocity.H;
 
-            airPoint = Point.GetCoords(airPoint, absOmega, recountSpeed, parameters.dt);
-            airPoint.alt = baroAltitude;
-
-            kvsPoints = new PointSet();
-
-            kvsPoints.Real = new PointValue(airPoint, parameters.earthModel, airPoint);
-            kvsPoints.Error = new PointValue(
-                new Point(parameters.point.lat - airPoint.lat, parameters.point.lon - airPoint.lon, baroAltError, Dimension.Radians),
-                parameters.earthModel, parameters.point);
+            
 
             kvsVelocities = new VelocitySet();
             kvsVelocities.Real = new VelocityValue(recountSpeed.E, recountSpeed.N, recountSpeed.H);
@@ -101,13 +109,50 @@ namespace ModellingTrajectoryLib
                 recountSpeed.H - parameters.velocity.H);
 
 
+            velocitiesE.Add(kvsVelocities.Error.Value.E);
+            velocitiesN.Add(kvsVelocities.Error.Value.N);
+
+            //velocitiesH.Add(kvsVelocities.Error.Value.H);
+            if (/*airData.isCompensation == 1 ||*/ airData.isCompensation == 0)
+            {
+                if (velocitiesE.Count > 5)
+                    kvsVelocities.Estimate = new VelocityValue(Common.Aproximate(velocitiesE, 3)[velocitiesE.Count],
+                                                               Common.Aproximate(velocitiesN, 3)[velocitiesN.Count],
+                                                               0);
+                else
+                    kvsVelocities.Estimate = new VelocityValue(0, 0, 0);
+            }
+            else
+                kvsVelocities.Estimate = new VelocityValue(0, 0, 0);
+
+
+            Velocity aproximatedVelocity = new Velocity
+                (
+                    recountSpeed.E - kvsVelocities.Estimate.Value.E,
+                    recountSpeed.N - kvsVelocities.Estimate.Value.N,
+                    recountSpeed.H
+                );
+            AbsoluteOmega absOmega = new AbsoluteOmega(aproximatedVelocity, parameters.earthModel, airPoint);
+            airPoint = Point.GetCoords(airPoint, absOmega, aproximatedVelocity, parameters.dt);
+            airPoint.alt = baroAltitude;
+
+            kvsPoints = new PointSet();
+            
+            kvsPoints.Real = new PointValue(airPoint, parameters.earthModel, airPoint);
+            kvsPoints.Error = new PointValue(
+                new Point(parameters.point.lat - airPoint.lat, parameters.point.lon - airPoint.lon, baroAltError, Dimension.Radians),
+                parameters.earthModel, parameters.point);
+
+           
+
+
             kvsPoints.Ideal = new PointValue(new Point(0, 0, baroAltitudeWithoutError, Dimension.Radians), parameters.earthModel, parameters.point);
             kvsVelocities.Ideal = new VelocityValue(parameters.velocity.E - error_AirspeedConstant.E - measurements.SKO.E * measurements.noise.E, 
                                                     parameters.velocity.N - error_AirspeedConstant.N - measurements.SKO.N * measurements.noise.N,
                                                     parameters.velocity.H - error_AirspeedConstant.H - measurements.SKO.H * measurements.noise.H);
 
-            measurements.constant.lat = kvsPoints.Error.Value.Meters.lat;// + measurements.SKO.lat * measurements.noise.lat;
-            measurements.constant.lon = kvsPoints.Error.Value.Meters.lon;// + measurements.SKO.lon * measurements.noise.lon;
+            measurements.constant.lat = kvsPoints.Error.Value.Meters.lat + measurements.SKO.lat * measurements.noise.lat;
+            measurements.constant.lon = kvsPoints.Error.Value.Meters.lon + measurements.SKO.lon * measurements.noise.lon;
             measurements.constant.alt = kvsPoints.Error.Value.Meters.alt;
 
             measurements.constant.E = error_AirspeedConstant.E;
@@ -131,13 +176,13 @@ namespace ModellingTrajectoryLib
         {
             double ksi = 1.0;
             double mErrComponent = 2.0 / 5.0 * ksi * M * machErr / (1.0 + ksi * M * M / 5.0);
-            return airData.pressureIndicatorError - mErrComponent;
+            return airData.pressureIndicatorError + airData.tempratureError / (airData.temperatureCelcius + 273.15) - mErrComponent;
         }
         private double GetAirspeedError(Atmosphere atm, InputAirData airData, double M, double machErr)
         {
             double ksi = 1.0;
 
-            double tComponent = airData.pressureIndicatorError / 2.0;
+            double tComponent = airData.pressureIndicatorError / 2.0 + airData.tempratureError / atm.temperature.kelvin;
             double mComponent = machErr / M;
             double mErrComponent = ksi * M * machErr / (1.0 - ksi * M * M / 5.0);
 
@@ -148,13 +193,13 @@ namespace ModellingTrajectoryLib
         {
             double chisl = Math.Sqrt(2 / (adiabaticKoef - 1)) * Pd / atm.pressure.pascal;
             double znamen = adiabaticKoef * M * Math.Pow(Pd / atm.pressure.pascal + 1.0, 1.0 / adiabaticKoef);
-            double mnoj = airData.pressureIndicatorError - airData.pressureError / atm.pressure.pascal;
+            double mnoj = airData.pressureIndicatorError + airData.tempratureError / atm.temperature.kelvin - airData.pressureError / atm.pressure.pascal;
 
             return mnoj * chisl / znamen;
         }
-        private double GetDynamicPressure(Atmosphere atm, Velocity vel, GravitationalAcceleration gravAcc, double dP)
+        private double GetDynamicPressure(Atmosphere atm, Velocity vel, GravitationalAcceleration gravAcc)
         {
-            double Ps_meters = Converter.PascalToKgM(atm.pressure.pascal) + dP;
+            double Ps_meters = Converter.PascalToKgM(atm.pressure.pascal);
             double massDensity = atm.density / Math.Abs(gravAcc.Z);
             double speed = Converter.MeterPerSecToKmPerHour(vel.module);
 

@@ -36,10 +36,7 @@ namespace ModellingTrajectoryLib
         double dVelocityOnFullTurn;
         double dVelocityOnEveryIteration;
 
-        int CountOfWindCall = 0;
         Point[] startedPoints;
-
-        bool turnHappened = false;
 
         internal void InitStartedData(double[] latArray, double[] lonArray, double[] altArray, double[] velocity)
         {
@@ -63,11 +60,11 @@ namespace ModellingTrajectoryLib
             velAbs = new double[velocity.Length - 1];
             for (int i = 1; i < velocity.Length; i++)
             {
-                if (velocity[i - 1] >= 222)
-                    velocity[i - 1] = 222;
-                else if (velocity[i] <= 50)
-                    velocity[i - 1] = 50;
-                velAbs[i - 1] = Converter.KmPerHourToMeterPerSec(velocity[i - 1]);
+                if (velocity[i-1] >= 150)
+                    velocity[i-1] = 150;
+                else if (velocity[i-1] <= 30)
+                    velocity[i-1] = 30;
+                velAbs[i-1] = Converter.KmPerHourToMeterPerSec(velocity[i-1]);
             }
         }
         private double[] MakeArray(int length)
@@ -108,12 +105,7 @@ namespace ModellingTrajectoryLib
         internal void CheckParamsBetweenPPM(int k, Point lastPoint, double velocityValue)
         {
             ComputeParamsBetweenPPM(k, lastPoint, velocityValue);
-            turnHappened = false;
-            //if (turnHappened)
-            //{
-            //    ComputeParamsBetweenPPM(k);
-            //    turnHappened = false;
-            //}
+
         }
         private void ComputeParamsBetweenPPM(int wpNumber, Point lastPoint, double velocityValue = 0)
         {
@@ -188,8 +180,6 @@ namespace ModellingTrajectoryLib
             numberOfIterations = (int)(timeTurnInt / dt);
             dHeading = UR / numberOfIterations;
 
-            turnHappened = true;
-
             //dRollOnTurn = (rollTarget / numberOfIterations) * 2;
 
             dVelocityOnFullTurn = velAbs[k + 1] - velAbs[k];
@@ -202,7 +192,7 @@ namespace ModellingTrajectoryLib
         internal void SetTurnAngles(int k, double dt, double altitude)
         {
             roll[k] = rollTarget;
-            double velocityValue = velAbs[k] + dVelocityOnEveryIteration;
+            double velocityValue = velAbs[k];// + dVelocityOnEveryIteration;
             double distTurn = velocityValue * dt;
             pitch[k] = Math.Atan2((startedPoints[k + 1].alt - altitude) / numberOfIterations, distTurn);
             heading[k] += dHeading;

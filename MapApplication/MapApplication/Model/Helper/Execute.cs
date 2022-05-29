@@ -26,6 +26,24 @@ namespace MapApplication.Model.Helper
         {
             Init(initData);
             trajectoryModelling.GetOutputs(ref Output);
+
+            //List<VelocityCSV> velocitiesCSV = new List<VelocityCSV>();
+            //foreach(VelocitySet velocities in Output.Default.ActualTrack.KVS.velocities)
+            //{
+            //    velocitiesCSV.Add(new VelocityCSV()
+            //    {
+            //        E = velocities.Error.Value.E,
+            //        N = velocities.Error.Value.N,
+            //        H = velocities.Error.Value.H
+            //    });
+            //}
+            //Common.WriteCSV(velocitiesCSV, @"..\..\..\..\matlab_scripts\test_csv\velSVS.csv");
+        }
+        private class VelocityCSV
+        {
+            public double E { get; set; }
+            public double N { get; set; }
+            public double H { get; set; }
         }
         private static void SetInputs(InitData initData, ref Input input)
         {
@@ -59,7 +77,6 @@ namespace MapApplication.Model.Helper
             airData.pressureIndicatorError = initData.airInfo[1].Value;
             airData.coordSKO = initData.airInfo[2].Value;
             airData.velSKO = initData.airInfo[3].Value;
-
 
             airData.pressureError = initData.windInfo[3].Value;
             airData.tempratureError = initData.windInfo[4].Value;

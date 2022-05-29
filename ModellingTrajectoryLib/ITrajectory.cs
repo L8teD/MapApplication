@@ -132,7 +132,7 @@ namespace ModellingTrajectoryLib
             input.wind = wind;
             input.INS = INS;
             courseAir = new CourseAirReckoning();
-            courseAir.Init(parameters.point, input.trajectory.altitude, air.relativeAltitude);
+            courseAir.Init(parameters.point, input.trajectory.altitude, air);
         }
         public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements)
         {

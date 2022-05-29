@@ -71,6 +71,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ModellingTrajectoryLib\bin\Debug\ModellingTrajectoryLib.dll</HintPath>
     </Reference>
+    <Reference Include="MyMatrix, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Projects\MyMatrix\MyMatrix\bin\Debug\MyMatrix.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -96,13 +100,10 @@
     <Compile Include="Model\Helper\Execute.cs" />
     <Compile Include="Model\Helper\Logger.cs" />
     <Compile Include="Model\Helper\PlotWorker.cs" />
-    <Compile Include="Model\Helper\Saver.cs" />
+    <Compile Include="ViewModel\DataClasses\TableParameter.cs" />
     <Compile Include="ViewModel\DataClasses\WindInfo.cs" />
+    <Compile Include="ViewModel\FlightDataVM.cs" />
     <Compile Include="ViewModel\PlotPageVM.cs" />
-    <Compile Include="ViewModel\UserControlsViewModels\DataRowVM.cs" />
-    <Compile Include="ViewModel\UserControlsViewModels\DataRowWithChangesVM.cs" />
-    <Compile Include="ViewModel\UserControlsViewModels\DataTableVM.cs" />
-    <Compile Include="ViewModel\UserControlsViewModels\DataTableWithChangesVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\PlotTableVM.cs" />
     <Compile Include="View\Pages\DebugMode.xaml.cs">
       <DependentUpon>DebugMode.xaml</DependentUpon>

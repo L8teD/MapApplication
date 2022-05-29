@@ -82,7 +82,7 @@
                         </ie:EventTrigger>
                     </ie:Interaction.Triggers>
                 </ComboBox>
-                <Button Content="Difference" Command="{Binding DifferenceClick}" Style="{StaticResource btn_Style2}"></Button>
+                <Button Content="Difference" Command="{Binding DifferenceClick}" Style="{StaticResource btn_Style2}" MinHeight="40" Margin="10,20"></Button>
             </StackPanel>
             
         </Border>

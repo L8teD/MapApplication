@@ -7,13 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommonLib
 {
-    public class Common 
-    {
-        public static bool IsGardenRingRoad(double lat, double lon)
-        {
-            return lat > 55.73 && lat < 55.768 && lon > 37.594 && lon < 37.6278;
-        }
-    }
+    
     public class Import
     {
         

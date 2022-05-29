@@ -41,9 +41,8 @@ namespace MapApplication.ViewModel
                 LegendSize = new OxySize(1000, 800),
                 LegendBorderThickness = 2,
                 LegendFontWeight = 12,
-                LegendFontSize = 16
+                LegendFontSize = 26
             });
-
             var bitmap = pngExporter.ExportToBitmap(MyPlotModel);
             Clipboard.SetImage(bitmap);
             MyPlotModel.Legends.Clear();
@@ -100,6 +99,7 @@ namespace MapApplication.ViewModel
         private void RefreshAxes(string xAxisTitle, string yAxisTitle)
         {
             MyPlotModel.Axes.Clear();
+
             CreateAxes(xAxisTitle, yAxisTitle);
         }
         private void CreateAxes(string xAxisTitle, string yAxisTitle)
@@ -109,7 +109,8 @@ namespace MapApplication.ViewModel
                 MajorGridlineStyle = LineStyle.Dash,
                 MajorGridlineColor = OxyColors.Gray,
                 Position = AxisPosition.Left,
-                Title = yAxisTitle
+                Title = yAxisTitle,
+                FontSize = 22
             };
             yAxis.AxisChanged += Y_Axis_AxisChanged;
 
@@ -118,11 +119,13 @@ namespace MapApplication.ViewModel
                 MajorGridlineStyle = LineStyle.Dash,
                 MajorGridlineColor = OxyColors.Gray,
                 Position = AxisPosition.Bottom,
-                Title = xAxisTitle
+                Title = xAxisTitle,
+                FontSize = 22
             };
             xAxis.AxisChanged += X_Axis_AxisChanged;
             MyPlotModel.Axes.Add(yAxis);
             MyPlotModel.Axes.Add(xAxis);
+            MyPlotModel.TitleFontSize = 28;
         }
         private void RefreshGrid(LinearAxis axis)
         {

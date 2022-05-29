@@ -39,6 +39,7 @@ namespace CommonLib
         public double temperatureCelcius;
         public double coordSKO;
         public double velSKO;
+        public double isCompensation;
     }
     #region InitErrors Struct
     public struct InsErrors
@@ -186,6 +187,7 @@ namespace CommonLib
     {
         public TrackData DesiredTrack;
         public TrackData ActualTrack;
+        //public TrackData AdditionalTrack;
     }
     public struct T_OutputFull
     {

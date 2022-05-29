@@ -1,4 +1,5 @@
-﻿using MapApplication.ViewModel;
+﻿using CommonLib;
+using MapApplication.ViewModel;
 using OxyPlot;
 using System;
 using System.Collections.Generic;
@@ -110,6 +111,13 @@ namespace MapApplication.Model
             xAxisName = "time, sec";
             yAxisName = PlotWorker.SelectPlotName(_name) + ", " + PlotWorker.SelectPlotDimension(_name, character);
             values = new List<DataPoint>();
+            //if (_name == PlotName.VelocityEast && _source == Source.KVS && _character == PlotCharacter.Estimate && _values.Count > 0)
+            //{
+            //    MyMatrix.Vector x = Common.Aproximate(_values, 3);
+            //    _values.Clear();
+            //    for (int i = 0; i < x.Length; i++)
+            //        _values.Add(x[i+1]);
+            //}
             for (int i = 0; i < _values.Count; i++)
             {
                 values.Add(new DataPoint(i, _values[i]));
@@ -120,6 +128,7 @@ namespace MapApplication.Model
     {
         DesiredTrack,
         ActualTrack
+        //AdditionalTrack
     }
     public enum Source
     {
