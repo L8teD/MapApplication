@@ -41,7 +41,41 @@ namespace MapApplication.ViewModel
                 LegendSize = new OxySize(1000, 800),
                 LegendBorderThickness = 2,
                 LegendFontWeight = 12,
-                LegendFontSize = 26
+                LegendFontSize = 26,
+            });
+            var bitmap = pngExporter.ExportToBitmap(MyPlotModel);
+            Clipboard.SetImage(bitmap);
+            MyPlotModel.Legends.Clear();
+        }
+        private void SetPlotParameter(ref string item, string value)
+        {
+            if(value != default(string))
+                item = value;
+        }
+        public void SaveToClipBoard(string title, string[] axesNames, string[] seriesNames, int legendPosition)
+        {
+            var pngExporter = new PngExporter { Width = 1460, Height = 900 };
+            MyPlotModel.Background = OxyColors.White;
+            for (int i = 0; i < MyPlotModel.Axes.Count; i++)
+            {
+                if (axesNames[i] != default(string))
+                    MyPlotModel.Axes[i].Title = axesNames[i];
+            }
+            for (int i = 0; i < MyPlotModel.Series.Count; i++)
+            {
+                if (seriesNames[i] != default(string))
+                    MyPlotModel.Series[i].Title = seriesNames[i];
+            }
+            MyPlotModel.Title = title;
+            MyPlotModel.TitleFontSize = 50;
+            MyPlotModel.Legends.Add(new Legend
+            {
+                LegendPosition = (LegendPosition)legendPosition,
+                LegendBorder = OxyColors.Black,
+                LegendSize = new OxySize(1000, 800),
+                LegendBorderThickness = 2,
+                LegendFontWeight = 16,
+                LegendFontSize = 36,
             });
             var bitmap = pngExporter.ExportToBitmap(MyPlotModel);
             Clipboard.SetImage(bitmap);
@@ -110,7 +144,8 @@ namespace MapApplication.ViewModel
                 MajorGridlineColor = OxyColors.Gray,
                 Position = AxisPosition.Left,
                 Title = yAxisTitle,
-                FontSize = 22
+                FontSize = 40,
+                FontWeight = 18
             };
             yAxis.AxisChanged += Y_Axis_AxisChanged;
 
@@ -120,7 +155,9 @@ namespace MapApplication.ViewModel
                 MajorGridlineColor = OxyColors.Gray,
                 Position = AxisPosition.Bottom,
                 Title = xAxisTitle,
-                FontSize = 22
+                FontSize = 40,
+                FontWeight = 18,
+                MajorStep = 200
             };
             xAxis.AxisChanged += X_Axis_AxisChanged;
             MyPlotModel.Axes.Add(yAxis);
@@ -129,7 +166,8 @@ namespace MapApplication.ViewModel
         }
         private void RefreshGrid(LinearAxis axis)
         {
-            axis.MajorStep = Math.Abs(axis.ActualMaximum - axis.ActualMinimum) / 10;
+            axis.MajorStep = Math.Abs(Math.Round(axis.ActualMaximum, MidpointRounding.ToEven) - 
+                Math.Round(axis.ActualMinimum, MidpointRounding.ToEven)) / 10;
         }
         private void X_Axis_AxisChanged(object sender, AxisChangedEventArgs e)
         {

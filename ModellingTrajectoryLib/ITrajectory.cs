@@ -14,7 +14,7 @@ namespace ModellingTrajectoryLib
     public interface ITrajectory
     {
         void Init(Input input, InputAirData air, InputWindData wind, InsErrors ins);
-        void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements);
+        void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements, bool turnIsHappened);
         Action<IKalman> FillOutputsData { get; set; }
         PointSet OutPoints { get; set; }
         VelocitySet OutVelocities { get; set; }
@@ -134,7 +134,7 @@ namespace ModellingTrajectoryLib
             courseAir = new CourseAirReckoning();
             courseAir.Init(parameters.point, input.trajectory.altitude, air);
         }
-        public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements)
+        public void Track(int wpNumber, ModellingFunctions functions, DrydenInput drydenInput, ref MeasurementsErrors measurements, bool turnIsHappened)
         {
             parameters.dt = input.INS.dt;
 
@@ -142,7 +142,7 @@ namespace ModellingTrajectoryLib
 
             ComputeParametersData(wpNumber, functions);
 
-            courseAir.Model(parameters, input.wind, ref input.air, drydenInput, ref kvsPoints, ref kvsVelocities, ref measurements);
+            courseAir.Model(parameters, input.wind, ref input.air, drydenInput, ref kvsPoints, ref kvsVelocities, ref measurements, turnIsHappened);
 
             localParams.Add(parameters);
         }

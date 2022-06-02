@@ -87,7 +87,11 @@ namespace MapApplication.Model
         public ObservableCollection<EquipmentData> windInfoDryden { get; set; }
         public ObservableCollection<EquipmentData> windInfo { get; set; }
     }
-
+    public class ReportData
+    {
+        public ObservableCollection<EquipmentData> trajectorySettings { get;set; }
+        public ObservableCollection<EquipmentData> weatherSettings { get;set; }
+    }
     public enum DataSource
     {
         twoChannel,

@@ -104,6 +104,7 @@
     <Compile Include="ViewModel\DataClasses\WindInfo.cs" />
     <Compile Include="ViewModel\FlightDataVM.cs" />
     <Compile Include="ViewModel\PlotPageVM.cs" />
+    <Compile Include="ViewModel\PlotParametersVM.cs" />
     <Compile Include="ViewModel\UserControlsViewModels\PlotTableVM.cs" />
     <Compile Include="View\Pages\DebugMode.xaml.cs">
       <DependentUpon>DebugMode.xaml</DependentUpon>
@@ -119,6 +120,9 @@
     </Compile>
     <Compile Include="View\Pages\PlotPage.xaml.cs">
       <DependentUpon>PlotPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PlotParameters.xaml.cs">
+      <DependentUpon>PlotParameters.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\PlotWindow.xaml.cs">
       <DependentUpon>PlotWindow.xaml</DependentUpon>
@@ -196,6 +200,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Pages\PlotPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\PlotParameters.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -335,6 +343,9 @@
     <Resource Include="AnotherFiles\Images\FillNote.png" />
     <Resource Include="AnotherFiles\Images\Note.png" />
     <Resource Include="AnotherFiles\Images\Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AnotherFiles\Images\tools.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Windows.Devices.Geolocation;
@@ -184,6 +184,7 @@ namespace MapApplication.Model
                 SetTableData.Invoke(indicatedData);
                 CreatePlotData();
                 RefreshPlots();
+                MessageBox.Show("END");
             }
             catch (Exception ex)
             {
@@ -310,20 +311,20 @@ namespace MapApplication.Model
             wayPoint.Velocity = 65;
             AddWayPoint(wayPointList, wayPoint);
             #endregion
-            #region wp#4
-            wayPoint.Latitude = 62.8207900360936;
-            wayPoint.Longitude = 91.3519291018104;
-            wayPoint.Altitude = 70;
-            wayPoint.Velocity = 50;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
-            #region wp#5
-            wayPoint.Latitude = 62.8014115778896;
-            wayPoint.Longitude = 91.2413854372366;
-            wayPoint.Altitude = 65;
-            wayPoint.Velocity = 75;
-            AddWayPoint(wayPointList, wayPoint);
-            #endregion
+            //#region wp#4
+            //wayPoint.Latitude = 62.8407900360936;
+            //wayPoint.Longitude = 91.3519291018104;
+            //wayPoint.Altitude = 70;
+            //wayPoint.Velocity = 50;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
+            //#region wp#5
+            //wayPoint.Latitude = 62.8414115778896;
+            //wayPoint.Longitude = 91.2413854372366;
+            //wayPoint.Altitude = 65;
+            //wayPoint.Velocity = 75;
+            //AddWayPoint(wayPointList, wayPoint);
+            //#endregion
             #region wp#6
             wayPoint.Latitude = 62.8700769498838;
             wayPoint.Longitude = 91.239128868378;
@@ -479,6 +480,32 @@ namespace MapApplication.Model
         {
             return new WayPoint() { Latitude = 55, Longitude = 37, Altitude = 200, Velocity = 100 };
         }
+        public ReportData SetReportData()
+        {
+            ReportData reportData = new ReportData();
+
+            reportData.trajectorySettings = new ObservableCollection<EquipmentData>();
+            reportData.weatherSettings = new ObservableCollection<EquipmentData>();
+
+            reportData.trajectorySettings.Add(new EquipmentData() { Name = "Ground speed", Value = 60, Dimension = "[m/sec]" });
+            reportData.trajectorySettings.Add(new EquipmentData() { Name = "Air speed", Value = 50, Dimension = "[m/sec]" });
+            reportData.trajectorySettings.Add(new EquipmentData() { Name = "Vertical velocity", Value = 0, Dimension = "[m/sec]" });
+            reportData.trajectorySettings.Add(new EquipmentData() { Name = "Target altitude", Value = 150, Dimension = "[m]" });
+            reportData.trajectorySettings.Add(new EquipmentData() { Name = "Target heading", Value = 320, Dimension = "[deg]" });
+
+
+
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "Wind speed", Value = 2, Dimension = "[m/sec]" });
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "Wind angle", Value = 45, Dimension = "[deg]" });
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "Pressure", Value = 100190, Dimension = "[P]" });
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "Temperature", Value = 25, Dimension = "[◦C]" });
+
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "σ_u", Value = 1.06, Dimension = "[m/s]" });
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "σ_v", Value = 1.06, Dimension = "[m/s]" });
+            reportData.weatherSettings.Add(new EquipmentData() { Name = "σ_w", Value = 0.7, Dimension = "[m/s]" });
+
+            return reportData;
+        }
         public InitData SetInputErrors(InitData initData)
         {
             initData.insErrors = new ObservableCollection<EquipmentData>();
@@ -546,9 +573,9 @@ namespace MapApplication.Model
             initData.windInfo.Add(new EquipmentData() { Name = "ΔP", Value = 5, Dimension = "[P]" });
             initData.windInfo.Add(new EquipmentData() { Name = "ΔT", Value = 0.2, Dimension = "[K]" });
 
-            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_u", Value = 1.06, Dimension = "[m/s]" });
-            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_v", Value = 1.06, Dimension = "[m/s]" });
-            initData.windInfoDryden.Add(new EquipmentData() { Name = "sigma_w", Value = 0.7, Dimension = "[m/s]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "σ_u", Value = 1.06, Dimension = "[m/s]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "σ_v", Value = 1.06, Dimension = "[m/s]" });
+            initData.windInfoDryden.Add(new EquipmentData() { Name = "σ_w", Value = 0.7, Dimension = "[m/s]" });
 
             initData.windInfoDryden.Add(new EquipmentData() { Name = "L_u", Value = 200, Dimension = "[m]" });
             initData.windInfoDryden.Add(new EquipmentData() { Name = "L_v", Value = 200, Dimension = "[m]" });

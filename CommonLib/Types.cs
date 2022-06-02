@@ -187,7 +187,7 @@ namespace CommonLib
     {
         public TrackData DesiredTrack;
         public TrackData ActualTrack;
-        //public TrackData AdditionalTrack;
+        public TrackData AdditionalTrack;
     }
     public struct T_OutputFull
     {

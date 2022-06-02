@@ -15,7 +15,7 @@ namespace ModellingTrajectoryLib
         public T_OutputFull Output = new T_OutputFull();
         private IKalman ActualFeedbackKalman;
         private IKalman ActualKalman;
-        private IKalman AdditionalKalman;
+        //private IKalman AdditionalKalman;
         private IKalman DesiredFeedbackKalman;
         private IKalman DesiredKalman;
 
@@ -62,7 +62,7 @@ namespace ModellingTrajectoryLib
             ActualFeedbackKalman = new KalmanFeedbackModel();
             ActualKalman = new KalmanModel();
 
-            AdditionalKalman = new KalmanModel();
+            //AdditionalKalman = new KalmanModel();
 
             InputAirData zeroInputAirData = input.air;
             InputWindData zeroInputWindData = input.wind;
@@ -83,6 +83,7 @@ namespace ModellingTrajectoryLib
         }
         public void Model()
         {
+            bool turnIsHappened = false;
             for (int wpNumber = 0; wpNumber < wayPointsCount - 1; wpNumber++)
             {
                 double LUR_Distance = functions.GetLUR(wpNumber, wayPointsCount - 2);
@@ -96,11 +97,11 @@ namespace ModellingTrajectoryLib
                     drydenInput.rand3 = randomize.GetRandom();
 
                     SetMeasurements();
-                    desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
-                    actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
-                    //additionalTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
+                    desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
+                    actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
+                    //additionalTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
                     Kalman();
-
+                    turnIsHappened = false;
                     PPM_DisctancePrev = PPM_Distance;
                     double ortDistAngleCurrent = functions.ComputeOrtDistAngle(desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians, wpNumber);
                     PPM_Distance = functions.GetPPM(ortDistAngleCurrent);
@@ -121,6 +122,7 @@ namespace ModellingTrajectoryLib
                 }
                 if (functions.TurnIsAvailable(wpNumber, wayPointsCount - 2))
                 {
+                    turnIsHappened = true;
                     functions.InitTurnVariables(wpNumber, input.INS.dt);
                     for (double j = 0; functions.TurnIsNotEnded(j); j += input.INS.dt)
                     {
@@ -130,11 +132,13 @@ namespace ModellingTrajectoryLib
                         drydenInput.rand3 = randomize.GetRandom();
                         SetMeasurements();
                         functions.SetTurnAngles(wpNumber, input.INS.dt, desiredTrack.OutPoints.Ideal.GetValueOrDefault().Radians.alt);
-                        desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
-                        actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
-                        //additionalTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements);
+                        desiredTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
+                        actualTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
+                        //additionalTrack.Track(wpNumber, functions, drydenInput, ref svsMeasurements, turnIsHappened);
+                        turnIsHappened = false;
                         Kalman();
                     }
+                    turnIsHappened = true;
                 }
             }
         }
@@ -240,9 +244,9 @@ namespace ModellingTrajectoryLib
                 //                                                desiredTrack.OutPoints.Ideal.GetValueOrDefault().Degrees.lon);
             }
 
-            desiredTrack.Estimation(DesiredKalman, correctorCounter % 2 == 0, gnssMeasurements, svsMeasurements, input.INS);
+            desiredTrack.Estimation(DesiredKalman, !(correctorCounter % 4 == 0), gnssMeasurements, svsMeasurements, input.INS);
             //desiredTrack.Estimation(DesiredFeedbackKalman, !isGardenRoad, gnssMeasurements, svsMeasurements, input.INS);
-            actualTrack.Estimation(ActualKalman, correctorCounter % 2 == 0, gnssMeasurements, svsMeasurements, input.INS);
+            actualTrack.Estimation(ActualKalman, !(correctorCounter % 4 == 0), gnssMeasurements, svsMeasurements, input.INS);
             //additionalTrack.Estimation(AdditionalKalman, !isGardenRoad, gnssMeasurements, svsMeasurements, input.INS);
             //actualTrack.Estimation(ActualFeedbackKalman, correctorCounter % 2 == 0, gnssMeasurements, svsMeasurements, input.INS);
             correctorCounter++;
@@ -325,7 +329,7 @@ namespace ModellingTrajectoryLib
             data = new T_Output();
             CreateOutputData(ref data.DesiredTrack);
             CreateOutputData(ref data.ActualTrack);
-            //CreateOutputData(ref data.AdditionalTrack);
+            CreateOutputData(ref data.AdditionalTrack);
         }
 
     }

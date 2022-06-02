@@ -22,6 +22,7 @@ namespace MapApplication.ViewModel
     {
         private Microsoft.Toolkit.Wpf.UI.Controls.MapControl Map;
         public InitData initData { get; set; }
+        public ReportData reportData { get; set; }
         public PlotTableVM PlotTable { get; set; }
 
         private MapElementsLayer airportsLayer;
@@ -340,7 +341,7 @@ namespace MapApplication.ViewModel
 
             m_Model.SetTableData += M_Model_SetTableData;
 
-
+            reportData = m_Model.SetReportData();  
             initData = m_Model.SetInputErrors(initData);
             loggerInfoList = m_Model.GetInfoFromLogger();
 

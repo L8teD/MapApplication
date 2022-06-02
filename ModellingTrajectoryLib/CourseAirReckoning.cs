@@ -52,7 +52,7 @@ namespace ModellingTrajectoryLib
             return randWind;
         }
         public void Model(Parameters parameters, InputWindData windData, ref InputAirData airData, DrydenInput drydenInput,
-                            ref PointSet kvsPoints, ref VelocitySet kvsVelocities, ref MeasurementsErrors measurements)
+                            ref PointSet kvsPoints, ref VelocitySet kvsVelocities, ref MeasurementsErrors measurements, bool turnIsHappened)
         {
             Atmosphere atmosphere = atmosphereData.Find(atm => CompareAltitude(atm.altitude.geometric, parameters.point.alt));          
             double relativeAltitude = airData.relativeAltitude;
@@ -66,7 +66,7 @@ namespace ModellingTrajectoryLib
                                             parameters.velocity.N - windSpeed.N,
                                             parameters.velocity.H - windSpeed.H);
 
-            Vector randWind = Vector.Zero(3); //GetDrydenComponent(windData, modellingAirSpeed, parameters.C, drydenInput);
+            Vector randWind = /*Vector.Zero(3); //*/GetDrydenComponent(windData, modellingAirSpeed, parameters.C, drydenInput);
 
             modellingAirSpeed.E += randWind[2];
             modellingAirSpeed.N += randWind[1];
@@ -108,16 +108,21 @@ namespace ModellingTrajectoryLib
                 recountSpeed.N - parameters.velocity.N,
                 recountSpeed.H - parameters.velocity.H);
 
+            //if (turnIsHappened)
+            //{
+            //    velocitiesE.Clear();
+            //    velocitiesN.Clear();
+            //}
 
             velocitiesE.Add(kvsVelocities.Error.Value.E);
             velocitiesN.Add(kvsVelocities.Error.Value.N);
 
             //velocitiesH.Add(kvsVelocities.Error.Value.H);
-            if (/*airData.isCompensation == 1 ||*/ airData.isCompensation == 0)
+            if (airData.isCompensation == 0 || airData.isCompensation == 1)
             {
-                if (velocitiesE.Count > 5)
-                    kvsVelocities.Estimate = new VelocityValue(Common.Aproximate(velocitiesE, 3)[velocitiesE.Count],
-                                                               Common.Aproximate(velocitiesN, 3)[velocitiesN.Count],
+                if (velocitiesE.Count > 10)
+                    kvsVelocities.Estimate = new VelocityValue(Common.Aproximate(velocitiesE, 10)[velocitiesE.Count],
+                                                               Common.Aproximate(velocitiesN, 10)[velocitiesN.Count],
                                                                0);
                 else
                     kvsVelocities.Estimate = new VelocityValue(0, 0, 0);

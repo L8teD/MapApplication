@@ -112,6 +112,10 @@
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="150, 0,0,0">
             <Image Source="pack://application:,,,/../AnotherFiles/Images/Save.png" Stretch="Fill" ></Image>
         </Button>
+        <Button Command="{Binding OpenPlotSettings}" Style="{StaticResource btn_Style}" Grid.Column="1"
+                MaxWidth="45" MaxHeight="40" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200, 0,0,0">
+            <Image Source="pack://application:,,,/../AnotherFiles/Images/tools.png" Stretch="Fill" ></Image>
+        </Button>
         <Button Command="{Binding Cmd_Home}" Style="{StaticResource btn_Style}" Grid.Column="1"
                 MaxWidth="45" MaxHeight="40" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Image Source="pack://application:,,,/../AnotherFiles/Images/house.png" Stretch="Fill" ></Image>

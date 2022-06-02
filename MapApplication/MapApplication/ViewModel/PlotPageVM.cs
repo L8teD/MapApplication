@@ -125,6 +125,20 @@ namespace MapApplication.ViewModel
                 }));
             }
         }
+        private RelayCommand cmd_OpenPlotSettings;
+        public RelayCommand OpenPlotSettings
+        {
+            get
+            {
+                return cmd_OpenPlotSettings ??
+                (cmd_OpenPlotSettings = new RelayCommand(obj =>
+                {
+                    PlotParameters settingWindow = new PlotParameters();
+                    settingWindow.DataContext = new PlotParametersVM(this);
+                    settingWindow.ShowDialog();
+                }));
+            }
+        }
         private RelayCommand cmd_Home;
         public RelayCommand Cmd_Home
         {
@@ -376,7 +390,7 @@ namespace MapApplication.ViewModel
                     PlotWorker.SelectData(name, character, actualPlotData.Display),
                     "Actual Track"));
             }
-            //if(additionalPlotData != null)
+            //if (additionalPlotData != null)
             //{
             //    IndicatedSeries.Add(PlotWorker.CreateLineSeries(
             //       PlotWorker.SelectData(name, character, additionalPlotData.Display),
